@@ -1,0 +1,122 @@
+// Copyright 2023 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.owner.v1beta1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// A user on the BSR.
+//
+// A name uniquely identifies a User, however name is mutable.
+message User {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id for the User.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The time the User was created.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The last time the User was updated.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  // The name of the User.
+  string name = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255
+  ];
+  // The type of the User.
+  UserType type = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The state of the User.
+  UserState state = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The role that the User has at the BSR instance level.
+  UserServerRole server_role = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The configurable description of the User.
+  string description = 8 [(buf.validate.field).string.max_len = 1023];
+  // The configurable URL that represents the homepage for a User.
+  string url = 9 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.max_len = 1023
+  ];
+  // The verification status of the User.
+  UserVerificationStatus verification_status = 10 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+}
+
+// The state of the a User, either active or inactive.
+enum UserState {
+  USER_STATE_UNSPECIFIED = 0;
+  USER_STATE_ACTIVE = 1;
+  USER_STATE_INACTIVE = 2;
+}
+
+// The type of a User.
+enum UserType {
+  USER_TYPE_UNSPECIFIED = 0;
+  USER_TYPE_STANDARD = 1;
+  USER_TYPE_MACHINE = 2;
+  USER_TYPE_SYSTEM = 3;
+}
+
+// The role that the User has at the BSR instance level.
+enum UserServerRole {
+  USER_SERVER_ROLE_UNSPECIFIED = 0;
+  USER_SERVER_ROLE_STANDARD = 1;
+  USER_SERVER_ROLE_ADMIN = 2;
+}
+
+// The verification status of an User.
+enum UserVerificationStatus {
+  USER_VERIFICATION_STATUS_UNSPECIFIED = 0;
+  // The User is unverified.
+  USER_VERIFICATION_STATUS_UNVERIFIED = 1;
+  // The User is verified.
+  USER_VERIFICATION_STATUS_VERIFIED = 2;
+  // The User is an official user of the BSR owner.
+  // TODO: should this exist?
+  USER_VERIFICATION_STATUS_OFFICIAL = 3;
+}
+
+// UserRef is a reference to a User, either an id or a name.
+//
+// This is used in requests.
+message UserRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the User.
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    // The name of the User.
+    string name = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+  }
+}

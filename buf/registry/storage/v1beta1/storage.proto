@@ -1,0 +1,86 @@
+// Copyright 2023 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.storage.v1beta1;
+
+import "buf/validate/validate.proto";
+
+// A digest.
+message Digest {
+  // The type of Digest.
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    // The SHAKE-256 hash function of the SHA-3 family.
+    TYPE_SHAKE256 = 1;
+  }
+  // The type of the Digest.
+  Type type = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The value of the Digest.
+  bytes value = 2 [(buf.validate.field).required = true];
+}
+
+// Content with its associated digest.
+message Blob {
+  // The digest of the blob.
+  Digest digest = 1 [(buf.validate.field).required = true];
+  // Content is the content of the blob.
+  bytes content = 2 [(buf.validate.field).required = true];
+}
+
+// A pointer to a file that can be read or written to from disk.
+//
+// A FileNode includes a path and a digest.
+// FilesNodes are purposfully simple, and do not include attributes such as permissions.
+message FileNode {
+  // The path of the file.
+  //
+  // The path must be relative, and connect contain any "." or ".." components
+  // The separator "/" must be used.
+  //
+  // TODO: Can we encode the above requirements via validation?
+  string path = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 4096
+  ];
+  // The digest of the file.
+  //
+  // The digest is always set, even if the file is empty.
+  Digest digest = 2 [(buf.validate.field).required = true];
+}
+
+// A file that can be read or written to from disk.
+//
+// A File includes a path and associated content.
+// Files are purposfully simple, and do not include attributes such as permissions.
+message File {
+  // The path of the File.
+  //
+  // The path must be relative, and connect contain any "." or ".." components
+  // The separator "/" must be used.
+  //
+  // TODO: Can we encode the above requirements via validation?
+  string path = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 4096
+  ];
+  // Content is the content of the blob.
+  //
+  // May be empty.
+  bytes content = 2;
+}

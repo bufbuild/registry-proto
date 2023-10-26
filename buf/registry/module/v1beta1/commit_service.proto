@@ -1,0 +1,258 @@
+// Copyright 2023 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1beta1;
+
+import "buf/registry/module/v1beta1/commit.proto";
+import "buf/registry/module/v1beta1/resource.proto";
+import "buf/registry/module/v1beta1/vcs_commit.proto";
+import "buf/registry/storage/v1beta1/storage.proto";
+import "buf/validate/validate.proto";
+
+// Operate on Commits.
+service CommitService {
+  // Resolve commits by Commit ID, Module, Branch, Tag, or VCSCommit.
+  rpc ResolveCommits(ResolveCommitsRequest) returns (ResolveCommitsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List linear Commit history starting at a given Commit, Module, Branch, Tag, or VCSCommit.
+  rpc ListCommitHistory(ListCommitHistoryRequest) returns (ListCommitHistoryResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create commits on a Module with associated Content.
+  //
+  // This is used by push and sync.
+  //
+  // TODO: PushCommits? Something else? This is creating potentially a bunch of resources.
+  rpc CreateCommits(CreateCommitsRequest) returns (CreateCommitsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Get the FileNodes on a Commit for a given set of Commits, Modules, Branches, Tags, or VCSCommits.
+  //
+  // Retrieving content is a two-step process:
+  //   - Get the FileNode messages. FileNodes are a map from path to digest.
+  //   - Get the Blob messages. Blobs are a map from digest to content.
+  rpc GetFileNodes(GetFileNodesRequest) returns (GetFileNodesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get the Blobs for files within Commits for a given set of Digests.
+  rpc GetBlobs(GetBlobsRequest) returns (GetBlobsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get the digests for Blobs that are not currently stored on the server.
+  rpc GetMissingBlobDigests(GetMissingBlobDigestsRequest) returns (GetMissingBlobDigestsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message ResolveCommitsRequest {
+  // References to request a Commit for.
+  //
+  // See the documentation on ResourceRef for resource resolution details.
+  //
+  // Once the resource is resolved, this reference is interpeted to refer to the following Commit:
+  //   - If a Module is referenced, this is interpreted to mean the latest released Commit on the Module.
+  //   - If a Commit is referenced, this just references that specific commit.
+  //   - If a Tag is referenced, this is interpreted to mean the Commit associated with the Tag.
+  //   - If a VCSCommit is referenced, this is interpreted to mean the Commit associated with the VCSCommit.
+  //   - Is a Branch is referenced, this is interpreted to mean the latest Commit on the Branch.
+  repeated ResourceRef resource_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message ResolveCommitsResponse {
+  // The found Commits in the same order as requested.
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message ListCommitHistoryRequest {
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2;
+  // The reference to get the history for.
+  //
+  // See the documentation on ResourceRef for resource resolution details.
+  //
+  // Once the resource is resolved, history is started from the following Commit:
+  //   - If a Module is referenced, history is started at the latest released Commit on the Module.
+  //   - If a Commit is referenced, history is started at this Commit.
+  //   - If a Tag is referenced, history is started at the Commit associated with the Tag.
+  //   - If a VCSCommit is referenced, history is started at the Commit associated with the VCSCommit.
+  //   - Is a Branch is referenced, history is started at the latest Commit on the Branch.
+  ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
+  // Only return Commits that have one or more associated Tags.
+  bool has_tag = 4;
+  // Only return Commits that have one or more associated VCSCommits.
+  bool has_vcs_commit = 5;
+}
+
+message ListCommitHistoryResponse {
+  // The next page token.
+  //
+  /// If empty, there are no more pages.
+  string next_page_token = 1;
+  // The listed Commits.
+  repeated Commit commits = 2;
+}
+
+message CreateCommitsRequest {
+  // Information on an associated VCS commit needed to create a VCSCommit.
+  message AssociatedVCSCommit {
+    // The hash of the VCSCommit.
+    //
+    // VCS-specific.
+    // Unique within a given Module.
+    string hash = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The type of VCS.
+    VCSType type = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true
+    ];
+    // The URL of of the repository on the VCS.
+    string vcs_repository_url = 3 [(buf.validate.field).string.uri = true];
+    // The name of the author of the VCSCommit.
+    //
+    // VCS-specific: not associated with the name of Users on the BSR, for example.
+    string author_name = 4;
+    // The email of the author of the VCSCommit.
+    //
+    // VCS-specific: not associated with the Users on the BSR, for example.
+    string author_email = 5;
+    // The name of the committer of the VCSCommit.
+    //
+    // VCS-specific: not associated with the name of Users on the BSR, for example.
+    string committer_name = 6;
+    // The email of the committer of the VCSCommit.
+    //
+    // VCS-specific: not associated with the Users on the BSR, for example.
+    string committer_email = 7;
+  }
+
+  // All of the Files for the Modules that should have Commits created for them.
+  //
+  // If you have a workspace, all files from the workspace, including buf.yaml and buf.lock, should
+  // be in files. The backend will parse the buf.yaml to discover the ModuleResourceRefs.
+  repeated buf.registry.storage.v1beta1.FileNode file_nodes = 1 [(buf.validate.field).repeated.min_items = 1];
+  // Blobs for the given FileNodes.
+  //
+  // Only Blobs that were returned as missing from GetMissingBlobDigests need to be sent.
+  // Other Blobs already exist on the server, and will be ignored.
+  repeated buf.registry.storage.v1beta1.Blob missing_blobs = 2;
+  // The names of Branches that should be associated with this Commit.
+  //
+  // If a Branch currently exists on the associated Module with a name, this existing
+  // Branch will be used. Otherwise, a new Branch will be created for the corresponding name.
+  //
+  // If empty, the default branch is assumed as the only branch.
+  repeated string branch_names = 3 [(buf.validate.field).repeated.items = {
+    string: {max_len: 255}
+  }];
+  // The names of Tags that should be associated with this Commit.
+  //
+  // If a Tag currently exists on the assocated Module with a name, the RPC will error, however
+  // this will change in the future when we allow Tags to move. If the Tag does not
+  // currently exist, a new Tag will be created for each name.
+  repeated string tag_names = 4 [(buf.validate.field).repeated.items = {
+    string: {max_len: 255}
+  }];
+  // Associated VCS commit information.
+  //
+  // If there are already VCSCommits on the associated Module with a given hash, this
+  // will result in an error. Otherwise, a new VCSCommit is created.
+  repeated AssociatedVCSCommit associated_vcs_commits = 5;
+}
+
+message CreateCommitsResponse {
+  // The created Commits.
+  //
+  // If the digest was found for an pre-existing Commit, this pre-existing Commit will be returned
+  // instead of a new Commit being created.
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetFileNodesRequest {
+  // An individual request for a set of files from a single Commit, Module, Branch, Tag, or VCSCommit.
+  message Value {
+    // The reference to get files for.
+    //
+    // See the documentation on ResourceRef for resource resolution details.
+    //
+    // Once the resource is resolved, files are returned from the following Commit:
+    //   - If a Module is referenced, files are returned from the latest released Commit on the Module.
+    //   - If a Commit is referenced, files are returned from this Commit.
+    //   - If a Tag is referenced, files are returned from the Commit associated with the Tag.
+    //   - If a VCSCommit is referenced, files are returned from the Commit associated with the VCSCommit.
+    //   - Is a Branch is referenced, files are returned from the latest Commit on the Branch.
+    ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
+    // Specific file paths to retrieve.
+    //
+    // If empty, all file paths for the given reference are retrieved.
+    //
+    // The path must be relative, and connect contain any "." or ".." components
+    // The separator "/" must be used.
+    //
+    // TODO: Can we encode the above requirements via validation?
+    repeated string paths = 2 [(buf.validate.field).repeated.items = {
+      string: {max_len: 4096}
+    }];
+    // Whether to allow file paths not to exist within the given module.
+    //
+    // For example, one may want to retrieve the file paths "buf.md" and "README.md",
+    // but only expect one to actually exist.
+    //
+    // If false, it is an error to specify non-existent file paths.
+    bool allow_paths_not_exist = 3;
+  }
+  // The File sets to request.
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetFileNodesResponse {
+  // A single set of FileNodes and their associated commits.
+  message Value {
+    repeated buf.registry.storage.v1beta1.FileNode file_nodes = 1 [(buf.validate.field).repeated.min_items = 1];
+    Commit commit = 2 [(buf.validate.field).required = true];
+  }
+  // The returned File sets in the same order as requested.
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetBlobsRequest {
+  // The digests to retrieve Blobs for.
+  repeated buf.registry.storage.v1beta1.Digest digests = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetBlobsResponse {
+  // The retrieved Blobs.
+  repeated buf.registry.storage.v1beta1.Blob blobs = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetMissingBlobDigestsRequest {
+  // The digests to see if we have Blobs for.
+  repeated buf.registry.storage.v1beta1.Digest digests = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetMissingBlobDigestsResponse {
+  // The digests that are missing.
+  repeated buf.registry.storage.v1beta1.Digest missing_blob_digests = 1;
+}

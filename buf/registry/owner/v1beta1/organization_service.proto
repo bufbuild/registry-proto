@@ -1,0 +1,140 @@
+// Copyright 2023 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.owner.v1beta1;
+
+import "buf/registry/owner/v1beta1/organization.proto";
+import "buf/registry/owner/v1beta1/user.proto";
+import "buf/validate/validate.proto";
+
+// Operate on Organizations
+service OrganizationService {
+  // Get Organizations by id or name.
+  rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List Organizations, usually by User.
+  rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create new Organizations.
+  rpc CreateOrganizations(CreateOrganizationsRequest) returns (CreateOrganizationsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Update existing organizations.
+  rpc UpdateOrganizations(UpdateOrganizationsRequest) returns (UpdateOrganizationsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Delete existsing organizations.
+  rpc DeleteOrganizations(DeleteOrganizationsRequest) returns (DeleteOrganizationsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message GetOrganizationsRequest {
+  // The Organizations to request.
+  repeated OrganizationRef organization_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetOrganizationsResponse {
+  // The retrieved Organizations in the same order as requested.
+  repeated Organization organizations = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message ListOrganizationsRequest {
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned,
+  string page_token = 2 [(buf.validate.field).string.max_len = 255];
+  // The ids of the specific Users to list Organizations for.
+  //
+  // If this is empty, all Organizations are listed, but this functionality
+  // is only available for Users with the UserServerRole of USER_SERVER_ROLE_ADMIN.
+  repeated UserRef user_refs = 3;
+}
+
+message ListOrganizationsResponse {
+  // The next page token.
+  //
+  /// If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 255];
+  // The listed Organizations.
+  repeated Organization organizations = 2;
+}
+
+message CreateOrganizationsRequest {
+  // An individual request to create an Organization.
+  message Value {
+    // The name of the Organization.
+    string name = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The configurable description of the Organization.
+    string description = 2 [(buf.validate.field).string.max_len = 1023];
+    // The configurable URL that represents the homepage for an Organization.
+    string url = 3 [
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).string.max_len = 1023
+    ];
+    // The verification status of the Organizatioh.
+    //
+    // If not set, the Organization will default to VERIFICATION_STATUS_UNVERIFIED.
+    OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
+  }
+  // The Organizations to create.
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message CreateOrganizationsResponse {
+  // The created Organizations in the same order as given on the request.
+  repeated Organization organizations = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdateOrganizationsRequest {
+  // An individual request to update an Organization.
+  message Value {
+    // The organization to update.
+    OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
+    // The configurable description of the Organization.
+    optional string description = 2 [(buf.validate.field).string.max_len = 1023];
+    // The configurable URL that represents the homepage for an Organization.
+    optional string url = 3 [
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).string.max_len = 1023
+    ];
+    // The verification status of the Organization.
+    optional OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
+  }
+  // The Organizations to update.
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdateOrganizationsResponse {
+  // The updated Organizations in the same order as given on the request.
+  repeated Organization organizations = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeleteOrganizationsRequest {
+  // The Organizations to delete.
+  repeated OrganizationRef organization_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeleteOrganizationsResponse {}

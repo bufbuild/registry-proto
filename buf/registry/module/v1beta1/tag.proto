@@ -1,0 +1,110 @@
+// Copyright 2023 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1beta1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/storage/v1beta1/storage.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// A tag on a specific Module.
+//
+// Many Tags can be associated with a single Commit.
+message Tag {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Tag.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The time the Tag was created on the BSR.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The last time the Tag was updated on the BSR.
+  //
+  // Currently, Tags are immutable, but this may change in the near future.
+  // TODO: is this true?
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  // The name of the Tag.
+  //
+  // Unique within a given Module.
+  string name = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255
+  ];
+  // The id of the User or Organization that owns the Module that the Tag is associated with.
+  string owner_id = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The id of the Module that the Tag is associated with.
+  string module_id = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The id of the Commit associated with the Tag.
+  string commit_id = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255
+  ];
+  // The Digest of the Commit associated with the Tag.
+  buf.registry.storage.v1beta1.Digest commit_digest = 8 [(buf.validate.field).required = true];
+  // The id of the User that last updated this Tag on the BSR.
+  string updated_by_user_id = 9 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+}
+
+// TagRef is a reference to a Tag, either an id or a fully-qualified name.
+//
+// This is used in requests.
+message TagRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Tag.
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    // The fully-qualified name of the Tag.
+    TagFullName name = 2;
+  }
+}
+
+// The fully-qualified name of a Tag within a BSR instance.
+//
+// A TagFullName uniquely identifies a Tag.
+// This is used for requests when a caller only has the tag name and not the ID.
+message TagFullName {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The name of the owner of the Module that contains the Tag, either a User or Organization.
+  string owner = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255
+  ];
+  // The name of the Module that contains the Tag, either a User or Organization.
+  string module = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255
+  ];
+  // The Tag name.
+  string tag = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255
+  ];
+}

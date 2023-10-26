@@ -1,0 +1,89 @@
+// Copyright 2023 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1beta1;
+
+import "buf/registry/module/v1beta1/branch.proto";
+import "buf/registry/module/v1beta1/module.proto";
+import "buf/registry/module/v1beta1/resource.proto";
+import "buf/validate/validate.proto";
+
+// Operate on Branches.
+service BranchService {
+  // Get Branches by ID or name.
+  rpc GetBranches(GetBranchesRequest) returns (GetBranchesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get release Branches for specific Modules.
+  rpc GetReleaseBranches(GetReleaseBranchesRequest) returns (GetReleaseBranchesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List Branches for a given Module, Commit, Tag, or VCSCommit.
+  rpc ListBranches(ListBranchesRequest) returns (ListBranchesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message GetBranchesRequest {
+  // The Branches to request.
+  repeated BranchRef branch_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetBranchesResponse {
+  // The retreived Branches in the same order as requested.
+  repeated Branch branches = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetReleaseBranchesRequest {
+  // The Modules to request the release Branches for.
+  repeated ModuleRef module_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetReleaseBranchesResponse {
+  // The retrieved release Branches in the same order as requested.
+  repeated Branch branches = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message ListBranchesRequest {
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned,
+  string page_token = 2;
+  // The reference to list Branches for.
+  //
+  // See the documentation on Ref for resource resolution details.
+  //
+  // Once the resource is resolved, the following Branches are listed:
+  //   - If a Module is referenced, all Branches for the Module are returned.
+  //   - If a Commit is referenced, all Branches that contain the Commit are returned.
+  //   - If a Tag is referenced, all Branches that contain the Tag are returned.
+  //   - If a VCSCommit is referenced, all Branches that contain the VCSCommit are returned.
+  //   - Is a Branch is referenced, this Branch is returned.
+  ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
+}
+
+message ListBranchesResponse {
+  // The next page token.
+  //
+  /// If empty, there are no more pages.
+  string next_page_token = 1;
+  // The listed Branches.
+  repeated Branch branches = 2;
+}
