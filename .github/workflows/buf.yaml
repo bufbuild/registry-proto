@@ -14,7 +14,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs:
       - lint
-      - breaking
     steps:
       - uses: actions/checkout@v3
       - uses: bufbuild/buf-setup-action@v1
