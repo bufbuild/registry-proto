@@ -40,7 +40,9 @@ message Blob {
   // The digest of the blob.
   Digest digest = 1 [(buf.validate.field).required = true];
   // Content is the content of the blob.
-  bytes content = 2 [(buf.validate.field).required = true];
+  //
+  // May be empty.
+  bytes content = 2;
 }
 
 // A pointer to a file that can be read or written to from disk.
