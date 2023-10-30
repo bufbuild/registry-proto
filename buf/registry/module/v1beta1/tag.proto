@@ -21,6 +21,8 @@ import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // A tag on a specific Module.
 //
 // Many Tags can be associated with a single Commit.

@@ -22,6 +22,8 @@ import "buf/registry/module/v1beta1/vcs_commit.proto";
 import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // Operate on Commits.
 service CommitService {
   // Resolve commits by Commit ID, Module, Branch, Tag, or VCSCommit.

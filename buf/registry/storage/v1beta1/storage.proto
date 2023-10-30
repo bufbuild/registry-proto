@@ -18,6 +18,8 @@ package buf.registry.storage.v1beta1;
 
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/storage/v1beta1";
+
 // A digest.
 message Digest {
   // The type of Digest.
