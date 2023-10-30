@@ -36,6 +36,7 @@ message Organization {
   // The last time the Organization was updated.
   google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The name of the Organization.
+  //
   // A name uniquely identifies an Organization, however name is mutable.
   string name = 4 [
     (buf.validate.field).required = true,

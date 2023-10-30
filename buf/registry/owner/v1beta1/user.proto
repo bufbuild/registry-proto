@@ -36,6 +36,7 @@ message User {
   // The last time the User was updated.
   google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The name of the User.
+  //
   // A name uniquely identifies a User, however name is mutable.
   string name = 4 [
     (buf.validate.field).required = true,
