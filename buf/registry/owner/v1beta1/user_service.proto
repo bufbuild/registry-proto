@@ -110,6 +110,8 @@ message CreateUsersRequest {
     UserVerificationStatus verification_status = 6 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to create.
+  //
+  // This operation is atomic. Either all Users are created, or an error happens and none of them are created.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -138,6 +140,8 @@ message UpdateUsersRequest {
     optional UserVerificationStatus verification_status = 6 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to update.
+  //
+  // This operation is atomic. Either all Users are updated, or an error happens and none of them are updated.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -148,6 +152,8 @@ message UpdateUsersResponse {
 
 message DeleteUsersRequest {
   // The Users to delete.
+  //
+  // This operation is atomic. Either all Users are deleted, or an error happens and none of them are deleted.
   repeated UserRef user_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 

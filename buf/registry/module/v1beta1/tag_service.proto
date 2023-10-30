@@ -101,6 +101,8 @@ message CreateTagsRequest {
     ];
   }
   // The Tags to create.
+  //
+  // This operation is atomic. Either all Tags are created, or an error happens and none of them are created.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -111,6 +113,8 @@ message CreateTagsResponse {
 
 message DeleteTagsRequest {
   // The Tags to delete.
+  //
+  // This operation is atomic. Either all Tags are deleted, or an error happens and none of them are deleted.
   repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 

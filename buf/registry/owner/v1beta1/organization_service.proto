@@ -102,6 +102,8 @@ message CreateOrganizationsRequest {
     OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
   }
   // The Organizations to create.
+  //
+  // This operation is atomic. Either all Organizations are created, or an error happens and none of them are created.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -126,6 +128,8 @@ message UpdateOrganizationsRequest {
     optional OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
   }
   // The Organizations to update.
+  //
+  // This operation is atomic. Either all Organizations are updated, or an error happens and none of them are updated.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -136,6 +140,8 @@ message UpdateOrganizationsResponse {
 
 message DeleteOrganizationsRequest {
   // The Organizations to delete.
+  //
+  // This operation is atomic. Either all Organizations are deleted, or an error happens and none of them are deleted.
   repeated OrganizationRef organization_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
