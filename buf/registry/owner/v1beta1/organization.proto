@@ -21,6 +21,8 @@ import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 // Organization is an organization on the BSR.
+//
+// A name uniquely identifies an Organization, however name is mutable.
 message Organization {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
