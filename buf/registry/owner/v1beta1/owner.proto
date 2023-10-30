@@ -21,6 +21,8 @@ import "buf/registry/owner/v1beta1/user.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1beta1";
+
 // A User or Organization.
 message Owner {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;

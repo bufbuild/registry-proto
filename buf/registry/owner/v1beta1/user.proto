@@ -20,6 +20,8 @@ import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1beta1";
+
 // A user on the BSR.
 //
 // A name uniquely identifies a User, however name is mutable.
