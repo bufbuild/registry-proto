@@ -21,6 +21,8 @@ import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // A branch on a specific Module.
 message Branch {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;

@@ -20,6 +20,8 @@ import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/owner/v1beta1/owner.proto";
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // Operate on Modules.
 service ModuleService {
   // Get Modules by id or name.

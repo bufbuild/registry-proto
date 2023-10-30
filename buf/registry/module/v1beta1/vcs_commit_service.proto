@@ -20,6 +20,8 @@ import "buf/registry/module/v1beta1/resource.proto";
 import "buf/registry/module/v1beta1/vcs_commit.proto";
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // Operate on VCSCommits.
 service VCSCommitService {
   // Get VCSCommits by id or name.

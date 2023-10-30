@@ -18,6 +18,8 @@ package buf.registry.priv.extension.v1beta1;
 
 import "google/protobuf/descriptor.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/priv/extension/v1beta1";
+
 extend google.protobuf.MessageOptions {
   // Constraints on a message.
   MessageConstraints message = 1160;

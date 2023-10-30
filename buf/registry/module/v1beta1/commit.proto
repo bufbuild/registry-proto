@@ -21,6 +21,8 @@ import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // A commit on a specific module.
 //
 // Commits can be associated with multiple Branches.

@@ -21,6 +21,8 @@ import "buf/registry/module/v1beta1/resource.proto";
 import "buf/registry/module/v1beta1/tag.proto";
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // Operate on Tags.
 service TagService {
   // Get Tags by id or name.
