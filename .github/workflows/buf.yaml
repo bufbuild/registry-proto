@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: bufbuild/buf-setup-action@v1
-      - uses: bufbuild/buf-lint-action@v1.0.3
+      - uses: bufbuild/buf-lint-action@v1.1.0
   push:
     environment: production
     runs-on: ubuntu-20.04
