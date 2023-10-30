@@ -21,8 +21,6 @@ import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 // A user on the BSR.
-//
-// A name uniquely identifies a User, however name is mutable.
 message User {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
@@ -36,6 +34,7 @@ message User {
   // The last time the User was updated.
   google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The name of the User.
+  // A name uniquely identifies a User, however name is mutable.
   string name = 4 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 255
