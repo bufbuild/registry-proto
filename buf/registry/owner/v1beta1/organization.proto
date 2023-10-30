@@ -29,16 +29,16 @@ message Organization {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
+  // The time the Organization was created.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The last time the Organization was updated.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The name of the Organization.
   // A name uniquely identifies an Organization, however name is mutable.
-  string name = 2 [
+  string name = 4 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 255
   ];
-  // The time the Organization was created.
-  google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
-  // The last time the Organization was updated.
-  google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
   // The configurable description of the Organization.
   string description = 5 [(buf.validate.field).string.max_len = 1023];
   // The configurable URL that represents the homepage for an Organization.
