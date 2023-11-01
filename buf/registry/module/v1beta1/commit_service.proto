@@ -167,7 +167,7 @@ message CreateCommitsRequest {
   //
   // If empty, the default branch is assumed as the only branch.
   repeated string branch_names = 3 [(buf.validate.field).repeated.items = {
-    string: {max_len: 255}
+    string: {max_len: 250}
   }];
   // The names of Tags that should be associated with this Commit.
   //
