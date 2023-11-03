@@ -56,11 +56,13 @@ message FileNode {
   //
   // The path must be relative, and connect contain any "." or ".." components
   // The separator "/" must be used.
-  //
-  // TODO: Can we encode the above requirements via validation?
   string path = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 4096
+    (buf.validate.field).string = {
+      max_len: 1000,
+      not_contains: "\\",
+      pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
+    }
   ];
   // The digest of the file.
   //
@@ -77,11 +79,13 @@ message File {
   //
   // The path must be relative, and connect contain any "." or ".." components
   // The separator "/" must be used.
-  //
-  // TODO: Can we encode the above requirements via validation?
   string path = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 4096
+    (buf.validate.field).string = {
+      max_len: 1000,
+      not_contains: "\\",
+      pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
+    }
   ];
   // Content is the content of the blob.
   //

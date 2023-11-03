@@ -250,10 +250,12 @@ message GetCommitNodesRequest {
     //
     // The path must be relative, and connect contain any "." or ".." components
     // The separator "/" must be used.
-    //
-    // TODO: Can we encode the above requirements via validation?
     repeated string paths = 2 [(buf.validate.field).repeated.items = {
-      string: {max_len: 4096}
+      string: {
+        max_len: 1000
+        not_contains: "\\"
+        pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
+      }
     }];
     // Whether to allow file paths not to exist within the given module.
     //
