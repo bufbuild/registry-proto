@@ -100,7 +100,7 @@ message CreateModulesRequest {
       (buf.validate.field).enum.defined_only = true
     ];
     // The configurable description of the Module.
-    string description = 4 [(buf.validate.field).string.max_len = 1023];
+    string description = 4 [(buf.validate.field).string.max_len = 350];
     // The configurable URL in the description of the module.
     string url = 5 [
       (buf.validate.field).string.uri = true,
@@ -109,7 +109,7 @@ message CreateModulesRequest {
     // The name of the release Branch of the module.
     //
     // If not set, the release branch will be "main" upon creation.
-    string release_branch_name = 6 [(buf.validate.field).string.max_len = 255];
+    string release_branch_name = 6 [(buf.validate.field).string.max_len = 250];
   }
   // The Modules to create.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
@@ -130,7 +130,7 @@ message UpdateModulesRequest {
     // The deprecation status of the module.
     optional ModuleState state = 4 [(buf.validate.field).enum.defined_only = true];
     // The configurable description of the module.
-    optional string description = 5 [(buf.validate.field).string.max_len = 1023];
+    optional string description = 5 [(buf.validate.field).string.max_len = 350];
     // uThe configurable URL in the description of the module.
     optional string url = 6 [
       (buf.validate.field).string.uri = true,
@@ -144,7 +144,7 @@ message UpdateModulesRequest {
       // The name of the release Branch of the Module.
       //
       // This Branch must already exist.
-      string release_branch_name = 8 [(buf.validate.field).string.max_len = 255];
+      string release_branch_name = 8 [(buf.validate.field).string.max_len = 250];
     }
   }
   // The Modules to update.

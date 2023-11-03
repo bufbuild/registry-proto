@@ -58,7 +58,7 @@ message Module {
     (buf.validate.field).enum.defined_only = true
   ];
   // The configurable description of the Module.
-  string description = 8 [(buf.validate.field).string.max_len = 1023];
+  string description = 8 [(buf.validate.field).string.max_len = 350];
   // The configurable URL in the description of the Module,
   string url = 9 [
     (buf.validate.field).string.uri = true,

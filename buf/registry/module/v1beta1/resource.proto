@@ -81,8 +81,8 @@ message ResourceFullName {
     (buf.validate.field).string.max_len = 255
   ];
   oneof child {
-    string branch_name = 3 [(buf.validate.field).string.max_len = 255];
-    string tag_name = 4 [(buf.validate.field).string.max_len = 255];
+    string branch_name = 3 [(buf.validate.field).string.max_len = 250];
+    string tag_name = 4 [(buf.validate.field).string.max_len = 250];
     string vcs_commit_hash = 5 [(buf.validate.field).string.max_len = 255];
     string ref = 6;
   }

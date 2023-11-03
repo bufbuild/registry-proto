@@ -46,7 +46,7 @@ message Tag {
   // Unique within a given Module.
   string name = 4 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
+    (buf.validate.field).string.max_len = 250
   ];
   // The id of the User or Organization that owns the Module that the Tag is associated with.
   string owner_id = 5 [
@@ -107,6 +107,6 @@ message TagFullName {
   // The Tag name.
   string tag = 3 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
+    (buf.validate.field).string.max_len = 250
   ];
 }

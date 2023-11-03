@@ -98,7 +98,7 @@ message CreateUsersRequest {
     // If not set, the default USER_SERVER_ROLE_STANDARD is used..
     UserServerRole server_role = 3 [(buf.validate.field).enum.defined_only = true];
     // The configurable description of the User.
-    string description = 4 [(buf.validate.field).string.max_len = 1023];
+    string description = 4 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for a User.
     string url = 5 [
       (buf.validate.field).string.uri = true,
@@ -128,7 +128,7 @@ message UpdateUsersRequest {
     // The role that the User has at the BSR instance level.
     optional UserServerRole server_role = 3 [(buf.validate.field).enum.defined_only = true];
     // The configurable description of the User.
-    optional string description = 4 [(buf.validate.field).string.max_len = 1023];
+    optional string description = 4 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for a User.
     optional string url = 5 [
       (buf.validate.field).string.uri = true,
