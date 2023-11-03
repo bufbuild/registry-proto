@@ -6,13 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install buf cli
+      - name: Lint
         run: |
-          go install github.com/bufbuild/buf/cmd/buf@21ba19590be4afe6fa3af0406e138c4fdc36fedf
-        #uses: bufbuild/buf-setup-action@v1
-        #with:
-        #  github_token: ${{ github.token }}
-      - uses: bufbuild/buf-lint-action@v1
+          make lint
   push:
     environment: production
     runs-on: ubuntu-latest
@@ -22,11 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install buf cli
-        run: |
-          go install github.com/bufbuild/buf/cmd/buf@21ba19590be4afe6fa3af0406e138c4fdc36fedf
-        #uses: bufbuild/buf-setup-action@v1
-        #with:
-        #  github_token: ${{ github.token }}
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
       - uses: bufbuild/buf-push-action@v1
         with:
           buf_token: ${{ secrets.BUF_TOKEN }}
