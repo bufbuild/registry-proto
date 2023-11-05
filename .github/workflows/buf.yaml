@@ -15,7 +15,7 @@ jobs:
       - uses: bufbuild/buf-setup-action@v1
       - uses: bufbuild/buf-breaking-action@v1.1.2
         with:
-          against: buf.build/bufbuild/knit
+          against: buf.build/bufbuild/registry
   push:
     environment: production
     runs-on: ubuntu-20.04
