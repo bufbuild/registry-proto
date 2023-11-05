@@ -48,11 +48,17 @@ service OrganizationService {
 
 message GetOrganizationsRequest {
   // The Organizations to request.
+  //
+  // Only Organizations with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated OrganizationRef organization_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message GetOrganizationsResponse {
   // The retrieved Organizations in the same order as requested.
+  //
+  // Only Organizations with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Organization organizations = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -69,6 +75,9 @@ message ListOrganizationsRequest {
   //
   // If this is empty, all Organizations are listed, but this functionality
   // is only available for Users with the UserServerRole of USER_SERVER_ROLE_ADMIN.
+  //
+  // Only Users with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated UserRef user_refs = 3;
 }
 
@@ -78,6 +87,9 @@ message ListOrganizationsResponse {
   /// If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 255];
   // The listed Organizations.
+  //
+  // Only Organizations with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Organization organizations = 2;
 }
 
@@ -107,6 +119,9 @@ message CreateOrganizationsRequest {
 
 message CreateOrganizationsResponse {
   // The created Organizations in the same order as given on the request.
+  //
+  // Only Organizations with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Organization organizations = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -114,6 +129,9 @@ message UpdateOrganizationsRequest {
   // An individual request to update an Organization.
   message Value {
     // The organization to update.
+    //
+    // Only Organizations with registry_hostnames equal to the hostname of the BSR instance you are
+    // calling can be referenced, other registry_hostnames will result in an error.
     OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
     // The configurable description of the Organization.
     optional string description = 2 [(buf.validate.field).string.max_len = 350];
@@ -131,11 +149,17 @@ message UpdateOrganizationsRequest {
 
 message UpdateOrganizationsResponse {
   // The updated Organizations in the same order as given on the request.
+  //
+  // Only Organizations with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Organization organizations = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message DeleteOrganizationsRequest {
   // The Organizations to delete.
+  //
+  // Only Organizations with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated OrganizationRef organization_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 

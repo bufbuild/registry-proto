@@ -71,11 +71,17 @@ message ResolveCommitsRequest {
   //   - If a Tag is referenced, this is interpreted to mean the Commit associated with the Tag.
   //   - If a VCSCommit is referenced, this is interpreted to mean the Commit associated with the VCSCommit.
   //   - Is a Branch is referenced, this is interpreted to mean the latest Commit on the Branch.
+  //
+  // Only resources with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated ResourceRef resource_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message ResolveCommitsResponse {
   // The found Commits in the same order as requested.
+  //
+  // Only Commits with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -98,6 +104,9 @@ message ListCommitHistoryRequest {
   //   - If a Tag is referenced, history is started at the Commit associated with the Tag.
   //   - If a VCSCommit is referenced, history is started at the Commit associated with the VCSCommit.
   //   - Is a Branch is referenced, history is started at the latest Commit on the Branch.
+  //
+  // Only resources with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // Only return Commits that have one or more associated Tags.
   bool has_tag = 4;
@@ -111,6 +120,9 @@ message ListCommitHistoryResponse {
   /// If empty, there are no more pages.
   string next_page_token = 1;
   // The listed Commits.
+  //
+  // Only Commits with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Commit commits = 2;
 }
 
@@ -189,6 +201,9 @@ message CreateCommitsResponse {
   //
   // If the digest was found for an pre-existing Commit, this pre-existing Commit will be returned
   // instead of a new Commit being created.
+  //
+  // Only Commits with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -205,6 +220,9 @@ message GetFileNodesRequest {
     //   - If a Tag is referenced, files are returned from the Commit associated with the Tag.
     //   - If a VCSCommit is referenced, files are returned from the Commit associated with the VCSCommit.
     //   - Is a Branch is referenced, files are returned from the latest Commit on the Branch.
+    //
+    // Only resources with registry_hostnames equal to the hostname of the BSR instance you are
+    // calling can be referenced, other registry_hostnames will result in an error.
     ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
     // Specific file paths to retrieve.
     //
@@ -232,7 +250,12 @@ message GetFileNodesRequest {
 message GetFileNodesResponse {
   // A single set of FileNodes and their associated commits.
   message Value {
+    // The FileNodes for the Commit.
     repeated buf.registry.storage.v1beta1.FileNode file_nodes = 1 [(buf.validate.field).repeated.min_items = 1];
+    // The Commit associated with the FileNodes.
+
+    // Only Commits with registry_hostnames equal to the hostname of the BSR instance you are
+    // calling will be returned.
     Commit commit = 2 [(buf.validate.field).required = true];
   }
   // The returned File sets in the same order as requested.

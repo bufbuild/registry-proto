@@ -36,11 +36,17 @@ service VCSCommitService {
 
 message GetVCSCommitsRequest {
   // The VCSCommits to request.
+  //
+  // Only VCSCommits with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated VCSCommitRef vcs_commit_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message GetVCSCommitsResponse {
   // The retrieved VCSCommits in the same order as requested.
+  //
+  // Only VCSCommits with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated VCSCommit vcs_commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -64,6 +70,9 @@ message ListVCSCommitsRequest {
   //   - If a Tag is referenced, all VCSCommits for the Commit associated with the Tag are returned.
   //   - If a VCSCommit is referenced, this VCSCommit is returned.
   //   - Is a Branch is referenced, all VCSCommits associated with Commits on the Branch are returned.
+  //
+  // Only resources with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
 }
 
@@ -73,5 +82,8 @@ message ListVCSCommitsResponse {
   /// If empty, there are no more pages.
   string next_page_token = 1;
   // The listed VCSCommits.
+  //
+  // Only VCSCommits with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated VCSCommit vcs_commits = 2;
 }

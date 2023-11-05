@@ -29,69 +29,77 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 message VCSCommit {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The id of the VCSCommit.
+  // The id of the VCSCommit within the BSR instnace denoted by registry_hostname.
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
+  // The hostname of the registry of the BSR instance that the VCSCommit is on.
+  string registry_hostname = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.hostname = true
+  ];
   // The time the VCSCommit was created on the BSR.
-  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
   // The last time the VCSCommit was updated on the BSR.
   //
   // Currently, VCSCommits are immutable, but this may change in the near future.
   // TODO: is this true?
-  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
   // The hash of the VCSCommit.
   //
   // VCS-specific.
   // Unique within a given Module.
-  string hash = 4 [
+  string hash = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 255
   ];
-  // The id of the User or Organization that owns the Module that the VCSCommit is associated with.
-  string owner_id = 5 [
+  // The id of the User or Organization within the BSR instance denoted by registry_hostname
+  // that owns the Module that the VCSCommit is associated with.
+  string owner_id = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // The id of the Module that the VCSCommit is associated with.
-  string module_id = 6 [
+  // The id of the Module within the BSR instance denoted by registry_hostname
+  // that the VCSCommit is associated with.
+  string module_id = 7 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
   // The type of VCS.
-  VCSType type = 7 [
+  VCSType type = 8 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
-  // The id of the Commit associated with the VCSCommit.
-  string commit_id = 8 [
+  // The id of the Commit within the BSR instance denoted by registry_hostname
+  // associated with the VCSCommit.
+  string commit_id = 9 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
   // The Digest of the Commit associated with the VCSCommit.
-  buf.registry.storage.v1beta1.Digest commit_digest = 9 [(buf.validate.field).required = true];
+  buf.registry.storage.v1beta1.Digest commit_digest = 10 [(buf.validate.field).required = true];
   // The URL of of the repository on the VCS.
-  string vcs_repository_url = 10 [
+  string vcs_repository_url = 11 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uri = true
   ];
   // The name of the author of the VCSCommit.
   //
   // VCS-specific: not associated with the name of Users on the BSR, for example.
-  string author_name = 11;
+  string author_name = 12;
   // The email of the author of the VCSCommit.
   //
   // VCS-specific: not associated with the Users on the BSR, for example.
-  string author_email = 12;
+  string author_email = 13;
   // The name of the committer of the VCSCommit.
   //
   // VCS-specific: not associated with the name of Users on the BSR, for example.
-  string committer_name = 13;
+  string committer_name = 14;
   // The email of the committer of the VCSCommit.
   //
   // VCS-specific: not associated with the Users on the BSR, for example.
-  string committer_email = 14;
+  string committer_email = 15;
 }
 
 // The VCS type, currently only git.
@@ -107,35 +115,41 @@ enum VCSType {
 message VCSCommitRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
+  // The fully-qualified name of a VCSCommit within a BSR instance.
+  //
+  // A Name uniquely identifies a VCSCommit within a BSR instance.
+  // This is used for requests when a caller only has the VCSCommit hash and not the ID.
+  message Name {
+    // The name of the owner of the Module that contains the VCSCommit, either a user or organization.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The name of the Module that contains the VCSCommit.
+    string module = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The hash of the VCSCommit.
+    string hash = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+  }
+
+  // The hostname of the registry of the Buf Schema Registry instance that the VCSCommit is on.
+  //
+  // In most circumstances, this must match the hostname of the instance you are calling via the API.
+  // Where there are exceptions to this, this is specifically noted in the top-level request message.
+  string registry_hostname = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.hostname = true
+  ];
   oneof value {
     option (buf.validate.oneof).required = true;
-    // The id of the VCSCommit.
-    string id = 1 [(buf.validate.field).string.uuid = true];
-    // The fully-qualified name of the VCSCommit.
-    VCSCommitFullName name = 2;
+    // The id of the VCSCommit within the BSR instance as denoted by registry_hostname.
+    string id = 2 [(buf.validate.field).string.uuid = true];
+    // The fully-qualified name of the VCSCommit within the BSR instance as denoted by registry_hostname.
+    Name name = 3;
   }
-}
-
-// The fully-qualified name of a VCSCommit within a BSR instance.
-//
-// A VCSCommitFullName uniquely identifies a VCSCommit.
-// This is used for requests when a caller only has the VCSCommit hash and not the ID.
-message VCSCommitFullName {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-
-  // The name of the owner of the Module that contains the VCSCommit, either a user or organization.
-  string owner = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The name of the Module that contains the VCSCommit.
-  string module = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The hash of the VCSCommit.
-  string hash = 3 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
 }

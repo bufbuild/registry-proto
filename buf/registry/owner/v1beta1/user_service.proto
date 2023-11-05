@@ -48,11 +48,17 @@ service UserService {
 
 message GetUsersRequest {
   // The Users to request.
+  //
+  // Only Users with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated UserRef user_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message GetUsersResponse {
   // The retreived Users in the same order as requested.
+  //
+  // Only Users with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated User users = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -69,6 +75,9 @@ message ListUsersRequest {
   //
   // If this is empty, all Users for all Organizations are listed, but this functionality
   // is only available for Users with the UserServerRole of USER_SERVER_ROLE_ADMIN.
+  //
+  // Only Organizations with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated OrganizationRef organization_refs = 3;
 }
 
@@ -78,6 +87,9 @@ message ListUsersResponse {
   /// If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 255];
   // The list of Users.
+  //
+  // Only Users with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated User users = 2;
 }
 
@@ -115,6 +127,9 @@ message CreateUsersRequest {
 
 message CreateUsersResponse {
   // The created Users in the same order as given on the request.
+  //
+  // Only Users with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated User users = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -122,6 +137,9 @@ message UpdateUsersRequest {
   // An individual request to update a User.
   message Value {
     // The User to update.
+    //
+    // Only Users with registry_hostnames equal to the hostname of the BSR instance you are
+    // calling can be referenced, other registry_hostnames will result in an error.
     UserRef user_ref = 1 [(buf.validate.field).required = true];
     // The state of the User.
     optional UserState state = 2 [(buf.validate.field).enum.defined_only = true];
@@ -143,11 +161,17 @@ message UpdateUsersRequest {
 
 message UpdateUsersResponse {
   // The updated Users in the same order as given on the request.
+  //
+  // Only Users with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated User users = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message DeleteUsersRequest {
   // The Users to delete.
+  //
+  // Only Users with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated UserRef user_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 

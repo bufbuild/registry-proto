@@ -45,11 +45,17 @@ service TagService {
 
 message GetTagsRequest {
   // The Tags to request.
+  //
+  // Only Tags with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message GetTagsResponse {
   // The retrieved Tags in the same order as requested.
+  //
+  // Only Tags with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Tag tags = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -72,6 +78,9 @@ message ListTagsRequest {
   //   - If a Tag is referenced, this Tag is returned.
   //   - If a VCSCommit is referenced, all Tags for commits that the VCSCommit is associated with are returned.
   //   - Is a Branch is referenced, all Tags for Commits on the Branch are returned.
+  //
+  // Only resources with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
 }
 
@@ -81,6 +90,9 @@ message ListTagsResponse {
   /// If empty, there are no more pages.
   string next_page_token = 1;
   // The listed Tags.
+  //
+  // Only Tags with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Tag tags = 2;
 }
 
@@ -88,13 +100,18 @@ message CreateTagsRequest {
   // An individual request to create a Tag.
   message Value {
     // The Module to create the Tag under.
+    //
+    // Only Modules with registry_hostnames equal to the hostname of the BSR instance you are
+    // calling can be referenced, other registry_hostnames will result in an error.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The Tag name.
     string name = 2 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 250
     ];
-    // The id of the Commit associated with the Tag.
+    // The id of the Commit associated with the Tag
+    //
+    // This Commit must be associated with the Module as denoted by module_ref.
     string commit_id = 3 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.uuid = true
@@ -106,11 +123,17 @@ message CreateTagsRequest {
 
 message CreateTagsResponse {
   // The created Tags in the same order as given on the request.
+  //
+  // Only Tags with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Tag tags = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message DeleteTagsRequest {
   // The Tags to delete.
+  //
+  // Only Tags with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 

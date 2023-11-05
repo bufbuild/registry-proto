@@ -29,44 +29,53 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 message Tag {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The id of the Tag.
+  // The id of the Tag within the BSR instance denoted by registry_hostname.
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
+  // The hostname of the registry of the BSR instance that the Tag is on.
+  string registry_hostname = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.hostname = true
+  ];
   // The time the Tag was created on the BSR.
-  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
   // The last time the Tag was updated on the BSR.
   //
   // Currently, Tags are immutable, but this may change in the near future.
   // TODO: is this true?
-  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
   // The name of the Tag.
   //
   // Unique within a given Module.
-  string name = 4 [
+  string name = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 250
   ];
-  // The id of the User or Organization that owns the Module that the Tag is associated with.
-  string owner_id = 5 [
+  // The id of the User or Organization within the BSR instance denoted by registry_hostname
+  // that owns the Module that the Tag is associated with.
+  string owner_id = 7 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // The id of the Module that the Tag is associated with.
-  string module_id = 6 [
+  // The id of the Module within the BSR instance denoted by registry_hostname
+  // that the Tag is associated with.
+  string module_id = 8 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // The id of the Commit associated with the Tag.
-  string commit_id = 7 [
+  // The id of the Commit within the BSR instance denoted by registry_hostname
+  // associated with the Tag.
+  string commit_id = 9 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
   // The Digest of the Commit associated with the Tag.
-  buf.registry.storage.v1beta1.Digest commit_digest = 8 [(buf.validate.field).required = true];
-  // The id of the User that last updated this Tag on the BSR.
-  string updated_by_user_id = 9 [
+  buf.registry.storage.v1beta1.Digest commit_digest = 10 [(buf.validate.field).required = true];
+  // The id of the User within the BSR instance denoted by registry_hostname
+  // that last updated this Tag on the BSR.
+  string updated_by_user_id = 11 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
@@ -78,35 +87,41 @@ message Tag {
 message TagRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
+  // The fully-qualified name of a Tag within a BSR instance.
+  //
+  // A Name uniquely identifies a Tag within a BSR instance.
+  // This is used for requests when a caller only has the tag name and not the ID.
+  message Name {
+    // The name of the owner of the Module that contains the Tag, either a User or Organization.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The name of the Module that contains the Tag, either a User or Organization.
+    string module = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The Tag name.
+    string tag = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 250
+    ];
+  }
+
+  // The hostname of the registry of the Buf Schema Registry instance that the Tag is on.
+  //
+  // In most circumstances, this must match the hostname of the instance you are calling via the API.
+  // Where there are exceptions to this, this is specifically noted in the top-level request message.
+  string registry_hostname = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.hostname = true
+  ];
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Tag.
-    string id = 1 [(buf.validate.field).string.uuid = true];
+    string id = 2 [(buf.validate.field).string.uuid = true];
     // The fully-qualified name of the Tag.
-    TagFullName name = 2;
+    Name name = 3;
   }
-}
-
-// The fully-qualified name of a Tag within a BSR instance.
-//
-// A TagFullName uniquely identifies a Tag.
-// This is used for requests when a caller only has the tag name and not the ID.
-message TagFullName {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-
-  // The name of the owner of the Module that contains the Tag, either a User or Organization.
-  string owner = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The name of the Module that contains the Tag, either a User or Organization.
-  string module = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The Tag name.
-  string tag = 3 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 250
-  ];
 }

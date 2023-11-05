@@ -42,12 +42,20 @@ message Owner {
 message OwnerRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
+  // The hostname of the registry of the Buf Schema Registry instance that the User or Organization is on.
+  //
+  // In most circumstances, this must match the hostname of the instance you are calling via the API.
+  // Where there are exceptions to this, this is specifically noted in the top-level request message.
+  string registry_hostname = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.hostname = true
+  ];
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the User or Organization.
-    string id = 1 [(buf.validate.field).string.uuid = true];
+    string id = 2 [(buf.validate.field).string.uuid = true];
     // The name of the User or Organization.
-    string name = 2 [(buf.validate.field).string = {
+    string name = 3 [(buf.validate.field).string = {
       min_len: 1;
       max_len: 255;
     }];

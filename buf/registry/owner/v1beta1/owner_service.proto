@@ -33,10 +33,16 @@ service OwnerService {
 
 message GetOwnersRequest {
   // The Users or Organizations to request.
+  //
+  // Only Users or Organizations with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated OwnerRef owner_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message GetOwnersResponse {
   // The retreived Users or Organizations in the same order as requested.
+  //
+  // Only Users or Organizations with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Owner owners = 1 [(buf.validate.field).repeated.min_items = 1];
 }

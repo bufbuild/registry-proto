@@ -51,11 +51,17 @@ service ModuleService {
 
 message GetModulesRequest {
   // The Modules to request.
+  //
+  // Only Modules with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated ModuleRef module_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message GetModulesResponse {
   // The retrieved Modules in the same order as requested.
+  //
+  // Only Modules with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Module modules = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -72,6 +78,9 @@ message ListModulesRequest {
   //
   // If empty, all Modules for all owners are listed, but this functionality
   // is only available for Users with the UserServerRole of USER_SERVER_ROLE_ADMIN.
+  //
+  // Only owners with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated buf.registry.owner.v1beta1.OwnerRef owner_refs = 3;
 }
 
@@ -81,6 +90,9 @@ message ListModulesResponse {
   /// If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 255];
   // The listed Modules.
+  //
+  // Only Modules with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Module modules = 2;
 }
 
@@ -88,6 +100,9 @@ message CreateModulesRequest {
   // An individual request to create a Module.
   message Value {
     // The User or Organization to create the Module under.
+    //
+    // Only owners with registry_hostnames equal to the hostname of the BSR instance you are
+    // calling will be returned.
     buf.registry.owner.v1beta1.OwnerRef owner_ref = 1 [(buf.validate.field).required = true];
     // The name of the Module.
     string name = 2 [
@@ -117,6 +132,9 @@ message CreateModulesRequest {
 
 message CreateModulesResponse {
   // The created Modules in the same order as given on the request.
+  //
+  // Only Modules with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Module modules = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -124,6 +142,9 @@ message UpdateModulesRequest {
   // An individual request to update a Module.
   message Value {
     // The Module to update.
+    //
+    // Only Modules with registry_hostnames equal to the hostname of the BSR instance you are
+    // calling can be referenced, other registry_hostnames will result in an error.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The module's visibility.
     optional ModuleVisibility visibility = 3 [(buf.validate.field).enum.defined_only = true];
@@ -139,10 +160,12 @@ message UpdateModulesRequest {
     oneof release_branch_ref {
       // The id of the release Branch of the Module.
       //
+      // This ID must be an ID of a Branch tied to the Module as denoted by module_ref.
       // This Branch must already exist.
       string release_branch_id = 7 [(buf.validate.field).string.uuid = true];
       // The name of the release Branch of the Module.
       //
+      // This name must be the name of a Branch tied to the Module as denoted by module_ref.
       // This Branch must already exist.
       string release_branch_name = 8 [(buf.validate.field).string.max_len = 250];
     }
@@ -153,11 +176,17 @@ message UpdateModulesRequest {
 
 message UpdateModulesResponse {
   // The updated Modules in the same order as given on the request.
+  //
+  // Only Modules with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Module modules = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message DeleteModulesRequest {
   // The Modules to delete.
+  //
+  // Only Modules with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated ModuleRef module_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 

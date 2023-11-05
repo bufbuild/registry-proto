@@ -41,21 +41,33 @@ service BranchService {
 
 message GetBranchesRequest {
   // The Branches to request.
+  //
+  // Only Branches with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated BranchRef branch_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message GetBranchesResponse {
   // The retreived Branches in the same order as requested.
+  //
+  // Only Branches with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Branch branches = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message GetReleaseBranchesRequest {
   // The Modules to request the release Branches for.
+  //
+  // Only Modules with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   repeated ModuleRef module_refs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message GetReleaseBranchesResponse {
   // The retrieved release Branches in the same order as requested.
+  //
+  // Only Branches with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Branch branches = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -78,6 +90,9 @@ message ListBranchesRequest {
   //   - If a Tag is referenced, all Branches that contain the Tag are returned.
   //   - If a VCSCommit is referenced, all Branches that contain the VCSCommit are returned.
   //   - Is a Branch is referenced, this Branch is returned.
+  //
+  // Only resources with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
 }
 
@@ -87,5 +102,8 @@ message ListBranchesResponse {
   /// If empty, there are no more pages.
   string next_page_token = 1;
   // The listed Branches.
+  //
+  // Only Branches with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling will be returned.
   repeated Branch branches = 2;
 }

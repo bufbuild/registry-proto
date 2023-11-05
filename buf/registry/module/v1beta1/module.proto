@@ -26,46 +26,53 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 message Module {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The id of the Module.
+  // The id of the Module within the BSR instance denoted by registry_hostname.
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
+  // The hostname of the registry of the Buf Schema Registry instance that the Module is on.
+  string registry_hostname = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.hostname = true
+  ];
   // The time the Module was created on the BSR.
-  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
   // The last time the Module was updated on the BSR.
-  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
   // The name of the Module.
   //
   // Unique within a given User or Organization.
-  string name = 4 [
+  string name = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 255
   ];
-  // The id of the User or Organization that owns the Module.
-  string owner_id = 5 [
+  // The id of the User or Organization within the BSR instance denoted by registry_hostname
+  // that owns the Module.
+  string owner_id = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
   // The Module's visibility, either public or private.
-  ModuleVisibility visibility = 6 [
+  ModuleVisibility visibility = 7 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
   // The Module state, either active or deprecated.
-  ModuleState state = 7 [
+  ModuleState state = 8 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
   // The configurable description of the Module.
-  string description = 8 [(buf.validate.field).string.max_len = 350];
+  string description = 9 [(buf.validate.field).string.max_len = 350];
   // The configurable URL in the description of the Module,
-  string url = 9 [
+  string url = 10 [
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.max_len = 1023
   ];
-  // The id of the Branch which releases are generated from.
-  string release_branch_id = 10 [
+  // The id of the Branch within the BSR instance denoted by registry_hostname
+  // which releases are generated from.
+  string release_branch_id = 11 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
@@ -96,30 +103,36 @@ enum ModuleState {
 message ModuleRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
+  // The fully-qualified name of a Module within a BSR instance.
+  //
+  // A Name uniquely identifies a Module within a BSR instance.
+  // This is used for requests when a caller only has the module name and not the ID.
+  message Name {
+    // The name of the owner of the Module, either a User or Organization.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The name of the Module.
+    string module = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+  }
+
+  // The hostname of the registry of the Buf Schema Registry instance that the Module is on.
+  //
+  // In most circumstances, this must match the hostname of the instance you are calling via the API.
+  // Where there are exceptions to this, this is specifically noted in the top-level request message.
+  string registry_hostname = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.hostname = true
+  ];
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Module.
-    string id = 1 [(buf.validate.field).string.uuid = true];
+    string id = 2 [(buf.validate.field).string.uuid = true];
     // The fully-qualified name of the Module.
-    ModuleFullName name = 2;
+    Name name = 3;
   }
-}
-
-// The fully-qualified name of a Module within a BSR instance.
-//
-// A ModuleFullName uniquely identifies a Module.
-// This is used for requests when a caller only has the module name and not the ID.
-message ModuleFullName {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-
-  // The name of the owner of the Module, either a User or Organization.
-  string owner = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The name of the Module.
-  string module = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
 }

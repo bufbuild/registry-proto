@@ -24,35 +24,40 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Organization is an organization on the BSR.
 //
-// A name uniquely identifies an Organization, however name is mutable.
+// A name uniquely identifies an Organization within a BSR instance, however name is mutable.
 message Organization {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The id for the Organization.
+  // The id for the Organization within the BSR instance denoted by registry_hostname.
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
+  // The hostname of the registry of the BSR instance that the Organization is on.
+  string registry_hostname = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.hostname = true
+  ];
   // The time the Organization was created.
-  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
   // The last time the Organization was updated.
-  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
   // The name of the Organization.
   //
-  // A name uniquely identifies an Organization, however name is mutable.
-  string name = 4 [
+  // A name uniquely identifies an Organization within a BSR instance, however name is mutable.
+  string name = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 255
   ];
   // The configurable description of the Organization.
-  string description = 5 [(buf.validate.field).string.max_len = 350];
+  string description = 6 [(buf.validate.field).string.max_len = 350];
   // The configurable URL that represents the homepage for an Organization.
-  string url = 6 [
+  string url = 7 [
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.max_len = 1023
   ];
   // The verification status of the Organization.
-  OrganizationVerificationStatus verification_status = 7 [
+  OrganizationVerificationStatus verification_status = 8 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
@@ -75,12 +80,20 @@ enum OrganizationVerificationStatus {
 message OrganizationRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
+  // The hostname of the registry of the Buf Schema Registry instance that the Organization is on.
+  //
+  // In most circumstances, this must match the hostname of the instance you are calling via the API.
+  // Where there are exceptions to this, this is specifically noted in the top-level request message.
+  string registry_hostname = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.hostname = true
+  ];
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Organization.
-    string id = 1 [(buf.validate.field).string.uuid = true];
+    string id = 2 [(buf.validate.field).string.uuid = true];
     // The name of the Organization.
-    string name = 2 [(buf.validate.field).string = {
+    string name = 3 [(buf.validate.field).string = {
       min_len: 1;
       max_len: 255;
     }];
