@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/commit.proto";
+import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/registry/module/v1beta1/vcs_commit.proto";
 import "buf/registry/storage/v1beta1/storage.proto";
@@ -44,7 +45,7 @@ service CommitService {
   }
   // Get the FileNodes on a Commit for a given set of Commits, Modules, Branches, Tags, or VCSCommits.
   //
-  // Retrieving content is a two-step process:
+  // Retrieving files is a two-step process:
   //   - Get the FileNode messages. FileNodes are a map from path to digest.
   //   - Get the Blob messages. Blobs are a map from digest to content.
   rpc GetFileNodes(GetFileNodesRequest) returns (GetFileNodesResponse) {
@@ -56,6 +57,10 @@ service CommitService {
   }
   // Get the digests for Blobs that are not currently stored on the server.
   rpc GetMissingBlobDigests(GetMissingBlobDigestsRequest) returns (GetMissingBlobDigestsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get the dependencies by Commit ID, Module, Branch, Tag, or VCSCommit.
+  rpc GetDeps(GetDepsRequest) returns (GetDepsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
@@ -162,23 +167,57 @@ message CreateCommitsRequest {
     string committer_email = 7;
   }
 
-  // All of the Files for the Modules that should have Commits created for them.
+  // A reference to a module dependency.
+  message DepRef {
+    // The reference to the commit of the dependency.
+    CommitRef commit_ref = 1 [(buf.validate.field).required = true];
+    // The digest of the dependency.
+    //
+    // TODO: Especially without federation, why do we need the client to produce this?
+    // Even with federation, in reality the server should be able to calculate this.
+    // We still might want this for validation, i.e. the digest is as we expect.
+    buf.registry.storage.v1beta1.Digest digest = 2 [(buf.validate.field).required = true];
+  }
+
+  // Information needed to create a Commit for a Module, including the Module name, and the set
+  // of files that make up a single Module when creating a commit.
   //
-  // If you have a workspace, all files from the workspace, including buf.yaml and buf.lock, should
-  // be in files. The backend will parse the buf.yaml to discover the ModuleResourceRefs.
-  repeated buf.registry.storage.v1beta1.FileNode file_nodes = 1 [(buf.validate.field).repeated.min_items = 1];
+  // Consists of .proto files, license files, and documentation files.
+  // Does *not* include any files relating to dependencies.
+  message CommitContent {
+    // The module to create a Commit for.
+    //
+    // Only Modules with registry_hostnames equal to the hostname of the BSR instance you are
+    // calling can be referenced, other registry_hostnames will result in an error.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The files that make up the Module.
+    repeated buf.registry.storage.v1beta1.FileNode file_nodes = 2 [(buf.validate.field).repeated.min_items = 1];
+  }
+
+  // All of the Modules that should have Commits created for them.
+  //
+  // Each CommitContent will result in an individual Commit being created for that module.
+  // All CommitContent must have unique ModuleRefs.
+  repeated CommitContent commit_contents = 1 [(buf.validate.field).repeated.min_items = 1];
+  // The dependencies of the Modules not referenced by module_commit_infos.
+  //
+  // The dependencies must not reference any Module referenced in commit_contents.
+  //
+  // As opposed to most other requests, dependencies with registry_hostnames other than
+  // the hostname of the BSR instance your are calling *are* accepted.
+  repeated DepRef dep_ref = 2;
   // Blobs for the given FileNodes.
   //
   // Only Blobs that were returned as missing from GetMissingBlobDigests need to be sent.
   // Other Blobs already exist on the server, and will be ignored.
-  repeated buf.registry.storage.v1beta1.Blob missing_blobs = 2;
+  repeated buf.registry.storage.v1beta1.Blob missing_blobs = 3;
   // The names of Branches that should be associated with this Commit.
   //
   // If a Branch currently exists on the associated Module with a name, this existing
   // Branch will be used. Otherwise, a new Branch will be created for the corresponding name.
   //
   // If empty, the default branch is assumed as the only branch.
-  repeated string branch_names = 3 [(buf.validate.field).repeated.items = {
+  repeated string branch_names = 4 [(buf.validate.field).repeated.items = {
     string: {max_len: 250}
   }];
   // The names of Tags that should be associated with this Commit.
@@ -186,14 +225,14 @@ message CreateCommitsRequest {
   // If a Tag currently exists on the assocated Module with a name, the RPC will error, however
   // this will change in the future when we allow Tags to move. If the Tag does not
   // currently exist, a new Tag will be created for each name.
-  repeated string tag_names = 4 [(buf.validate.field).repeated.items = {
+  repeated string tag_names = 5 [(buf.validate.field).repeated.items = {
     string: {max_len: 250}
   }];
   // Associated VCS commit information.
   //
   // If there are already VCSCommits on the associated Module with a given hash, this
   // will result in an error. Otherwise, a new VCSCommit is created.
-  repeated AssociatedVCSCommit associated_vcs_commits = 5;
+  repeated AssociatedVCSCommit associated_vcs_commits = 6;
 }
 
 message CreateCommitsResponse {
@@ -280,4 +319,32 @@ message GetMissingBlobDigestsRequest {
 message GetMissingBlobDigestsResponse {
   // The digests that are missing.
   repeated buf.registry.storage.v1beta1.Digest missing_blob_digests = 1;
+}
+
+message GetDepsRequest {
+  // References to get dependencies for..
+  //
+  // See the documentation on ResourceRef for resource resolution details.
+  //
+  // Once the resource is resolved, this reference is interpeted to refer to the following Commit:
+  //   - If a Module is referenced, this is interpreted to mean the latest released Commit on the Module.
+  //   - If a Commit is referenced, this just references that specific commit.
+  //   - If a Tag is referenced, this is interpreted to mean the Commit associated with the Tag.
+  //   - If a VCSCommit is referenced, this is interpreted to mean the Commit associated with the VCSCommit.
+  //   - Is a Branch is referenced, this is interpreted to mean the latest Commit on the Branch.
+  //
+  // Only resources with registry_hostnames equal to the hostname of the BSR instance you are
+  // calling can be referenced, other registry_hostnames will result in an error.
+  repeated ResourceRef resource_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetDepsResponse {
+  message Dep {
+    Commit commit = 1 [(buf.validate.field).required = true];
+    buf.registry.storage.v1beta1.Digest digest = 2 [(buf.validate.field).required = true];
+  }
+  message Value {
+    repeated Dep deps = 1;
+  }
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
