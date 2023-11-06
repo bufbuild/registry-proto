@@ -161,7 +161,7 @@ message CreateCommitsRequest {
   message ModuleNode {
     // The reference to the Module to create a Commit for.
     ModuleRef module_ref = 1;
-    // The FileNodes of the Module.
+    // The FileNodes for the Module.
     //
     // This consists of the .proto files, license files, and documentation files. This does
     // not contain any files relating to dependencies of configuration (such as buf.lock or
