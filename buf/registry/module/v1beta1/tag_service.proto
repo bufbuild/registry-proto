@@ -45,7 +45,10 @@ service TagService {
 
 message GetTagsRequest {
   // The Tags to request.
-  repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated TagRef tag_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetTagsResponse {
@@ -101,7 +104,10 @@ message CreateTagsRequest {
     ];
   }
   // The Tags to create.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message CreateTagsResponse {
@@ -111,7 +117,10 @@ message CreateTagsResponse {
 
 message DeleteTagsRequest {
   // The Tags to delete.
-  repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated TagRef tag_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message DeleteTagsResponse {}

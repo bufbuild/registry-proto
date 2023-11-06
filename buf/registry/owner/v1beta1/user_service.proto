@@ -48,7 +48,10 @@ service UserService {
 
 message GetUsersRequest {
   // The Users to request.
-  repeated UserRef user_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated UserRef user_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetUsersResponse {
@@ -110,7 +113,10 @@ message CreateUsersRequest {
     UserVerificationStatus verification_status = 6 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to create.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message CreateUsersResponse {
@@ -138,7 +144,10 @@ message UpdateUsersRequest {
     optional UserVerificationStatus verification_status = 6 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to update.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message UpdateUsersResponse {
@@ -148,7 +157,10 @@ message UpdateUsersResponse {
 
 message DeleteUsersRequest {
   // The Users to delete.
-  repeated UserRef user_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated UserRef user_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message DeleteUsersResponse {}

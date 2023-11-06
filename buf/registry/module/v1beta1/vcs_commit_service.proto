@@ -36,7 +36,10 @@ service VCSCommitService {
 
 message GetVCSCommitsRequest {
   // The VCSCommits to request.
-  repeated VCSCommitRef vcs_commit_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated VCSCommitRef vcs_commit_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetVCSCommitsResponse {
