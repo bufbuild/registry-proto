@@ -164,7 +164,7 @@ message CreateCommitsRequest {
     // The FileNodes for the Module.
     //
     // This consists of the .proto files, license files, and documentation files. This does
-    // not contain any files relating to dependencies of configuration (such as buf.lock or
+    // not contain any files relating to dependencies or configuration (such as buf.lock or
     // buf.yaml). A server will respond with an error if an unexpected file is passed here.
     //
     // Blobs are shared across Modules within a given CreateCommit call; missing blobs
