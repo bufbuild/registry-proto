@@ -78,7 +78,10 @@ message ResolveCommitsRequest {
   //   - If a Tag is referenced, this is interpreted to mean the Commit associated with the Tag.
   //   - If a VCSCommit is referenced, this is interpreted to mean the Commit associated with the VCSCommit.
   //   - Is a Branch is referenced, this is interpreted to mean the latest Commit on the Branch.
-  repeated ResourceRef resource_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated ResourceRef resource_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message ResolveCommitsResponse {
@@ -264,7 +267,10 @@ message GetCommitNodesRequest {
     bool allow_paths_not_exist = 3;
   }
   // The File sets to request.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetCommitNodesResponse {
@@ -290,7 +296,10 @@ message GetCommitNodesResponse {
 
 message GetBlobsRequest {
   // The digests to retrieve Blobs for.
-  repeated buf.registry.storage.v1beta1.Digest digests = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated buf.registry.storage.v1beta1.Digest digests = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetBlobsResponse {
@@ -300,7 +309,10 @@ message GetBlobsResponse {
 
 message GetMissingBlobDigestsRequest {
   // The digests to see if we have Blobs for.
-  repeated buf.registry.storage.v1beta1.Digest digests = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated buf.registry.storage.v1beta1.Digest digests = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetMissingBlobDigestsResponse {

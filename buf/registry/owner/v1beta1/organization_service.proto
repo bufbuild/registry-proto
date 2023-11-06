@@ -48,7 +48,10 @@ service OrganizationService {
 
 message GetOrganizationsRequest {
   // The Organizations to request.
-  repeated OrganizationRef organization_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated OrganizationRef organization_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetOrganizationsResponse {
@@ -102,7 +105,10 @@ message CreateOrganizationsRequest {
     OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
   }
   // The Organizations to create.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message CreateOrganizationsResponse {
@@ -126,7 +132,10 @@ message UpdateOrganizationsRequest {
     optional OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
   }
   // The Organizations to update.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message UpdateOrganizationsResponse {
@@ -136,7 +145,10 @@ message UpdateOrganizationsResponse {
 
 message DeleteOrganizationsRequest {
   // The Organizations to delete.
-  repeated OrganizationRef organization_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated OrganizationRef organization_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message DeleteOrganizationsResponse {}
