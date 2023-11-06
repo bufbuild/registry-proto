@@ -252,7 +252,7 @@ message GetCommitNodesRequest {
     // The separator "/" must be used.
     repeated string paths = 2 [(buf.validate.field).repeated.items = {
       string: {
-        max_len: 1000
+        max_len: 4096
         not_contains: "\\"
         pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
       }
