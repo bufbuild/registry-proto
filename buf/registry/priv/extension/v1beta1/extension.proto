@@ -33,6 +33,8 @@ message MessageConstraints {
   // This is not just for request/response messages, this is also for any message that
   // is part of a request. It says that the message cannot form part of a response.
   //
+  // This applies to all nested messages within the message that is marked as request_only.
+  //
   // Exclusive with response_only.
   //
   // TODO: Also have a marker for specific request/response messages?
@@ -44,15 +46,18 @@ message MessageConstraints {
   // This is not just for request/response messages, this is also for any message that
   // is part of a response. It says that the message cannot form part of a request.
   //
+  // This applies to all nested messages within the message that is marked as response_only.
+  //
   // Exclusive with request_only.
   //
   // TODO: Also have a marker for specific request/response messages?
   // TODO: enum?
   bool response_only = 2;
-
   // The given message should only be recursively used as part of RPCs that are marked
   // as NO_SIDE_EFFECTS. Typically used to denote that a message should
   // only be used in read-only contexts.
+  ///
+  // This applies to all nested messages within the message that is marked as no_side_effects_only.
   //
   // This is not just for request/response messages, this is also for any message that
   // is part of an RPC.

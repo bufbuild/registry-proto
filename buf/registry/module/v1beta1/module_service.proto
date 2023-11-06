@@ -140,10 +140,12 @@ message UpdateModulesRequest {
       // The id of the release Branch of the Module.
       //
       // This Branch must already exist.
+      // This Branch must be contained within the Module referenced by module_ref.
       string release_branch_id = 7 [(buf.validate.field).string.uuid = true];
       // The name of the release Branch of the Module.
       //
       // This Branch must already exist.
+      // This Branch must be contained within the Module referenced by module_ref.
       string release_branch_name = 8 [(buf.validate.field).string.max_len = 250];
     }
   }
