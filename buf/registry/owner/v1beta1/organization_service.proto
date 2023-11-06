@@ -71,7 +71,7 @@ message ListOrganizationsRequest {
   // The ids of the specific Users to list Organizations for.
   //
   // If this is empty, all Organizations are listed, but this functionality
-  // is only available for Users with the UserServerRole of USER_SERVER_ROLE_ADMIN.
+  // is limited to Users with the necessary permissions.
   repeated UserRef user_refs = 3;
 }
 

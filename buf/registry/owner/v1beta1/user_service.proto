@@ -71,7 +71,7 @@ message ListUsersRequest {
   // The specific Organizations to list Users for.
   //
   // If this is empty, all Users for all Organizations are listed, but this functionality
-  // is only available for Users with the UserServerRole of USER_SERVER_ROLE_ADMIN.
+  // is limited to Users with the necessary permissions.
   repeated OrganizationRef organization_refs = 3;
 }
 
@@ -96,21 +96,17 @@ message CreateUsersRequest {
     //
     // If not set, the default USER_TYPE_STANDARD is used.
     UserType type = 2 [(buf.validate.field).enum.defined_only = true];
-    // The role that the User has at the BSR instance level.
-    //
-    // If not set, the default USER_SERVER_ROLE_STANDARD is used..
-    UserServerRole server_role = 3 [(buf.validate.field).enum.defined_only = true];
     // The configurable description of the User.
-    string description = 4 [(buf.validate.field).string.max_len = 350];
+    string description = 3 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for a User.
-    string url = 5 [
+    string url = 4 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 1023
     ];
     // The verification status of the User.
     //
     // If not set, the User will default to VERIFICATION_STATUS_UNVERIFIED.
-    UserVerificationStatus verification_status = 6 [(buf.validate.field).enum.defined_only = true];
+    UserVerificationStatus verification_status = 5 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to create.
   repeated Value values = 1 [
@@ -131,17 +127,15 @@ message UpdateUsersRequest {
     UserRef user_ref = 1 [(buf.validate.field).required = true];
     // The state of the User.
     optional UserState state = 2 [(buf.validate.field).enum.defined_only = true];
-    // The role that the User has at the BSR instance level.
-    optional UserServerRole server_role = 3 [(buf.validate.field).enum.defined_only = true];
     // The configurable description of the User.
-    optional string description = 4 [(buf.validate.field).string.max_len = 350];
+    optional string description = 3 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for a User.
-    optional string url = 5 [
+    optional string url = 4 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 1023
     ];
     // The verification status of the User.
-    optional UserVerificationStatus verification_status = 6 [(buf.validate.field).enum.defined_only = true];
+    optional UserVerificationStatus verification_status = 5 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to update.
   repeated Value values = 1 [
