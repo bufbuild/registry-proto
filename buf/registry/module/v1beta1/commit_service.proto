@@ -161,10 +161,10 @@ message CreateCommitsRequest {
   message ModuleNode {
     // The reference to the Module to create a Commit for.
     ModuleRef module_ref = 1;
-    // The FileNodes of the Module.
+    // The FileNodes for the Module.
     //
     // This consists of the .proto files, license files, and documentation files. This does
-    // not contain any files relating to dependencies of configuration (such as buf.lock or
+    // not contain any files relating to dependencies or configuration (such as buf.lock or
     // buf.yaml). A server will respond with an error if an unexpected file is passed here.
     //
     // Blobs are shared across Modules within a given CreateCommit call; missing blobs
@@ -268,8 +268,8 @@ message GetCommitNodesRequest {
 }
 
 message GetCommitNodesResponse {
-  // A single set of commits and their associated nodes.
-  message Value {
+  // A single Commit node and its associated FileNodes and dependencies.
+  message CommitNode {
     // The Commit for the nodes referenced in this message.
     //
     // The Digest on the Commit will always match the Digest calculable by the FileNodes and the DepNodes.
@@ -284,8 +284,8 @@ message GetCommitNodesResponse {
     // Use GetCommitNodes recursively to get the nodes for dependency commits.
     repeated Commit deps = 3;
   }
-  // The returned nodes in the same order as requested.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  // The returned CommitNodes in the same order as requested.
+  repeated CommitNode commit_nodes = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message GetBlobsRequest {
