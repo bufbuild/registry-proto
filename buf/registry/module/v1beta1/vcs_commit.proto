@@ -107,35 +107,33 @@ enum VCSType {
 message VCSCommitRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
+  // The fully-qualified name of a VCSCommit within a BSR instance.
+  //
+  // A Name uniquely identifies a VCSCommit.
+  // This is used for requests when a caller only has the VCSCommit hash and not the ID.
+  message Name {
+    // The name of the owner of the Module that contains the VCSCommit, either a user or organization.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The name of the Module that contains the VCSCommit.
+    string module = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The hash of the VCSCommit.
+    string hash = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+  }
+
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the VCSCommit.
     string id = 1 [(buf.validate.field).string.uuid = true];
     // The fully-qualified name of the VCSCommit.
-    VCSCommitFullName name = 2;
+    Name name = 2;
   }
-}
-
-// The fully-qualified name of a VCSCommit within a BSR instance.
-//
-// A VCSCommitFullName uniquely identifies a VCSCommit.
-// This is used for requests when a caller only has the VCSCommit hash and not the ID.
-message VCSCommitFullName {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-
-  // The name of the owner of the Module that contains the VCSCommit, either a user or organization.
-  string owner = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The name of the Module that contains the VCSCommit.
-  string module = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The hash of the VCSCommit.
-  string hash = 3 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
 }
