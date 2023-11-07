@@ -51,7 +51,10 @@ service ModuleService {
 
 message GetModulesRequest {
   // The Modules to request.
-  repeated ModuleRef module_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated ModuleRef module_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetModulesResponse {
@@ -71,7 +74,7 @@ message ListModulesRequest {
   // The specific Users or Organizations to list Modules for.
   //
   // If empty, all Modules for all owners are listed, but this functionality
-  // is only available for Users with the UserServerRole of USER_SERVER_ROLE_ADMIN.
+  // is limited to Users with the necessary permissions.
   repeated buf.registry.owner.v1beta1.OwnerRef owner_refs = 3;
 }
 
@@ -100,7 +103,7 @@ message CreateModulesRequest {
       (buf.validate.field).enum.defined_only = true
     ];
     // The configurable description of the Module.
-    string description = 4 [(buf.validate.field).string.max_len = 1023];
+    string description = 4 [(buf.validate.field).string.max_len = 350];
     // The configurable URL in the description of the module.
     string url = 5 [
       (buf.validate.field).string.uri = true,
@@ -109,12 +112,15 @@ message CreateModulesRequest {
     // The name of the release Branch of the module.
     //
     // If not set, the release branch will be "main" upon creation.
-    string release_branch_name = 6 [(buf.validate.field).string.max_len = 255];
+    string release_branch_name = 6 [(buf.validate.field).string.max_len = 250];
   }
   // The Modules to create.
   //
   // This operation is atomic. Either all Modules are created, or an error happens and none of them are created.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message CreateModulesResponse {
@@ -132,7 +138,7 @@ message UpdateModulesRequest {
     // The deprecation status of the module.
     optional ModuleState state = 4 [(buf.validate.field).enum.defined_only = true];
     // The configurable description of the module.
-    optional string description = 5 [(buf.validate.field).string.max_len = 1023];
+    optional string description = 5 [(buf.validate.field).string.max_len = 350];
     // uThe configurable URL in the description of the module.
     optional string url = 6 [
       (buf.validate.field).string.uri = true,
@@ -142,17 +148,22 @@ message UpdateModulesRequest {
       // The id of the release Branch of the Module.
       //
       // This Branch must already exist.
-      string release_branch_id = 7 [(buf.validate.field).string.max_len = 255];
+      // This Branch must be contained within the Module referenced by module_ref.
+      string release_branch_id = 7 [(buf.validate.field).string.uuid = true];
       // The name of the release Branch of the Module.
       //
       // This Branch must already exist.
-      string release_branch_name = 8 [(buf.validate.field).string.max_len = 255];
+      // This Branch must be contained within the Module referenced by module_ref.
+      string release_branch_name = 8 [(buf.validate.field).string.max_len = 250];
     }
   }
   // The Modules to update.
   //
   // This operation is atomic. Either all Modules are updated, or an error happens and none of them are updated.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message UpdateModulesResponse {
@@ -164,7 +175,10 @@ message DeleteModulesRequest {
   // The Modules to delete.
   //
   // This operation is atomic. Either all Modules are deleted, or an error happens and none of them are deleted.
-  repeated ModuleRef module_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated ModuleRef module_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message DeleteModulesResponse {}

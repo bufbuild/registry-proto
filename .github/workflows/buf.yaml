@@ -3,20 +3,34 @@ on:
   push:
 jobs:
   lint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: bufbuild/buf-setup-action@v1
-      - uses: bufbuild/buf-lint-action@v1.0.3
+      - uses: actions/checkout@v4
+      - name: install
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21.x
+      - name: cache
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-registry-proto-ci-${{ hashFiles('**/Makefile') }}
+          restore-keys: ${{ runner.os }}-registry-proto-ci-
+      - name: Lint
+        run: |
+          make lint
   push:
     environment: production
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     needs:
       - lint
     steps:
-      - uses: actions/checkout@v3
-      - uses: bufbuild/buf-setup-action@v1
-      - uses: bufbuild/buf-push-action@v1.1.1
+      - uses: actions/checkout@v4
+      - name: Install buf cli
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
+      - uses: bufbuild/buf-push-action@v1
         with:
           buf_token: ${{ secrets.BUF_TOKEN }}

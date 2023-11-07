@@ -33,7 +33,10 @@ service OwnerService {
 
 message GetOwnersRequest {
   // The Users or Organizations to request.
-  repeated OwnerRef owner_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated OwnerRef owner_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetOwnersResponse {

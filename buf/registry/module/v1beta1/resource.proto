@@ -30,7 +30,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 //
 // The id or name is resolved to a specific resource.
 // If an id is passed, this is interpreted as being the id of the resource.
-// If a name is passed, the semantics according to ResourceFullName are applied.
+// If a name is passed, the semantics according to ResourceRef.Name are applied.
 //
 // ResourceRefs can only be used in requests, and only for read-only RPCs, that is
 // you should not use an arbitrary reference when modifying a specific resource.
@@ -38,52 +38,56 @@ message ResourceRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
   option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
 
-  oneof ref {
-    string id = 1;
-    ResourceFullName name = 2;
+  // The fully-qualified name component of a ResourceRef.
+  //
+  // The following semantics are applied:
+  //   - If the child oneof is not specified, the name is interpreted to reference a Module.
+  //   - If branch_name is specified, the name is interpreted to reference a Branch.
+  //   - If tag_name is specified, the name is interpreted to reference a Tag.
+  //   - If vcs_commit_hash is specified, the name is interpeted to reference a VCSCommit.
+  //   - If ref is specified, it is interpreted to be either an id or name.
+  //     - If an id, this is equivalent to setting the id field on ResourceRef. However,
+  //       backends can choose to validate that the owner and module fields match the resource
+  //       referenced, as additional validation.
+  //     - If a name, this is interpreted to be either a Branch name, Tag name,
+  //       or VCSCommit hash.
+  //     - If there is a conflict between names across resources (for example, there is a
+  //       Branch and Tag with the same name), the following order of precedence is applied:
+  //       - Commit
+  //       - VCSCommit
+  //       - Tag
+  //       - Branch
+  //
+  // Names can only be used in requests, and only for read-only RPCs, that is
+  // you should not use an arbitrary reference when modifying a specific resource.
+  message Name {
+    // The name of the User or Organization that owns the resource.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The name of the Module the contains or is the resource.
+    string module = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    oneof child {
+      // The name of the Branch.
+      string branch_name = 3 [(buf.validate.field).string.max_len = 250];
+      // The name of the Tag.
+      string tag_name = 4 [(buf.validate.field).string.max_len = 250];
+      // The hash of the VCSCommit.
+      string vcs_commit_hash = 5 [(buf.validate.field).string.max_len = 255];
+      // The untyped reference, applying the semantics as documented on the Name message.
+      string ref = 6;
+    }
   }
-}
 
-// The fully-qualified name component of a ResourceRef.
-//
-// See the documentation on ResourceRef for more details.
-//
-// The following semantics are applied:
-//   - If the child oneof is not specified, the name is interpreted to reference a Module.
-//   - If branch_name is specified, the name is interpreted to reference a Branch.
-//   - If tag_name is specified, the name is interpreted to reference a Tag.
-//   - If vcs_commit_hash is specified, the name is interpeted to reference a VCSCommit.
-//   - If ref is specified, it is interpreted to be either an id or name.
-//     - If an id, this is equivalent to setting the id field on ResourceRef. However,
-//       backends can choose to validate that the owner and module fields match the resource
-//       referenced, as additional validation.
-//     - If a name, this is interpreted to be either a Branch name, Tag name,
-//       or VCSCommit hash.
-//     - If there is a conflict between names across resources (for example, there is a
-//       Branch and Tag with the same name), the following order of precedence is applied:
-//       - Commit
-//       - VCSCommit
-//       - Tag
-//       - Branch
-//
-// ResourceFullNames can only be used in requests, and only for read-only RPCs, that is
-// you should not use an arbitrary reference when modifying a specific resource.
-message ResourceFullName {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-  option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
-
-  string owner = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  string module = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  oneof child {
-    string branch_name = 3 [(buf.validate.field).string.max_len = 255];
-    string tag_name = 4 [(buf.validate.field).string.max_len = 255];
-    string vcs_commit_hash = 5 [(buf.validate.field).string.max_len = 255];
-    string ref = 6;
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the resource.
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    // The fully-qualified name of the resource.
+    Name name = 2;
   }
 }

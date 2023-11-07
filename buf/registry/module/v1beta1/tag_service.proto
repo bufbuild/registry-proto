@@ -45,7 +45,10 @@ service TagService {
 
 message GetTagsRequest {
   // The Tags to request.
-  repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated TagRef tag_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetTagsResponse {
@@ -92,18 +95,21 @@ message CreateTagsRequest {
     // The Tag name.
     string name = 2 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 255
+      (buf.validate.field).string.max_len = 250
     ];
     // The id of the Commit associated with the Tag.
     string commit_id = 3 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 255
+      (buf.validate.field).string.uuid = true
     ];
   }
   // The Tags to create.
   //
   // This operation is atomic. Either all Tags are created, or an error happens and none of them are created.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message CreateTagsResponse {
@@ -113,9 +119,13 @@ message CreateTagsResponse {
 
 message DeleteTagsRequest {
   // The Tags to delete.
+  repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
   //
   // This operation is atomic. Either all Tags are deleted, or an error happens and none of them are deleted.
-  repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated TagRef tag_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message DeleteTagsResponse {}

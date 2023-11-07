@@ -41,7 +41,10 @@ service BranchService {
 
 message GetBranchesRequest {
   // The Branches to request.
-  repeated BranchRef branch_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated BranchRef branch_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetBranchesResponse {
@@ -51,7 +54,10 @@ message GetBranchesResponse {
 
 message GetReleaseBranchesRequest {
   // The Modules to request the release Branches for.
-  repeated ModuleRef module_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated ModuleRef module_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetReleaseBranchesResponse {

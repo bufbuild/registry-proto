@@ -46,7 +46,7 @@ message Tag {
   // Unique within a given Module.
   string name = 4 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
+    (buf.validate.field).string.max_len = 250
   ];
   // The id of the User or Organization that owns the Module that the Tag is associated with.
   string owner_id = 5 [
@@ -61,7 +61,7 @@ message Tag {
   // The id of the Commit associated with the Tag.
   string commit_id = 7 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
+    (buf.validate.field).string.uuid = true
   ];
   // The Digest of the Commit associated with the Tag.
   buf.registry.storage.v1beta1.Digest commit_digest = 8 [(buf.validate.field).required = true];
@@ -78,35 +78,33 @@ message Tag {
 message TagRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
+  // The fully-qualified name of a Tag within a BSR instance.
+  //
+  // A Name uniquely identifies a Tag.
+  // This is used for requests when a caller only has the tag name and not the ID.
+  message Name {
+    // The name of the owner of the Module that contains the Tag, either a User or Organization.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The name of the Module that contains the Tag, either a User or Organization.
+    string module = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 255
+    ];
+    // The Tag name.
+    string tag = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 250
+    ];
+  }
+
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Tag.
     string id = 1 [(buf.validate.field).string.uuid = true];
     // The fully-qualified name of the Tag.
-    TagFullName name = 2;
+    Name name = 2;
   }
-}
-
-// The fully-qualified name of a Tag within a BSR instance.
-//
-// A TagFullName uniquely identifies a Tag.
-// This is used for requests when a caller only has the tag name and not the ID.
-message TagFullName {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-
-  // The name of the owner of the Module that contains the Tag, either a User or Organization.
-  string owner = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The name of the Module that contains the Tag, either a User or Organization.
-  string module = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The Tag name.
-  string tag = 3 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
 }

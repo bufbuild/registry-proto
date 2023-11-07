@@ -38,12 +38,14 @@ message Organization {
   // The last time the Organization was updated.
   google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The name of the Organization.
+  //
+  // A name uniquely identifies an Organization, however name is mutable.
   string name = 4 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 255
   ];
   // The configurable description of the Organization.
-  string description = 5 [(buf.validate.field).string.max_len = 1023];
+  string description = 5 [(buf.validate.field).string.max_len = 350];
   // The configurable URL that represents the homepage for an Organization.
   string url = 6 [
     (buf.validate.field).string.uri = true,
@@ -78,9 +80,9 @@ message OrganizationRef {
     // The id of the Organization.
     string id = 1 [(buf.validate.field).string.uuid = true];
     // The name of the Organization.
-    string name = 2 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 255
-    ];
+    string name = 2 [(buf.validate.field).string = {
+      min_len: 1;
+      max_len: 255;
+    }];
   }
 }

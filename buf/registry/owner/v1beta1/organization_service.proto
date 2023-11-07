@@ -48,7 +48,10 @@ service OrganizationService {
 
 message GetOrganizationsRequest {
   // The Organizations to request.
-  repeated OrganizationRef organization_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated OrganizationRef organization_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetOrganizationsResponse {
@@ -68,7 +71,7 @@ message ListOrganizationsRequest {
   // The ids of the specific Users to list Organizations for.
   //
   // If this is empty, all Organizations are listed, but this functionality
-  // is only available for Users with the UserServerRole of USER_SERVER_ROLE_ADMIN.
+  // is limited to Users with the necessary permissions.
   repeated UserRef user_refs = 3;
 }
 
@@ -90,7 +93,7 @@ message CreateOrganizationsRequest {
       (buf.validate.field).string.max_len = 255
     ];
     // The configurable description of the Organization.
-    string description = 2 [(buf.validate.field).string.max_len = 1023];
+    string description = 2 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for an Organization.
     string url = 3 [
       (buf.validate.field).string.uri = true,
@@ -104,7 +107,10 @@ message CreateOrganizationsRequest {
   // The Organizations to create.
   //
   // This operation is atomic. Either all Organizations are created, or an error happens and none of them are created.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message CreateOrganizationsResponse {
@@ -118,7 +124,7 @@ message UpdateOrganizationsRequest {
     // The organization to update.
     OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
     // The configurable description of the Organization.
-    optional string description = 2 [(buf.validate.field).string.max_len = 1023];
+    optional string description = 2 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for an Organization.
     optional string url = 3 [
       (buf.validate.field).string.uri = true,
@@ -128,9 +134,13 @@ message UpdateOrganizationsRequest {
     optional OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
   }
   // The Organizations to update.
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
   //
   // This operation is atomic. Either all Organizations are updated, or an error happens and none of them are updated.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message UpdateOrganizationsResponse {
@@ -142,7 +152,10 @@ message DeleteOrganizationsRequest {
   // The Organizations to delete.
   //
   // This operation is atomic. Either all Organizations are deleted, or an error happens and none of them are deleted.
-  repeated OrganizationRef organization_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated OrganizationRef organization_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message DeleteOrganizationsResponse {}
