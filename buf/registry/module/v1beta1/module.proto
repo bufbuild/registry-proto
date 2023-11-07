@@ -38,12 +38,10 @@ message Module {
   // The name of the Module.
   //
   // Unique within a given User or Organization.
-  string name = 4 [
-    (buf.validate.field).string = {
-      min_len: 2,
-      max_len: 100
-    }
-  ];
+  string name = 4 [(buf.validate.field).string = {
+    min_len: 2,
+    max_len: 100
+  }];
   // The id of the User or Organization that owns the Module.
   string owner_id = 5 [
     (buf.validate.field).required = true,
@@ -109,12 +107,10 @@ message ModuleRef {
       (buf.validate.field).string.max_len = 255
     ];
     // The name of the Module.
-    string module = 2 [
-      (buf.validate.field).string = {
-        min_len: 2,
-        max_len: 100
-      }
-    ];
+    string module = 2 [(buf.validate.field).string = {
+      min_len: 2,
+      max_len: 100
+    }];
   }
 
   oneof value {
