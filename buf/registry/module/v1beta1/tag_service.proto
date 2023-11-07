@@ -119,7 +119,6 @@ message CreateTagsResponse {
 
 message DeleteTagsRequest {
   // The Tags to delete.
-  repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
   //
   // This operation is atomic. Either all Tags are deleted, or an error happens and none of them are deleted.
   repeated TagRef tag_refs = 1 [
