@@ -134,7 +134,6 @@ message UpdateOrganizationsRequest {
     optional OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
   }
   // The Organizations to update.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
   //
   // This operation is atomic. Either all Organizations are updated, or an error happens and none of them are updated.
   repeated Value values = 1 [
