@@ -54,20 +54,15 @@ message User {
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
-  // The role that the User has at the BSR instance level.
-  UserServerRole server_role = 7 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).enum.defined_only = true
-  ];
   // The configurable description of the User.
-  string description = 8 [(buf.validate.field).string.max_len = 350];
+  string description = 7 [(buf.validate.field).string.max_len = 350];
   // The configurable URL that represents the homepage for a User.
-  string url = 9 [
+  string url = 8 [
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.max_len = 1023
   ];
   // The verification status of the User.
-  UserVerificationStatus verification_status = 10 [
+  UserVerificationStatus verification_status = 9 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
@@ -86,13 +81,6 @@ enum UserType {
   USER_TYPE_STANDARD = 1;
   USER_TYPE_MACHINE = 2;
   USER_TYPE_SYSTEM = 3;
-}
-
-// The role that the User has at the BSR instance level.
-enum UserServerRole {
-  USER_SERVER_ROLE_UNSPECIFIED = 0;
-  USER_SERVER_ROLE_STANDARD = 1;
-  USER_SERVER_ROLE_ADMIN = 2;
 }
 
 // The verification status of an User.

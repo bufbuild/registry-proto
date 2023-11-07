@@ -74,7 +74,7 @@ message ListModulesRequest {
   // The specific Users or Organizations to list Modules for.
   //
   // If empty, all Modules for all owners are listed, but this functionality
-  // is only available for Users with the UserServerRole of USER_SERVER_ROLE_ADMIN.
+  // is limited to Users with the necessary permissions.
   repeated buf.registry.owner.v1beta1.OwnerRef owner_refs = 3;
 }
 
