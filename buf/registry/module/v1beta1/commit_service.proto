@@ -35,7 +35,7 @@ service CommitService {
   rpc ListCommitHistory(ListCommitHistoryRequest) returns (ListCommitHistoryResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Create commits on a Module with associated content (e.g. blobs, branches, tags).
+  // Create commits on a Module with associated Content.
   //
   // This is used by push and sync.
   //
