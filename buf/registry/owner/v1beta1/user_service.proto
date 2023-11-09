@@ -110,7 +110,7 @@ message CreateUsersRequest {
   }
   // The Users to create.
   //
-  // This operation is atomic. Either all Users are created or an error happens.
+  // This operation is atomic. Either all Users are created or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -141,7 +141,7 @@ message UpdateUsersRequest {
   }
   // The Users to update.
   //
-  // This operation is atomic. Either all Users are updated or an error happens.
+  // This operation is atomic. Either all Users are updated or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -156,7 +156,7 @@ message UpdateUsersResponse {
 message DeleteUsersRequest {
   // The Users to delete.
   //
-  // This operation is atomic. Either all Users are deleted or an error happens.
+  // This operation is atomic. Either all Users are deleted or an error is returned.
   repeated UserRef user_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250

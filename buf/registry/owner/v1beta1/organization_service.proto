@@ -106,7 +106,7 @@ message CreateOrganizationsRequest {
   }
   // The Organizations to create.
   //
-  // This operation is atomic. Either all Organizations are created or an error happens.
+  // This operation is atomic. Either all Organizations are created or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -135,7 +135,7 @@ message UpdateOrganizationsRequest {
   }
   // The Organizations to update.
   //
-  // This operation is atomic. Either all Organizations are updated or an error happens.
+  // This operation is atomic. Either all Organizations are updated or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -150,7 +150,7 @@ message UpdateOrganizationsResponse {
 message DeleteOrganizationsRequest {
   // The Organizations to delete.
   //
-  // This operation is atomic. Either all Organizations are deleted or an error happens.
+  // This operation is atomic. Either all Organizations are deleted or an error is returned.
   repeated OrganizationRef organization_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
