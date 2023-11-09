@@ -34,10 +34,14 @@ service TagService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
   // Create new Tags on a Module.
+  //
+  // This operation is atomic. Either all Tags are created or an error is returned.
   rpc CreateTags(CreateTagsRequest) returns (CreateTagsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Delete existing Tags.
+  //
+  // This operation is atomic. Either all Tags are deleted or an error is returned.
   rpc DeleteTags(DeleteTagsRequest) returns (DeleteTagsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
