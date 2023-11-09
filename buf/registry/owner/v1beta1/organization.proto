@@ -42,7 +42,7 @@ message Organization {
   // A name uniquely identifies an Organization, however name is mutable.
   string name = 4 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
+    (buf.validate.field).string.max_len = 32
   ];
   // The configurable description of the Organization.
   string description = 5 [(buf.validate.field).string.max_len = 350];
@@ -82,7 +82,7 @@ message OrganizationRef {
     // The name of the Organization.
     string name = 2 [(buf.validate.field).string = {
       min_len: 1;
-      max_len: 255;
+      max_len: 32;
     }];
   }
 }
