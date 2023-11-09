@@ -62,7 +62,7 @@ message Module {
   // The configurable URL in the description of the Module,
   string url = 9 [
     (buf.validate.field).string.uri = true,
-    (buf.validate.field).string.max_len = 1023
+    (buf.validate.field).string.max_len = 255
   ];
   // The id of the Branch which releases are generated from.
   string release_branch_id = 10 [
@@ -104,7 +104,7 @@ message ModuleRef {
     // The name of the owner of the Module, either a User or Organization.
     string owner = 1 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 255
+      (buf.validate.field).string.max_len = 32
     ];
     // The name of the Module.
     string module = 2 [(buf.validate.field).string = {
