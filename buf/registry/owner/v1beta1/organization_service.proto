@@ -33,14 +33,20 @@ service OrganizationService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
   // Create new Organizations.
+  //
+  // This operation is atomic. Either all Organizations are created or an error is returned.
   rpc CreateOrganizations(CreateOrganizationsRequest) returns (CreateOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Update existing organizations.
+  //
+  // This operation is atomic. Either all Organizations are updated or an error is returned.
   rpc UpdateOrganizations(UpdateOrganizationsRequest) returns (UpdateOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Delete existsing organizations.
+  //
+  // This operation is atomic. Either all Organizations are deleted or an error is returned.
   rpc DeleteOrganizations(DeleteOrganizationsRequest) returns (DeleteOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
@@ -105,8 +111,6 @@ message CreateOrganizationsRequest {
     OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
   }
   // The Organizations to create.
-  //
-  // This operation is atomic. Either all Organizations are created or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -134,8 +138,6 @@ message UpdateOrganizationsRequest {
     optional OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
   }
   // The Organizations to update.
-  //
-  // This operation is atomic. Either all Organizations are updated or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -149,8 +151,6 @@ message UpdateOrganizationsResponse {
 
 message DeleteOrganizationsRequest {
   // The Organizations to delete.
-  //
-  // This operation is atomic. Either all Organizations are deleted or an error is returned.
   repeated OrganizationRef organization_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250

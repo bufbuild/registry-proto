@@ -34,10 +34,14 @@ service TagService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
   // Create new Tags on a Module.
+  //
+  // This operation is atomic. Either all Tags are created or an error is returned.
   rpc CreateTags(CreateTagsRequest) returns (CreateTagsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Delete existing Tags.
+  //
+  // This operation is atomic. Either all Tags are deleted or an error is returned.
   rpc DeleteTags(DeleteTagsRequest) returns (DeleteTagsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
@@ -104,8 +108,6 @@ message CreateTagsRequest {
     ];
   }
   // The Tags to create.
-  //
-  // This operation is atomic. Either all Tags are created or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -119,8 +121,6 @@ message CreateTagsResponse {
 
 message DeleteTagsRequest {
   // The Tags to delete.
-  //
-  // This operation is atomic. Either all Tags are deleted or an error is returned.
   repeated TagRef tag_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250

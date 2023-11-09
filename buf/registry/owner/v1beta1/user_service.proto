@@ -33,14 +33,20 @@ service UserService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
   // Create new Users.
+  //
+  // This operation is atomic. Either all Users are created or an error is returned.
   rpc CreateUsers(CreateUsersRequest) returns (CreateUsersResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Update existing Users.
+  //
+  // This operation is atomic. Either all Users are updated or an error is returned.
   rpc UpdateUsers(UpdateUsersRequest) returns (UpdateUsersResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Delete existing Users.
+  //
+  // This operation is atomic. Either all Users are deleted or an error is returned.
   rpc DeleteUsers(DeleteUsersRequest) returns (DeleteUsersResponse) {
     option idempotency_level = IDEMPOTENT;
   }
@@ -109,8 +115,6 @@ message CreateUsersRequest {
     UserVerificationStatus verification_status = 5 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to create.
-  //
-  // This operation is atomic. Either all Users are created or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -140,8 +144,6 @@ message UpdateUsersRequest {
     optional UserVerificationStatus verification_status = 5 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to update.
-  //
-  // This operation is atomic. Either all Users are updated or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -155,8 +157,6 @@ message UpdateUsersResponse {
 
 message DeleteUsersRequest {
   // The Users to delete.
-  //
-  // This operation is atomic. Either all Users are deleted or an error is returned.
   repeated UserRef user_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250

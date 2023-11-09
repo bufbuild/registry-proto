@@ -36,14 +36,20 @@ service ModuleService {
   //
   // When a Module is created, a Branch representing the release Branch
   // is created as well.
+  //
+  // This operation is atomic. Either all Modules are created or an error is returned.
   rpc CreateModules(CreateModulesRequest) returns (CreateModulesResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Update existing Modules.
+  //
+  // This operation is atomic. Either all Modules are updated or an error is returned.
   rpc UpdateModules(UpdateModulesRequest) returns (UpdateModulesResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Delete existing Modules.
+  //
+  // This operation is atomic. Either all Modules are deleted or an error is returned.
   rpc DeleteModules(DeleteModulesRequest) returns (DeleteModulesResponse) {
     option idempotency_level = IDEMPOTENT;
   }
@@ -115,8 +121,6 @@ message CreateModulesRequest {
     string release_branch_name = 6 [(buf.validate.field).string.max_len = 250];
   }
   // The Modules to create.
-  //
-  // This operation is atomic. Either all Modules are created or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -158,8 +162,6 @@ message UpdateModulesRequest {
     }
   }
   // The Modules to update.
-  //
-  // This operation is atomic. Either all Modules are updated or an error is returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -173,8 +175,6 @@ message UpdateModulesResponse {
 
 message DeleteModulesRequest {
   // The Modules to delete.
-  //
-  // This operation is atomic. Either all Modules are deleted or an error is returned.
   repeated ModuleRef module_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
