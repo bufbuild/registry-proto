@@ -116,7 +116,7 @@ message CreateModulesRequest {
   }
   // The Modules to create.
   //
-  // This operation is atomic. Either all Modules are created, or an error happens and none of them are created.
+  // This operation is atomic. Either all Modules are created or an error happens.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -159,7 +159,7 @@ message UpdateModulesRequest {
   }
   // The Modules to update.
   //
-  // This operation is atomic. Either all Modules are updated, or an error happens and none of them are updated.
+  // This operation is atomic. Either all Modules are updated or an error happens.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -174,7 +174,7 @@ message UpdateModulesResponse {
 message DeleteModulesRequest {
   // The Modules to delete.
   //
-  // This operation is atomic. Either all Modules are deleted, or an error happens and none of them are deleted.
+  // This operation is atomic. Either all Modules are deleted or an error happens.
   repeated ModuleRef module_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
