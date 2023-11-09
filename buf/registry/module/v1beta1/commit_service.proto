@@ -39,7 +39,7 @@ service CommitService {
   //
   // This is used by push and sync.
   //
-  // This operation is atomic. Either all Commits and associated content are created, or an error is returned.
+  // This operation is atomic. Either all Commits and associated content are created or an error is returned.
   //
   // TODO: PushCommits? Something else? This is creating potentially a bunch of resources.
   rpc CreateCommits(CreateCommitsRequest) returns (CreateCommitsResponse) {
