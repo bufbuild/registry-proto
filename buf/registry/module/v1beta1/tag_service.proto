@@ -75,6 +75,7 @@ message ListTagsRequest {
   //   - If a Tag is referenced, this Tag is returned.
   //   - If a VCSCommit is referenced, all Tags for commits that the VCSCommit is associated with are returned.
   //   - Is a Branch is referenced, all Tags for Commits on the Branch are returned.
+  //   - If a Digest is referenced, all Tags that contain a Commit with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
 }
 
