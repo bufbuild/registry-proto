@@ -189,7 +189,6 @@ message CreateCommitsRequest {
     repeated DepNode dep_nodes = 3;
   }
 
-
   // The pointers to the content for the Modules that should have Commits created for them.
   //
   // Each ModuleNode must have a unique ModuleRef.
