@@ -310,14 +310,25 @@ message GetBlobsResponse {
 }
 
 message GetMissingBlobDigestsRequest {
-  // The digests to see if we have Blobs for.
-  repeated buf.registry.storage.v1beta1.Digest digests = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
-  ];
+  message ModuleBlobDigests {
+    // The reference to the Module that the digests belong to.
+    ModuleRef module = 1;
+    // The digests to see if we have Blobs for.
+    repeated buf.registry.storage.v1beta1.Digest blob_digests = 2 [
+      (buf.validate.field).repeated.min_items = 1,
+      (buf.validate.field).repeated.max_items = 250
+    ];
+  }
+  repeated ModuleBlobDigests module_blob_digests = 1;
 }
 
 message GetMissingBlobDigestsResponse {
+  message MissingBlobDigest {
+    // The reference to the Module that the missing digests are for.
+    ModuleRef module = 1;
+    // The digests that are missing.
+    repeated buf.registry.storage.v1beta1.Digest missing_blob_digests = 2;
+  }
   // The digests that are missing.
-  repeated buf.registry.storage.v1beta1.Digest missing_blob_digests = 1;
+  repeated MissingBlobDigest missing_blob_digests = 1;
 }
