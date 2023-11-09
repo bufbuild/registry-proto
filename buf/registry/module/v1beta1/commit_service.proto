@@ -319,7 +319,10 @@ message GetMissingBlobDigestsRequest {
       (buf.validate.field).repeated.max_items = 250
     ];
   }
-  repeated ModuleBlobDigests module_blob_digests = 1;
+  repeated ModuleBlobDigests module_blob_digests = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetMissingBlobDigestsResponse {
