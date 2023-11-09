@@ -327,8 +327,8 @@ message GetMissingBlobDigestsRequest {
 
 message GetMissingBlobDigestsResponse {
   message MissingBlobDigest {
-    // The reference to the Module that the missing digests are for.
-    ModuleRef module_ref = 1;
+    // The Module that the missing digests are for.
+    Module module = 1 [(buf.validate.field).required = true];
     // The digests that are missing.
     repeated buf.registry.storage.v1beta1.Digest missing_blob_digests = 2;
   }
