@@ -101,7 +101,7 @@ message CreateUsersRequest {
     // The configurable URL that represents the homepage for a User.
     string url = 4 [
       (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 1023
+      (buf.validate.field).string.max_len = 255
     ];
     // The verification status of the User.
     //
@@ -132,7 +132,7 @@ message UpdateUsersRequest {
     // The configurable URL that represents the homepage for a User.
     optional string url = 4 [
       (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 1023
+      (buf.validate.field).string.max_len = 255
     ];
     // The verification status of the User.
     optional UserVerificationStatus verification_status = 5 [(buf.validate.field).enum.defined_only = true];
