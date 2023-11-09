@@ -21,6 +21,8 @@ import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // A branch on a specific Module.
 message Branch {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
@@ -41,7 +43,7 @@ message Branch {
   // Unique within a given Module.
   string name = 4 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
+    (buf.validate.field).string.max_len = 250
   ];
   // The id of the User or Organization that owns the Module that the Branch is associated with.
   string owner_id = 5 [
@@ -73,35 +75,33 @@ message Branch {
 message BranchRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
+  // The fully-qualified name of a Branch within a BSR instance.
+  //
+  // A Name uniquely identifies a Branch.
+  // This is used for requests when a caller only has the branch name and not the ID.
+  message Name {
+    // The name of the User or Organization that owns the Module that contains this Branch.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 32
+    ];
+    // The name of the Module that contains this Branch.
+    string module = 2 [(buf.validate.field).string = {
+      min_len: 2,
+      max_len: 100
+    }];
+    // The name of the Branch.
+    string branch = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 250
+    ];
+  }
+
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Branch.
     string id = 1 [(buf.validate.field).string.uuid = true];
     // The fully-qualified name of the Branch.
-    BranchFullName name = 2;
+    Name name = 2;
   }
-}
-
-// The fully-qualified name of a Branch within a BSR instance.
-//
-// A BranchFullName uniquely identifies a Branch.
-// This is used for requests when a caller only has the branch name and not the ID.
-message BranchFullName {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-
-  // The name of the User or Organization that owns the Module that contains this Branch.
-  string owner = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The name of the Module that contains this Branch.
-  string module = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The name of the Branch.
-  string branch = 3 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
 }

@@ -17,7 +17,10 @@ syntax = "proto3";
 package buf.registry.module.v1beta1;
 
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
 // A reference to any of these resources:
 //   - Module
@@ -28,7 +31,7 @@ import "buf/validate/validate.proto";
 //
 // The id or name is resolved to a specific resource.
 // If an id is passed, this is interpreted as being the id of the resource.
-// If a name is passed, the semantics according to ResourceFullName are applied.
+// If a name is passed, the semantics according to ResourceRef.Name are applied.
 //
 // ResourceRefs can only be used in requests, and only for read-only RPCs, that is
 // you should not use an arbitrary reference when modifying a specific resource.
@@ -36,52 +39,64 @@ message ResourceRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
   option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
 
-  oneof ref {
-    string id = 1;
-    ResourceFullName name = 2;
+  // The fully-qualified name component of a ResourceRef.
+  //
+  // The following semantics are applied:
+  //   - If the child oneof is not specified, the name is interpreted to reference a Module.
+  //   - If branch_name is specified, the name is interpreted to reference a Branch.
+  //   - If tag_name is specified, the name is interpreted to reference a Tag.
+  //   - If vcs_commit_hash is specified, the name is interpreted to reference a VCSCommit.
+  //   - If digest is specified, the name is interpreted to reference a Commit with this Digest.
+  //   - If ref is specified, it is interpreted to be either an id or name.
+  //     - If an id, this is equivalent to setting the id field on ResourceRef. However,
+  //       backends can choose to validate that the owner and module fields match the resource
+  //       referenced, as additional validation.
+  //     - If a name, this is interpreted to be either a Branch name, Tag name,
+  //       VCSCommit hash, or Digest string. A digest string is of the form "typeString:hexValue",
+  //       where typeString is the lowercase of the Type value with TYPE_ stripped, and hexValue
+  //       is the hex-encoded value of the digest.
+  //     - If there is a conflict between names across resources (for example, there is a
+  //       Branch and Tag with the same name), the following order of precedence is applied:
+  //       - Commit
+  //       - VCSCommit
+  //       - Tag
+  //       - Branch
+  //
+  // Names can only be used in requests, and only for read-only RPCs, that is
+  // you should not use an arbitrary reference when modifying a specific resource.
+  message Name {
+    // The name of the User or Organization that owns the resource.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 32
+    ];
+    // The name of the Module the contains or is the resource.
+    string module = 2 [(buf.validate.field).string = {
+      min_len: 2,
+      max_len: 100
+    }];
+    oneof child {
+      // The name of the Branch.
+      string branch_name = 3 [(buf.validate.field).string.max_len = 250];
+      // The name of the Tag.
+      string tag_name = 4 [(buf.validate.field).string.max_len = 250];
+      // The hash of the VCSCommit.
+      string vcs_commit_hash = 5 [(buf.validate.field).string.pattern = "^[0-9a-fA-F]{40}$"];
+      // The digest of the Commit.
+      buf.registry.storage.v1beta1.Digest digest = 6;
+      // The untyped reference, applying the semantics as documented on the Name message.
+      //
+      // If this value is present but empty, this should be treated as not present, that is
+      // an empty value is the same as a null value.
+      string ref = 7;
+    }
   }
-}
 
-// The fully-qualified name component of a ResourceRef.
-//
-// See the documentation on ResourceRef for more details.
-//
-// The following semantics are applied:
-//   - If the child oneof is not specified, the name is interpreted to reference a Module.
-//   - If branch_name is specified, the name is interpreted to reference a Branch.
-//   - If tag_name is specified, the name is interpreted to reference a Tag.
-//   - If vcs_commit_hash is specified, the name is interpeted to reference a VCSCommit.
-//   - If ref is specified, it is interpreted to be either an id or name.
-//     - If an id, this is equivalent to setting the id field on ResourceRef. However,
-//       backends can choose to validate that the owner and module fields match the resource
-//       referenced, as additional validation.
-//     - If a name, this is interpreted to be either a Branch name, Tag name,
-//       or VCSCommit hash.
-//     - If there is a conflict between names across resources (for example, there is a
-//       Branch and Tag with the same name), the following order of precedence is applied:
-//       - Commit
-//       - VCSCommit
-//       - Tag
-//       - Branch
-//
-// ResourceFullNames can only be used in requests, and only for read-only RPCs, that is
-// you should not use an arbitrary reference when modifying a specific resource.
-message ResourceFullName {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-  option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
-
-  string owner = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  string module = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  oneof child {
-    string branch_name = 3 [(buf.validate.field).string.max_len = 255];
-    string tag_name = 4 [(buf.validate.field).string.max_len = 255];
-    string vcs_commit_hash = 5 [(buf.validate.field).string.max_len = 255];
-    string ref = 6;
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the resource.
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    // The fully-qualified name of the resource.
+    Name name = 2;
   }
 }

@@ -21,6 +21,8 @@ import "buf/registry/module/v1beta1/resource.proto";
 import "buf/registry/module/v1beta1/tag.proto";
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // Operate on Tags.
 service TagService {
   // Get Tags by id or name.
@@ -43,7 +45,10 @@ service TagService {
 
 message GetTagsRequest {
   // The Tags to request.
-  repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated TagRef tag_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetTagsResponse {
@@ -70,6 +75,7 @@ message ListTagsRequest {
   //   - If a Tag is referenced, this Tag is returned.
   //   - If a VCSCommit is referenced, all Tags for commits that the VCSCommit is associated with are returned.
   //   - Is a Branch is referenced, all Tags for Commits on the Branch are returned.
+  //   - If a Digest is referenced, all Tags that contain a Commit with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
 }
 
@@ -90,16 +96,19 @@ message CreateTagsRequest {
     // The Tag name.
     string name = 2 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 255
+      (buf.validate.field).string.max_len = 250
     ];
     // The id of the Commit associated with the Tag.
     string commit_id = 3 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 255
+      (buf.validate.field).string.uuid = true
     ];
   }
   // The Tags to create.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message CreateTagsResponse {
@@ -109,7 +118,10 @@ message CreateTagsResponse {
 
 message DeleteTagsRequest {
   // The Tags to delete.
-  repeated TagRef tag_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated TagRef tag_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message DeleteTagsResponse {}

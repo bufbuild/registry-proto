@@ -19,6 +19,8 @@ package buf.registry.owner.v1beta1;
 import "buf/registry/owner/v1beta1/owner.proto";
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1beta1";
+
 // Operate on Users and Organizations in situations where you only
 // know a reference to an owner, without knowing whether or not that
 // owner is a User or Organization.
@@ -31,7 +33,10 @@ service OwnerService {
 
 message GetOwnersRequest {
   // The Users or Organizations to request.
-  repeated OwnerRef owner_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated OwnerRef owner_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetOwnersResponse {

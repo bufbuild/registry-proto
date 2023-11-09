@@ -20,6 +20,8 @@ import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // A module within the BSR.
 message Module {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
@@ -36,10 +38,10 @@ message Module {
   // The name of the Module.
   //
   // Unique within a given User or Organization.
-  string name = 4 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
+  string name = 4 [(buf.validate.field).string = {
+    min_len: 2,
+    max_len: 100
+  }];
   // The id of the User or Organization that owns the Module.
   string owner_id = 5 [
     (buf.validate.field).required = true,
@@ -56,11 +58,11 @@ message Module {
     (buf.validate.field).enum.defined_only = true
   ];
   // The configurable description of the Module.
-  string description = 8 [(buf.validate.field).string.max_len = 1023];
+  string description = 8 [(buf.validate.field).string.max_len = 350];
   // The configurable URL in the description of the Module,
   string url = 9 [
     (buf.validate.field).string.uri = true,
-    (buf.validate.field).string.max_len = 1023
+    (buf.validate.field).string.max_len = 255
   ];
   // The id of the Branch which releases are generated from.
   string release_branch_id = 10 [
@@ -94,30 +96,28 @@ enum ModuleState {
 message ModuleRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
+  // The fully-qualified name of a Module within a BSR instance.
+  //
+  // A Name uniquely identifies a Module.
+  // This is used for requests when a caller only has the module name and not the ID.
+  message Name {
+    // The name of the owner of the Module, either a User or Organization.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 32
+    ];
+    // The name of the Module.
+    string module = 2 [(buf.validate.field).string = {
+      min_len: 2,
+      max_len: 100
+    }];
+  }
+
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Module.
     string id = 1 [(buf.validate.field).string.uuid = true];
     // The fully-qualified name of the Module.
-    ModuleFullName name = 2;
+    Name name = 2;
   }
-}
-
-// The fully-qualified name of a Module within a BSR instance.
-//
-// A ModuleFullName uniquely identifies a Module.
-// This is used for requests when a caller only has the module name and not the ID.
-message ModuleFullName {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-
-  // The name of the owner of the Module, either a User or Organization.
-  string owner = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
-  // The name of the Module.
-  string module = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
-  ];
 }

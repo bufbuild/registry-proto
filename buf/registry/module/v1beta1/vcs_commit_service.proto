@@ -20,6 +20,8 @@ import "buf/registry/module/v1beta1/resource.proto";
 import "buf/registry/module/v1beta1/vcs_commit.proto";
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // Operate on VCSCommits.
 service VCSCommitService {
   // Get VCSCommits by id or name.
@@ -34,7 +36,10 @@ service VCSCommitService {
 
 message GetVCSCommitsRequest {
   // The VCSCommits to request.
-  repeated VCSCommitRef vcs_commit_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated VCSCommitRef vcs_commit_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetVCSCommitsResponse {
@@ -62,6 +67,7 @@ message ListVCSCommitsRequest {
   //   - If a Tag is referenced, all VCSCommits for the Commit associated with the Tag are returned.
   //   - If a VCSCommit is referenced, this VCSCommit is returned.
   //   - Is a Branch is referenced, all VCSCommits associated with Commits on the Branch are returned.
+  //   - If a Digest is referenced, all VCSCommits associated with Commits with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
 }
 

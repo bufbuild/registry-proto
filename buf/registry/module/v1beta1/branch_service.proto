@@ -21,6 +21,8 @@ import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
 // Operate on Branches.
 service BranchService {
   // Get Branches by ID or name.
@@ -39,7 +41,10 @@ service BranchService {
 
 message GetBranchesRequest {
   // The Branches to request.
-  repeated BranchRef branch_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated BranchRef branch_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetBranchesResponse {
@@ -49,7 +54,10 @@ message GetBranchesResponse {
 
 message GetReleaseBranchesRequest {
   // The Modules to request the release Branches for.
-  repeated ModuleRef module_refs = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated ModuleRef module_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetReleaseBranchesResponse {
@@ -76,6 +84,7 @@ message ListBranchesRequest {
   //   - If a Tag is referenced, all Branches that contain the Tag are returned.
   //   - If a VCSCommit is referenced, all Branches that contain the VCSCommit are returned.
   //   - Is a Branch is referenced, this Branch is returned.
+  //   - If a Digest is referenced, all Branches that contain a Commit with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
 }
 

@@ -18,6 +18,8 @@ package buf.registry.storage.v1beta1;
 
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/storage/v1beta1";
+
 // A digest.
 message Digest {
   // The type of Digest.
@@ -40,7 +42,9 @@ message Blob {
   // The digest of the blob.
   Digest digest = 1 [(buf.validate.field).required = true];
   // Content is the content of the blob.
-  bytes content = 2 [(buf.validate.field).required = true];
+  //
+  // May be empty.
+  bytes content = 2;
 }
 
 // A pointer to a file that can be read or written to from disk.
@@ -52,11 +56,13 @@ message FileNode {
   //
   // The path must be relative, and connect contain any "." or ".." components
   // The separator "/" must be used.
-  //
-  // TODO: Can we encode the above requirements via validation?
   string path = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 4096
+    (buf.validate.field).string = {
+      max_len: 4096,
+      not_contains: "\\",
+      pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
+    }
   ];
   // The digest of the file.
   //
@@ -73,11 +79,13 @@ message File {
   //
   // The path must be relative, and connect contain any "." or ".." components
   // The separator "/" must be used.
-  //
-  // TODO: Can we encode the above requirements via validation?
   string path = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 4096
+    (buf.validate.field).string = {
+      max_len: 4096,
+      not_contains: "\\",
+      pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
+    }
   ];
   // Content is the content of the blob.
   //
