@@ -42,7 +42,7 @@ message User {
   // A name uniquely identifies a User, however name is mutable.
   string name = 4 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 255
+    (buf.validate.field).string.max_len = 32
   ];
   // The type of the User.
   UserType type = 5 [
@@ -59,7 +59,7 @@ message User {
   // The configurable URL that represents the homepage for a User.
   string url = 8 [
     (buf.validate.field).string.uri = true,
-    (buf.validate.field).string.max_len = 1023
+    (buf.validate.field).string.max_len = 255
   ];
   // The verification status of the User.
   UserVerificationStatus verification_status = 9 [
@@ -108,7 +108,7 @@ message UserRef {
     // The name of the User.
     string name = 2 [(buf.validate.field).string = {
       min_len: 1;
-      max_len: 255;
+      max_len: 32;
     }];
   }
 }

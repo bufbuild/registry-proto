@@ -80,6 +80,8 @@ message ResolveCommitsRequest {
   //   - If a Tag is referenced, this is interpreted to mean the Commit associated with the Tag.
   //   - If a VCSCommit is referenced, this is interpreted to mean the Commit associated with the VCSCommit.
   //   - Is a Branch is referenced, this is interpreted to mean the latest Commit on the Branch.
+  //   - If a Digest is referenced, this is interpreted to mean the latest released Commit that has this Digest.
+  //     Digests referencing unreleased Commits cannot be referenced.
   repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -110,6 +112,8 @@ message ListCommitHistoryRequest {
   //   - If a Tag is referenced, history is started at the Commit associated with the Tag.
   //   - If a VCSCommit is referenced, history is started at the Commit associated with the VCSCommit.
   //   - Is a Branch is referenced, history is started at the latest Commit on the Branch.
+  //   - If a Digest is referenced, history is started at the latest released Commit that has this Digest.
+  //     Digests referencing unreleased Commits cannot be referenced.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // Only return Commits that have one or more associated Tags.
   bool has_tag = 4;
@@ -135,7 +139,7 @@ message CreateCommitsRequest {
     // Unique within a given Module.
     string hash = 1 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 255
+      (buf.validate.field).string.pattern = "^[0-9a-fA-F]{40}$"
     ];
     // The type of VCS.
     VCSType type = 2 [
@@ -162,10 +166,18 @@ message CreateCommitsRequest {
     string committer_email = 7;
   }
 
+  // A pointer to a dependency of a Module.
+  message DepNode {
+    // The reference to the Module to create a Commit for.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The digest of the dependency.
+    buf.registry.storage.v1beta1.Digest digest = 2 [(buf.validate.field).required = true];
+  }
+
   // The pointers to the content of a single Module that a Commit will be created for.
   message ModuleNode {
     // The reference to the Module to create a Commit for.
-    ModuleRef module_ref = 1;
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The FileNodes for the Module.
     //
     // This consists of the .proto files, license files, and documentation files. This does
@@ -174,15 +186,9 @@ message CreateCommitsRequest {
     //
     // Blobs are shared across Modules within a given CreateCommit call; missing blobs
     // should be passed via the missing_blobs field. See GetMissingBlobDigests for more details.
-    repeated buf.registry.storage.v1beta1.FileNode file_nodes = 2;
-  }
-
-  // A pointer to a dependency of a Module.
-  message DepNode {
-    // The ID of the the Commit of the dependency.
-    string commit_id = 1 [(buf.validate.field).required = true];
-    // The digest of the dependency.
-    buf.registry.storage.v1beta1.Digest digest = 2 [(buf.validate.field).required = true];
+    repeated buf.registry.storage.v1beta1.FileNode file_nodes = 2 [(buf.validate.field).repeated.min_items = 1];
+    // The dependencies of the Module.
+    repeated DepNode dep_nodes = 3;
   }
 
   // The pointers to the content for the Modules that should have Commits created for them.
@@ -190,11 +196,6 @@ message CreateCommitsRequest {
   // Each ModuleNode must have a unique ModuleRef.
   // A commit will be created for each ModuleNode.
   repeated ModuleNode module_nodes = 1 [(buf.validate.field).repeated.min_items = 1];
-  // The dependencies of the Modules that are not contained within module_nodes.
-  //
-  // No dep should reference a Commit that is within a Module referenced by module_ref on
-  // any of the ModuleNodes in module_nodes.
-  repeated DepNode dep_nodes = 2;
   // Blobs for the FileNodes referenced by module_nodes that are not present on the server.
   //
   // Only Blobs that were returned as missing from GetMissingBlobDigests need to be sent.
@@ -202,14 +203,14 @@ message CreateCommitsRequest {
   //
   // If a FileNode within module_nodes has a Blob that is not on the server, and is not
   // within missing_blobs, an error will be returned.
-  repeated buf.registry.storage.v1beta1.Blob missing_blobs = 3;
+  repeated buf.registry.storage.v1beta1.Blob missing_blobs = 2;
   // The names of Branches that should be associated with this Commit.
   //
   // If a Branch currently exists on the associated Module with a name, this existing
   // Branch will be used. Otherwise, a new Branch will be created for the corresponding name.
   //
   // If empty, the default branch is assumed as the only branch.
-  repeated string branch_names = 4 [(buf.validate.field).repeated.items = {
+  repeated string branch_names = 3 [(buf.validate.field).repeated.items = {
     string: {max_len: 250}
   }];
   // The names of Tags that should be associated with this Commit.
@@ -217,14 +218,14 @@ message CreateCommitsRequest {
   // If a Tag currently exists on the assocated Module with a name, the RPC will error, however
   // this will change in the future when we allow Tags to move. If the Tag does not
   // currently exist, a new Tag will be created for each name.
-  repeated string tag_names = 5 [(buf.validate.field).repeated.items = {
+  repeated string tag_names = 4 [(buf.validate.field).repeated.items = {
     string: {max_len: 250}
   }];
   // Associated VCS commit information.
   //
   // If there are already VCSCommits on the associated Module with a given hash, this
   // will result in an error. Otherwise, a new VCSCommit is created.
-  repeated AssociatedVCSCommit associated_vcs_commits = 6;
+  repeated AssociatedVCSCommit associated_vcs_commits = 5;
 }
 
 message CreateCommitsResponse {
@@ -248,6 +249,8 @@ message GetCommitNodesRequest {
     //   - If a Tag is referenced, files are returned from the Commit associated with the Tag.
     //   - If a VCSCommit is referenced, files are returned from the Commit associated with the VCSCommit.
     //   - Is a Branch is referenced, files are returned from the latest Commit on the Branch.
+    //   - If a Digest is referenced, files are returned from the latest released Commit that has this Digest.
+    //     Digests referencing unreleased Commits cannot be referenced.
     ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
     // Specific file paths to retrieve.
     //

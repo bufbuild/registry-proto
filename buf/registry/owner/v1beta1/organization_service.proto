@@ -96,14 +96,14 @@ message CreateOrganizationsRequest {
     // The name of the Organization.
     string name = 1 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 255
+      (buf.validate.field).string.max_len = 32
     ];
     // The configurable description of the Organization.
     string description = 2 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for an Organization.
     string url = 3 [
       (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 1023
+      (buf.validate.field).string.max_len = 255
     ];
     // The verification status of the Organizatioh.
     //
@@ -132,7 +132,7 @@ message UpdateOrganizationsRequest {
     // The configurable URL that represents the homepage for an Organization.
     optional string url = 3 [
       (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 1023
+      (buf.validate.field).string.max_len = 255
     ];
     // The verification status of the Organization.
     optional OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];

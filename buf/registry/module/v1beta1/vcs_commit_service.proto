@@ -67,6 +67,7 @@ message ListVCSCommitsRequest {
   //   - If a Tag is referenced, all VCSCommits for the Commit associated with the Tag are returned.
   //   - If a VCSCommit is referenced, this VCSCommit is returned.
   //   - Is a Branch is referenced, all VCSCommits associated with Commits on the Branch are returned.
+  //   - If a Digest is referenced, all VCSCommits associated with Commits with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
 }
 

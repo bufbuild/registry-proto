@@ -19,12 +19,21 @@ jobs:
       - name: Lint
         run: |
           make lint
+  breaking:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bufbuild/buf-setup-action@v1
+      - uses: bufbuild/buf-breaking-action@v1
+        with:
+          against: buf.build/bufbuild/registry
   push:
     environment: production
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     needs:
       - lint
+      - breaking
     steps:
       - uses: actions/checkout@v4
       - name: Install buf cli
