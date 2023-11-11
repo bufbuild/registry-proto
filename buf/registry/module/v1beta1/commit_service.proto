@@ -302,27 +302,64 @@ message GetCommitNodesResponse {
 }
 
 message GetBlobsRequest {
-  // The digests to retrieve Blobs for.
-  repeated buf.registry.storage.v1beta1.Digest digests = 1 [
+  // A set of blog Digests associated with a Module.
+  message Value {
+    // The reference to the Module that the Blobs belong to.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The Digests to retrieve Blobs for.
+    repeated buf.registry.storage.v1beta1.Digest blob_digests = 2 [
+      (buf.validate.field).repeated.min_items = 1,
+      (buf.validate.field).repeated.max_items = 250
+    ];
+  }
+  repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
 }
 
 message GetBlobsResponse {
-  // The retrieved Blobs.
-  repeated buf.registry.storage.v1beta1.Blob blobs = 1 [(buf.validate.field).repeated.min_items = 1];
+  // A set of missing blob Digests associated with a Module.
+  message Value {
+    // The Module that associated with the Blobs.
+    Module module = 1 [(buf.validate.field).required = true];
+    // The retrieved Blobs.
+    repeated buf.registry.storage.v1beta1.Blob blobs = 2 [
+      (buf.validate.field).repeated.min_items = 1,
+      (buf.validate.field).repeated.max_items = 250
+    ];
+  }
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
 }
 
 message GetMissingBlobDigestsRequest {
-  // The digests to see if we have Blobs for.
-  repeated buf.registry.storage.v1beta1.Digest digests = 1 [
+  // A set of blob Digests associated with a Module.
+  message Value {
+    // The reference to the Module that the digests belong to.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The Digests to see if we have Blobs for.
+    repeated buf.registry.storage.v1beta1.Digest blob_digests = 2 [
+      (buf.validate.field).repeated.min_items = 1,
+      (buf.validate.field).repeated.max_items = 250
+    ];
+  }
+  repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
 }
 
 message GetMissingBlobDigestsResponse {
+  // A set of missing blob Digests associated with a Module.
+  message Value {
+    // The Module that the missing digests are for.
+    Module module = 1 [(buf.validate.field).required = true];
+    // The digests that are missing.
+    repeated buf.registry.storage.v1beta1.Digest missing_blob_digests = 2 [(buf.validate.field).repeated.min_items = 1];
+  }
   // The digests that are missing.
-  repeated buf.registry.storage.v1beta1.Digest missing_blob_digests = 1;
+  repeated Value values = 1;
 }
