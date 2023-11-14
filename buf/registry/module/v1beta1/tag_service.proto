@@ -33,10 +33,10 @@ service TagService {
   rpc ListTags(ListTagsRequest) returns (ListTagsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Create new Tags on a Module.
+  // Set Tags on a ResourceRef. If tags already existed, it moves them.
   //
-  // This operation is atomic. Either all Tags are created or an error is returned.
-  rpc CreateTags(CreateTagsRequest) returns (CreateTagsResponse) {
+  // This operation is atomic. Either all Tags are set or an error is returned.
+  rpc SetTags(SetTagsRequest) returns (SetTagsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Delete existing Tags.
@@ -92,31 +92,36 @@ message ListTagsResponse {
   repeated Tag tags = 2;
 }
 
-message CreateTagsRequest {
-  // An individual request to create a Tag.
+message SetTagsRequest {
+  // An individual request to set Tags.
   message Value {
-    // The Module to create the Tag under.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-    // The Tag name.
-    string name = 2 [
+    // The reference to resolve the Commit to which this Tags will be set.
+    //
+    // See the documentation on Ref for resource resolution details.
+    //
+    // The Tags are set depending on the kind of resource that is resolved:
+    //   - If a Module is referenced, Tags are set to the latest released commit in the module.
+    //   - If a Commit is referenced, Tags are set for that Commit.
+    //   - If a Tag is referenced, Tags are set for the Commit that this Tag references.
+    //   - If a VCSCommit is referenced, Tags are set for the Commit that this VCSCommit references.
+    //   - Is a Branch is referenced, Tags are set for the Commit that this Branch references.
+    //   - If a Digest is referenced, Tags are set for the most recent Commit with this Digest.
+    ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
+    // The Tags names.
+    repeated string name = 2 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 250
     ];
-    // The id of the Commit associated with the Tag.
-    string commit_id = 3 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.uuid = true
-    ];
   }
-  // The Tags to create.
+  // The Tags to set.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
 }
 
-message CreateTagsResponse {
-  // The created Tags in the same order as given on the request.
+message SetTagsResponse {
+  // The set Tags in the same order as given on the request.
   repeated Tag tags = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
