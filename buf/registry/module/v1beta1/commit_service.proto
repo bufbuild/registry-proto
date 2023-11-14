@@ -77,7 +77,8 @@ message ResolveCommitsRequest {
   // Once the resource is resolved, this reference is interpeted to refer to the following Commit:
   //   - If a Module is referenced, this is interpreted to mean the latest released Commit on the Module.
   //   - If a Commit is referenced, this just references that specific commit.
-  //   - If a Tag is referenced, this is interpreted to mean the Commit associated with the Tag.
+  //   - If a Tag is referenced, this is interpreted to mean the released Commit associated with the Tag.
+  //     Tags referencing unreleased commits cannot be referenced.
   //   - If a VCSCommit is referenced, this is interpreted to mean the Commit associated with the VCSCommit.
   //   - Is a Branch is referenced, this is interpreted to mean the latest Commit on the Branch.
   //   - If a Digest is referenced, this is interpreted to mean the latest released Commit that has this Digest.
@@ -215,9 +216,8 @@ message CreateCommitsRequest {
   }];
   // The names of Tags that should be associated with this Commit.
   //
-  // If a Tag currently exists on the assocated Module with a name, the RPC will error, however
-  // this will change in the future when we allow Tags to move. If the Tag does not
-  // currently exist, a new Tag will be created for each name.
+  // If a Tag currently exists on the associated Module with a name, the Tag will move to this
+  // commit. If the Tag does not currently exist, a new Tag will be created for the name.
   repeated string tag_names = 4 [(buf.validate.field).repeated.items = {
     string: {max_len: 250}
   }];

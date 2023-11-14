@@ -39,6 +39,12 @@ service TagService {
   rpc CreateTags(CreateTagsRequest) returns (CreateTagsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
+  // Move existing Tags on a Module.
+  //
+  // This operation is atomic. Either all Tags are moved or an error is returned.
+  rpc MoveTags(MoveTagsRequest) returns (MoveTagsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
   // Delete existing Tags.
   //
   // This operation is atomic. Either all Tags are deleted or an error is returned.
@@ -117,6 +123,34 @@ message CreateTagsRequest {
 
 message CreateTagsResponse {
   // The created Tags in the same order as given on the request.
+  repeated Tag tags = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message MoveTagsRequest {
+  // An individual request to move a Tag.
+  message Value {
+    // The Module associated with the Tag.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The Tag name.
+    string name = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 250
+    ];
+    // The id of the Commit to associate with the Tag.
+    string commit_id = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
+  }
+  // The Tags to move.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message MoveTagsResponse {
+  // The moved Tags in the same order as given on the request.
   repeated Tag tags = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 

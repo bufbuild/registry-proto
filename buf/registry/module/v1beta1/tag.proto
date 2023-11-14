@@ -25,7 +25,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // A tag on a specific Module.
 //
-// Many Tags can be associated with a single Commit.
+// Many Tags can be associated with a single Commit. A tag can reference any commit, including
+// unreleased commits.
 message Tag {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
@@ -37,9 +38,6 @@ message Tag {
   // The time the Tag was created on the BSR.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
   // The last time the Tag was updated on the BSR.
-  //
-  // Currently, Tags are immutable, but this may change in the near future.
-  // TODO: is this true?
   google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The name of the Tag.
   //
