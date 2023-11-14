@@ -216,8 +216,8 @@ message CreateCommitsRequest {
   }];
   // The names of Tags that should be associated with this Commit.
   //
-  // If a Tag currently exists on the associated Module with a name, the Tag will move to this
-  // commit. If the Tag does not currently exist, a new Tag will be created for the name.
+  // If a Tag currently exists on the associated Module with a name, the Tag will be updated
+  // to reference this commit. Otherwise, a new Tag will be created for the name.
   repeated string tag_names = 4 [(buf.validate.field).repeated.items = {
     string: {max_len: 250}
   }];
