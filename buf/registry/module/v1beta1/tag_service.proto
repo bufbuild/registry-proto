@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/registry/module/v1beta1/tag.proto";
 import "buf/validate/validate.proto";
@@ -100,11 +99,11 @@ message SetTagsRequest {
     // See the documentation on Ref for resource resolution details.
     //
     // The Tags are set depending on the kind of resource that is resolved:
-    //   - If a Module is referenced, Tags are set to the latest released commit in the module.
+    //   - If a Module is referenced, Tags are set to the latest released Commit in the module.
     //   - If a Commit is referenced, Tags are set for that Commit.
     //   - If a Tag is referenced, Tags are set for the Commit that this Tag references.
     //   - If a VCSCommit is referenced, Tags are set for the Commit that this VCSCommit references.
-    //   - Is a Branch is referenced, Tags are set for the Commit that this Branch references.
+    //   - Is a Branch is referenced, Tags are set for the latest Commit on the Branch.
     //   - If a Digest is referenced, Tags are set for the most recent Commit with this Digest.
     ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
     // The Tags names.
