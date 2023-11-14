@@ -78,11 +78,11 @@ message ResolveCommitsRequest {
   //   - If a Module is referenced, this is interpreted to mean the latest released Commit on the Module.
   //   - If a Commit is referenced, this just references that specific commit.
   //   - If a Tag is referenced, this is interpreted to mean the released Commit associated with the Tag.
-  //     Tags referencing unreleased commits cannot be referenced.
+  //     Tags referencing unreleased commits cannot be resolved.
   //   - If a VCSCommit is referenced, this is interpreted to mean the Commit associated with the VCSCommit.
   //   - Is a Branch is referenced, this is interpreted to mean the latest Commit on the Branch.
   //   - If a Digest is referenced, this is interpreted to mean the latest released Commit that has this Digest.
-  //     Digests referencing unreleased Commits cannot be referenced.
+  //     Digests referencing unreleased Commits cannot be resolved.
   repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
