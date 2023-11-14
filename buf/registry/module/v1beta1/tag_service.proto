@@ -39,10 +39,10 @@ service TagService {
   rpc CreateTags(CreateTagsRequest) returns (CreateTagsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
-  // Create new Tags on a Module, and Update existing Tags on a Module.
+  // Update existing Tags on a Module.
   //
-  // This operation is atomic. Either all Tags are created/updated or an error is returned.
-  rpc CreateOrUpdateTags(CreateOrUpdateTagsRequest) returns (CreateOrUpdateTagsResponse) {
+  // This operation is atomic. Either all Tags are updated or an error is returned.
+  rpc UpdateTags(UpdateTagsRequest) returns (UpdateTagsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Delete existing Tags.
@@ -101,26 +101,18 @@ message ListTagsResponse {
 message CreateTagsRequest {
   // An individual request to create a Tag.
   message Value {
+    // The Module to create the Tag under.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The Tag name.
-    //
-    // If there is already a Tag with a name, the request errors. Otherwise, a new Tag will be
-    // created associated with the commit identified.
-    repeated string name = 1 [
+    string name = 2 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 250
     ];
-    // The reference to resolve the Commit to which these Tags will be set.
-    //
-    // See the documentation on Ref for resource resolution details.
-    //
-    // The Tags are set depending on the kind of resource that is resolved:
-    //   - If a Module is referenced, Tags are set to the latest released Commit in the module.
-    //   - If a Commit is referenced, Tags are set for that Commit.
-    //   - If a Tag is referenced, Tags are set for the Commit that this Tag references.
-    //   - If a VCSCommit is referenced, Tags are set for the Commit that this VCSCommit references.
-    //   - Is a Branch is referenced, Tags are set for the latest Commit on the Branch.
-    //   - If a Digest is referenced, Tags are set for the most recent Commit with this Digest.
-    ResourceRef resource_ref = 2 [(buf.validate.field).required = true];
+    // The id of the Commit associated with the Tag.
+    string commit_id = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
   }
   // The Tags to create.
   repeated Value values = 1 [
@@ -134,40 +126,23 @@ message CreateTagsResponse {
   repeated Tag tags = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message CreateOrUpdateTagsRequest {
-  // An individual request to create or update a Tag.
+message UpdateTagsRequest {
+  // An individual request to update a Tag.
   message Value {
-    // The Tag names.
-    //
-    // If there is already a Tag with a name, it will be updated to be associated with
-    // the commit identified. Otherwise, a new Tag will be created associated with the
-    // commit identified.
-    repeated string name = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 250
-    ];
-    // The reference to resolve the Commit to which these Tags will be set.
-    //
-    // See the documentation on Ref for resource resolution details.
-    //
-    // The Tags are set depending on the kind of resource that is resolved:
-    //   - If a Module is referenced, Tags are set to the latest released Commit in the module.
-    //   - If a Commit is referenced, Tags are set for that Commit.
-    //   - If a Tag is referenced, Tags are set for the Commit that this Tag references.
-    //   - If a VCSCommit is referenced, Tags are set for the Commit that this VCSCommit references.
-    //   - Is a Branch is referenced, Tags are set for the latest Commit on the Branch.
-    //   - If a Digest is referenced, Tags are set for the most recent Commit with this Digest.
-    ResourceRef resource_ref = 2 [(buf.validate.field).required = true];
+    // The Tag to update.
+    TagRef tag_ref = 1 [(buf.validate.field).required = true];
+    // The id of the Commit associated with the Tag.
+    optional string commit_id = 2 [(buf.validate.field).string.uuid = true];
   }
-  // The Tags to create or update.
+  // The Tags to update.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
 }
 
-message CreateOrUpdateTagsResponse {
-  // The created or updated Tags in the same order as given on the request.
+message UpdateTagsResponse {
+  // The updated Tags in the same order as given on the request.
   repeated Tag tags = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
