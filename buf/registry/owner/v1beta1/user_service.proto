@@ -47,6 +47,9 @@ service UserService {
   // Delete existing Users.
   //
   // This operation is atomic. Either all Users are deleted or an error is returned.
+  // Duplicate UserRefs are allowed, and only one User will be deleted. Likewise,
+  // duplicate UserRefs belonging to the same User, by id or name, are allowed, and
+  // only one User will be deleted.
   rpc DeleteUsers(DeleteUsersRequest) returns (DeleteUsersResponse) {
     option idempotency_level = IDEMPOTENT;
   }
