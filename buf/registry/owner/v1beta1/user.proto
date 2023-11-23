@@ -79,8 +79,11 @@ enum UserState {
 // The type of a User.
 enum UserType {
   USER_TYPE_UNSPECIFIED = 0;
+  // Users that are standard users.
   USER_TYPE_STANDARD = 1;
-  USER_TYPE_MACHINE = 2;
+  // Users that are bots.
+  USER_TYPE_BOT = 2;
+  // Users that are internal system users.
   USER_TYPE_SYSTEM = 3;
 }
 
