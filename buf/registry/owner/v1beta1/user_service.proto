@@ -18,6 +18,7 @@ package buf.registry.owner.v1beta1;
 
 import "buf/registry/owner/v1beta1/organization.proto";
 import "buf/registry/owner/v1beta1/user.proto";
+import "buf/registry/v1beta1/list.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1beta1";
@@ -82,6 +83,10 @@ message ListUsersRequest {
   // If this is empty, all Users for all Organizations are listed, but this functionality
   // is limited to Users with the necessary permissions.
   repeated OrganizationRef organization_refs = 3;
+  // The order to sort the Users.
+  //
+  // If empty, the default ORDER_ASCENDING is used.
+  buf.registry.v1beta1.Order order = 4 [(buf.validate.field).enum.defined_only = true];
   message Filter {
     // Filter by the type of the User.
     repeated UserType type = 1 [(buf.validate.field).enum.defined_only = true];
@@ -89,16 +94,7 @@ message ListUsersRequest {
     repeated UserState state = 2 [(buf.validate.field).enum.defined_only = true];
   }
   // The filter to apply.
-  Filter filter = 4;
-  enum OrderDirection {
-    ORDER_DIRECTION_UNSPECIFIED = 0;
-    ORDER_DIRECTION_ASC = 1;
-    ORDER_DIRECTION_DESC = 2;
-  }
-  // The order to sort the Users.
-  //
-  // If empty, the default ORDER_DIRECTION_ASC is used.
-  OrderDirection order_direction = 5 [(buf.validate.field).enum.defined_only = true];
+  Filter filter = 5;
 }
 
 message ListUsersResponse {

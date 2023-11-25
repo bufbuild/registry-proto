@@ -21,6 +21,7 @@ import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/registry/module/v1beta1/vcs_commit.proto";
 import "buf/registry/storage/v1beta1/storage.proto";
+import "buf/registry/v1beta1/list.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
@@ -119,6 +120,10 @@ message ListCommitHistoryRequest {
   bool has_tag = 4;
   // Only return Commits that have one or more associated VCSCommits.
   bool has_vcs_commit = 5;
+  // The order to sort the Commits.
+  //
+  // If empty, the default ORDER_ASCENDING is used.
+  buf.registry.v1beta1.Order order = 6 [(buf.validate.field).enum.defined_only = true];
 }
 
 message ListCommitHistoryResponse {

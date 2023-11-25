@@ -18,6 +18,7 @@ package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/registry/module/v1beta1/vcs_commit.proto";
+import "buf/registry/v1beta1/list.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
@@ -78,4 +79,8 @@ message ListVCSCommitsResponse {
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The listed VCSCommits.
   repeated VCSCommit vcs_commits = 2;
+  // The order to sort the VCSCommits.
+  //
+  // If empty, the default ORDER_ASCENDING is used.
+  buf.registry.v1beta1.Order order = 4 [(buf.validate.field).enum.defined_only = true];
 }
