@@ -87,14 +87,6 @@ message ListUsersRequest {
   //
   // If empty, the default ORDER_ASCENDING is used.
   buf.registry.v1beta1.Order order = 4 [(buf.validate.field).enum.defined_only = true];
-  message Filter {
-    // Filter by the type of the User.
-    repeated UserType type = 1 [(buf.validate.field).enum.defined_only = true];
-    // Filter by the state of the User.
-    repeated UserState state = 2 [(buf.validate.field).enum.defined_only = true];
-  }
-  // The filter to apply.
-  Filter filter = 5;
 }
 
 message ListUsersResponse {
