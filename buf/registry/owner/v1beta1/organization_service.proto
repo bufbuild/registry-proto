@@ -18,7 +18,6 @@ package buf.registry.owner.v1beta1;
 
 import "buf/registry/owner/v1beta1/organization.proto";
 import "buf/registry/owner/v1beta1/user.proto";
-import "buf/registry/v1beta1/list.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1beta1";
@@ -80,10 +79,8 @@ message ListOrganizationsRequest {
   // If this is empty, all Organizations are listed, but this functionality
   // is limited to Users with the necessary permissions.
   repeated UserRef user_refs = 3;
-  // The order to sort the Organizations.
-  //
-  // If empty, the default ORDER_ASCENDING is used.
-  buf.registry.v1beta1.Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  // Whether to sort the Organizations in descending order.
+  bool sort_desc = 4;
 }
 
 message ListOrganizationsResponse {
