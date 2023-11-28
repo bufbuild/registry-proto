@@ -82,6 +82,8 @@ message ListUsersRequest {
   // If this is empty, all Users for all Organizations are listed, but this functionality
   // is limited to Users with the necessary permissions.
   repeated OrganizationRef organization_refs = 3;
+  // Whether to sort the Users in descending order.
+  bool sort_desc = 4;
 }
 
 message ListUsersResponse {

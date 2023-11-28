@@ -119,6 +119,8 @@ message ListCommitHistoryRequest {
   bool has_tag = 4;
   // Only return Commits that have one or more associated VCSCommits.
   bool has_vcs_commit = 5;
+  // Whether to sory the Commits in descending order.
+  bool sort_desc = 6;
 }
 
 message ListCommitHistoryResponse {

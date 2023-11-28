@@ -86,6 +86,8 @@ message ListBranchesRequest {
   //   - Is a Branch is referenced, this Branch is returned.
   //   - If a Digest is referenced, all Branches that contain a Commit with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
+  // Whether to sort the Branches in descending order.
+  bool sort_desc = 4;
 }
 
 message ListBranchesResponse {

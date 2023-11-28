@@ -78,4 +78,6 @@ message ListVCSCommitsResponse {
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The listed VCSCommits.
   repeated VCSCommit vcs_commits = 2;
+  // Whether to sort the VCSCommits in descending order.
+  bool sort_desc = 4;
 }

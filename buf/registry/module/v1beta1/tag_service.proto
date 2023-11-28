@@ -81,6 +81,8 @@ message ListTagsRequest {
   //   - Is a Branch is referenced, all Tags for Commits on the Branch are returned.
   //   - If a Digest is referenced, all Tags that contain a Commit with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
+  // Whether to sort the Tags in descending order.
+  bool sort_desc = 4;
 }
 
 message ListTagsResponse {

@@ -82,6 +82,8 @@ message ListModulesRequest {
   // If empty, all Modules for all owners are listed, but this functionality
   // is limited to Users with the necessary permissions.
   repeated buf.registry.owner.v1beta1.OwnerRef owner_refs = 3;
+  // Whether to sort the Modules in descending order.
+  bool sort_desc = 4;
 }
 
 message ListModulesResponse {

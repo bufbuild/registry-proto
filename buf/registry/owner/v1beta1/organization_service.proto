@@ -79,6 +79,8 @@ message ListOrganizationsRequest {
   // If this is empty, all Organizations are listed, but this functionality
   // is limited to Users with the necessary permissions.
   repeated UserRef user_refs = 3;
+  // Whether to sort the Organizations in descending order.
+  bool sort_desc = 4;
 }
 
 message ListOrganizationsResponse {
