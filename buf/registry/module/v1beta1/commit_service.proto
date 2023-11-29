@@ -77,8 +77,7 @@ message ResolveCommitsRequest {
   // Once the resource is resolved, this reference is interpeted to refer to the following Commit:
   //   - If a Module is referenced, this is interpreted to mean the latest released Commit on the Module.
   //   - If a Commit is referenced, this just references that specific commit.
-  //   - If a Tag is referenced, this is interpreted to mean the released Commit associated with the Tag.
-  //     Tags referencing unreleased commits cannot be resolved.
+  //   - If a Tag is referenced, this is interpreted to mean the Commit associated with the Tag.
   //   - If a VCSCommit is referenced, this is interpreted to mean the Commit associated with the VCSCommit.
   //   - Is a Branch is referenced, this is interpreted to mean the latest Commit on the Branch.
   //   - If a Digest is referenced, this is interpreted to mean the latest released Commit that has this Digest.
