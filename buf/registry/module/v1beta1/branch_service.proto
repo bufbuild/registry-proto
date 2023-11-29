@@ -17,8 +17,10 @@ syntax = "proto3";
 package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/branch.proto";
+import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/module/v1beta1/resource.proto";
+import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
@@ -37,6 +39,16 @@ service BranchService {
   rpc ListBranches(ListBranchesRequest) returns (ListBranchesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+  // Push existing Commits onto Branches.
+  //
+  // This operation is atomic. Either all Commits are pushed to the referenced Branches or an error
+  // is returned.
+  rpc PushCommits(PushCommitsRequest) returns (PushCommitsResponse);
+  // Create or update histories for Branches.
+  //
+  // This operation is atomic. Either all Branches have their histories created/update updated or an
+  // error is returned.
+  rpc CreateOrUpdateBranchHistories(CreateOrUpdateBranchHistoriesRequest) returns (CreateOrUpdateBranchHistoriesResponse);
 }
 
 message GetBranchesRequest {
@@ -97,4 +109,108 @@ message ListBranchesResponse {
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The listed Branches.
   repeated Branch branches = 2;
+}
+
+message PushCommitsRequest {
+  // A request to push a Commit to a Branch.
+  message Value {
+    // The Branch to push the Commit to.
+    BranchRef branch_ref = 1 [(buf.validate.field).required = true];
+    // The ID of the Commit to push to the Branch.
+    //
+    // This Commit will become the latest Commit on the Branch.
+    //
+    // If the Commit already exists on the Branch, an error is returned.
+    string commit_id = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
+  }
+  // The requests to push a Commit to a Branch.
+  //
+  // Commits will be pushed to Branches in the order provided.
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message PushCommitsResponse {
+  message Value {
+    // The Branch to which the Commit was pushed.
+    Branch branch = 1 [(buf.validate.field).required = true];
+    // The Commit that was pushed to the Branch.
+    Commit commit = 2 [(buf.validate.field).required = true];
+  }
+  // The Branches that were pushed to, in the order of the request.
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message CreateOrUpdateBranchHistoriesRequest {
+  // A request to creatqe a new Branch with the expected history.
+  message CreateBranchOp {
+    // The module for which to create the Branch.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The name of the branch to create.
+    string branch_name = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 250
+    ];
+    // The ID of another Commit on another Branch from which to import Branch history. The history
+    // of any Branch that contains this Commit will be imported into the newly created Branch, up to
+    // and including this Commit.
+    //
+    // This is primarily designed for use in forking a Branch from an existing Branch instead of
+    // pushing the new Branch's entire history.
+    optional string import_from_commit_id = 3 [(buf.validate.field).string.uuid = true];
+    // The IDs of Commits to add to the Branch, ordered in order in which they should be added to
+    // the Branch's history.
+    repeated string commit_ids_to_add = 4 [(buf.validate.field).string.uuid = true];
+  }
+
+  // A request to update an existing Branch's history.
+  message UpdateBranchOp {
+    // The branch to update the history of.
+    BranchRef branch_ref = 1 [(buf.validate.field).required = true];
+    // The ID of the latest Commit on the Branch.
+    //
+    // If the ID provided does not match the ID of the latest Commit on the Branch, an error is
+    // returned.
+    string latest_commit_id = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
+    // The IDs of Commits to remove from the Branch, ordered in order in which they appear in the
+    // Branch's history.
+    //
+    // These commits must appear in order at the end of the Branch's history.
+    repeated string commit_ids_to_remove = 3 [(buf.validate.field).string.uuid = true];
+    // The IDs of Commits to add to the Branch, ordered in order in which they should be added to
+    // the Branch's history.
+    repeated string commit_ids_to_add = 4 [(buf.validate.field).string.uuid = true];
+  }
+
+  message Value {
+    oneof request {
+      // A request to create a new Branch with the expected history.
+      CreateBranchOp new_branch_op = 1;
+      // A request to patch the history of a Branch.
+      //
+      // After this request is successful, the history of the Branch will be:
+      // [..., head, <commits to add>].
+      UpdateBranchOp existing_branch_op = 2;
+    }
+  }
+  // The requests to update Branch histories.
+  //
+  // Branches will be created/updated in the order provided.
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message CreateOrUpdateBranchHistoriesResponse {
+  message Value {
+    // The Branch whose history was updated.
+    Branch branch = 1 [(buf.validate.field).required = true];
+    // The new Commits after the previous HEAD, in the order that the Commits appear in history.
+    repeated Commit commits = 3;
+  }
+  // The Branches that were updated, in the order of the request.
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
