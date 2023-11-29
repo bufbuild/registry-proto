@@ -101,7 +101,7 @@ message ListCommitHistoryRequest {
   // The page to start from.
   //
   // If empty, the first page is returned.
-  string page_token = 2;
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The reference to get the history for.
   //
   // See the documentation on ResourceRef for resource resolution details.
@@ -119,13 +119,15 @@ message ListCommitHistoryRequest {
   bool has_tag = 4;
   // Only return Commits that have one or more associated VCSCommits.
   bool has_vcs_commit = 5;
+  // Whether to sory the Commits in descending order.
+  bool sort_desc = 6;
 }
 
 message ListCommitHistoryResponse {
   // The next page token.
   //
   /// If empty, there are no more pages.
-  string next_page_token = 1;
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The listed Commits.
   repeated Commit commits = 2;
 }

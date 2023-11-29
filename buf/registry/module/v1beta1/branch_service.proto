@@ -73,7 +73,7 @@ message ListBranchesRequest {
   // The page to start from.
   //
   // If empty, the first page is returned,
-  string page_token = 2;
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The reference to list Branches for.
   //
   // See the documentation on Ref for resource resolution details.
@@ -86,13 +86,15 @@ message ListBranchesRequest {
   //   - Is a Branch is referenced, this Branch is returned.
   //   - If a Digest is referenced, all Branches that contain a Commit with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
+  // Whether to sort the Branches in descending order.
+  bool sort_desc = 4;
 }
 
 message ListBranchesResponse {
   // The next page token.
   //
   /// If empty, there are no more pages.
-  string next_page_token = 1;
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The listed Branches.
   repeated Branch branches = 2;
 }

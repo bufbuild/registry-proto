@@ -47,6 +47,9 @@ service UserService {
   // Delete existing Users.
   //
   // This operation is atomic. Either all Users are deleted or an error is returned.
+  // Duplicate UserRefs are allowed, and only one User will be deleted. Likewise,
+  // duplicate UserRefs belonging to the same User, by id or name, are allowed, and
+  // only one User will be deleted.
   rpc DeleteUsers(DeleteUsersRequest) returns (DeleteUsersResponse) {
     option idempotency_level = IDEMPOTENT;
   }
@@ -73,19 +76,21 @@ message ListUsersRequest {
   // The page to start from.
   //
   // If empty, the first page is returned,
-  string page_token = 2 [(buf.validate.field).string.max_len = 255];
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The specific Organizations to list Users for.
   //
   // If this is empty, all Users for all Organizations are listed, but this functionality
   // is limited to Users with the necessary permissions.
   repeated OrganizationRef organization_refs = 3;
+  // Whether to sort the Users in descending order.
+  bool sort_desc = 4;
 }
 
 message ListUsersResponse {
   // The next page token.
   //
   /// If empty, there are no more pages.
-  string next_page_token = 1 [(buf.validate.field).string.max_len = 255];
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The list of Users.
   repeated User users = 2;
 }
@@ -107,7 +112,8 @@ message CreateUsersRequest {
     // The configurable URL that represents the homepage for a User.
     string url = 4 [
       (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 255
+      (buf.validate.field).string.max_len = 255,
+      (buf.validate.field).ignore_empty = true
     ];
     // The verification status of the User.
     //
@@ -137,8 +143,11 @@ message UpdateUsersRequest {
     optional string description = 3 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for a User.
     optional string url = 4 [
-      (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 255
+      (buf.validate.field).string.max_len = 255,
+      (buf.validate.field).cel = {
+        id: "string.uri",
+        expression: "this == '' || this.isUri() ? '' : 'value must be a valid URI'"
+      }
     ];
     // The verification status of the User.
     optional UserVerificationStatus verification_status = 5 [(buf.validate.field).enum.defined_only = true];
