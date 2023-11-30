@@ -209,9 +209,9 @@ message CreateCommitsRequest {
     repeated buf.registry.storage.v1beta1.Blob missing_blobs = 2;
     // Associated VCS commit information.
     //
-    // If there is already a VCSCommit on the associated Module with a given hash, this
+    // If there are already VCSCommits on the associated Module with a given hash, this
     // will result in an error. Otherwise, a new VCSCommit is created.
-    AssociatedVCSCommit associated_vcs_commit = 5;
+    repeated AssociatedVCSCommit associated_vcs_commits = 3;
   }
   // The requests to create Commits.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
