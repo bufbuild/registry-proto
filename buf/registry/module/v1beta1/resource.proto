@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
+import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
@@ -65,30 +66,22 @@ message ResourceRef {
   // Names can only be used in requests, and only for read-only RPCs, that is
   // you should not use an arbitrary reference when modifying a specific resource.
   message Name {
-    // The name of the User or Organization that owns the resource.
-    string owner = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 32
-    ];
-    // The name of the Module the contains or is the resource.
-    string module = 2 [(buf.validate.field).string = {
-      min_len: 2,
-      max_len: 100
-    }];
+    // The full name of the Module the contains or is the resource.
+    ModuleFullName module = 1;
     oneof child {
       // The name of the Branch.
-      string branch_name = 3 [(buf.validate.field).string.max_len = 250];
+      string branch_name = 2 [(buf.validate.field).string.max_len = 250];
       // The name of the Tag.
-      string tag_name = 4 [(buf.validate.field).string.max_len = 250];
+      string tag_name = 3 [(buf.validate.field).string.max_len = 250];
       // The hash of the VCSCommit.
-      string vcs_commit_hash = 5 [(buf.validate.field).string.pattern = "^[0-9a-fA-F]{40}$"];
+      string vcs_commit_hash = 4 [(buf.validate.field).string.pattern = "^[0-9a-fA-F]{40}$"];
       // The digest of the Commit.
-      buf.registry.storage.v1beta1.Digest digest = 6;
+      buf.registry.storage.v1beta1.Digest digest = 5;
       // The untyped reference, applying the semantics as documented on the Name message.
       //
       // If this value is present but empty, this should be treated as not present, that is
       // an empty value is the same as a null value.
-      string ref = 7;
+      string ref = 6;
     }
   }
 

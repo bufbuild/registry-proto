@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
+import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
@@ -112,18 +113,10 @@ message VCSCommitRef {
   // A Name uniquely identifies a VCSCommit.
   // This is used for requests when a caller only has the VCSCommit hash and not the ID.
   message Name {
-    // The name of the owner of the Module that contains the VCSCommit, either a user or organization.
-    string owner = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 32
-    ];
-    // The name of the Module that contains the VCSCommit.
-    string module = 2 [(buf.validate.field).string = {
-      min_len: 2,
-      max_len: 100
-    }];
+    // The full name of the Module that contains the VCSCommit.
+    ModuleFullName module = 1;
     // The hash of the VCSCommit.
-    string hash = 3 [
+    string hash = 2 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.pattern = "^[0-9a-fA-F]{40}$"
     ];
