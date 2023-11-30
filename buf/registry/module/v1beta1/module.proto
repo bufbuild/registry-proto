@@ -112,7 +112,7 @@ message ModuleFullName {
 // This is used in requests.
 message ModuleRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-  
+
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Module.
