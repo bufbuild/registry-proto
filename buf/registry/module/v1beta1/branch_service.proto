@@ -186,7 +186,7 @@ message PatchBranchHistoriesRequest {
     //
     // This is primarily designed for use in forking a Branch from an existing Branch instead of
     // providing the new Branch's entire history.
-    optional string import_from_commit_id = 3 [(buf.validate.field).string.uuid = true];
+    string import_from_commit_id = 3 [(buf.validate.field).string.uuid = true];
     // The IDs of Commits to add to the Branch, ordered in order in which they should be added to
     // the Branch's history.
     //
