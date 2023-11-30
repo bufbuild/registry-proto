@@ -172,6 +172,10 @@ message PatchBranchHistoriesRequest {
     // The module for which to create the Branch.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The name of the branch to create.
+    //
+    // TODO: Especially if we create branches via AppendCommits, why the assymmetry with
+    // using ModuleRef/branch_name here, but BranchRef in PatchBranchHistory? The answer
+    // likely comes down to "we know we don't have a Branch ID in this", but need to check.
     string branch_name = 2 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 250
