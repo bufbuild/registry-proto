@@ -38,17 +38,23 @@ service BranchService {
   rpc ListBranches(ListBranchesRequest) returns (ListBranchesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Push existing Commits onto Branches.
+  // Append existing Commits onto Branches.
   //
-  // This operation is atomic. Either all Commits are pushed to the referenced Branches in the order
+  // This operation is atomic. Either all Commits are appended to the referenced Branches in the order
   // provided or an error is returned.
   //
-  // This operation does not allow the caller to assert the state of Branches before pushing any
-  // Commits onto them. As a result, multiple concurrent PushCommits operations that target the same
+  // This operation does not allow the caller to assert the state of Branches before appending any
+  // Commits onto them. As a result, multiple concurrent AppendCommits operations that target the same
   // Branch will all succeed, and the latest Commit on the Branch will be determined by the last
-  // request that succeeded. To deterministically push Commits onto a Branch, use
+  // request that succeeded. To deterministically append Commits onto a Branch, use
   // PatchBranchHistories instead.
-  rpc PushCommits(PushCommitsRequest) returns (PushCommitsResponse);
+  //
+  // As opposed to most endpoints in the registry API, the returned response Values may not be
+  // the same length as the input request Values. The returned response Values will include
+  // the unique set of Branches that were updated as part of this request. If there were
+  // multiple Commits appended to a single Branch, the length returned response Values will
+  // be less than the length of the input request Values.
+  rpc AppendCommits(AppendCommitsRequest) returns (AppendCommitsResponse);
   // Patch histories for Branches.
   //
   // This operation is atomic. Either all Branches have their histories patched or an error is
@@ -118,10 +124,9 @@ message ListBranchesResponse {
   repeated Branch branches = 2;
 }
 
-message PushCommitsRequest {
-  // A request to push a Commit to a Branch.
+message AppendCommitsRequest {
   message Value {
-    // The Branch to push the Commit to.
+    // The Branch to append the Commit to.
     BranchRef branch_ref = 1 [(buf.validate.field).required = true];
     // The ID of the Commit to push to the Branch.
     //
@@ -133,20 +138,25 @@ message PushCommitsRequest {
       (buf.validate.field).string.uuid = true
     ];
   }
-  // The requests to push a Commit to a Branch.
+  // The Commits to append with the Branches they should be appended to.
   //
-  // Commits will be pushed to Branches in the order provided.
+  // Commits will be appended to a given Branch in the order they are provided. That is
+  // [ Value<branch1,commit_id2>, Value<branch2,commit_id1>, Value<branch1, commit_id1>]
+  // will result in branch1 having commit_id2 appended first, commit_id1 appended last,
+  // and branch2 having only commit_id1 appended.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message PushCommitsResponse {
+message AppendCommitsResponse {
   message Value {
-    // The Branch to which the Commit was pushed.
+    // The updated Branch to which a Commit was appended.
     Branch branch = 1 [(buf.validate.field).required = true];
-    // The Commit that was pushed to the Branch.
-    Commit commit = 2 [(buf.validate.field).required = true];
   }
-  // The Branches that were pushed to, in the order of the request.
+  // The Branches that were appended to. This list will be the unique set of Branches
+  // that were appended to, and the length of values will be less than the length
+  // of the input request values if multiple Commits were appended to a single Branch.
+  // However, the response values will have Branches ordered in the same order that
+  // the Branches first appeared in the request.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
