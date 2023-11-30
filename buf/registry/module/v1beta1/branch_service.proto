@@ -127,6 +127,10 @@ message ListBranchesResponse {
 message AppendCommitsRequest {
   message Value {
     // The Branch to append the Commit to.
+    //
+    // TODO: Does this branch need to already exist? If not, document, and perhaps
+    // re-evaluate naming of RPC, or (more likely) just document that non-existent
+    // branches will be created.
     BranchRef branch_ref = 1 [(buf.validate.field).required = true];
     // The ID of the Commit to push to the Branch.
     //
