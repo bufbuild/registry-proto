@@ -184,6 +184,9 @@ message PatchBranchHistoriesRequest {
     // of any Branch that contains this Commit will be imported into the newly created Branch, up to
     // and including this Commit.
     //
+    // TODO: if Commits are on multiple Branches, how is the history between them resolved? ie
+    // how does this affect ListCommitHistory?
+    //
     // This is primarily designed for use in forking a Branch from an existing Branch instead of
     // providing the new Branch's entire history.
     string import_from_commit_id = 3 [(buf.validate.field).string.uuid = true];
@@ -219,6 +222,8 @@ message PatchBranchHistoriesRequest {
     //
     // If any Commits are referenced in commit_ids_to_remove, those Commits are removed before
     // these Commits are added to the Branch.
+    //
+    // TODO: Add starting at latest commit?
     repeated string commit_ids_to_add = 4 [(buf.validate.field).string.uuid = true];
   }
 
@@ -236,6 +241,11 @@ message PatchBranchHistoriesRequest {
   // The requests to update Branch histories.
   //
   // Branches will be created/updated in the order provided.
+  //
+  // TODO: Does this mean if I have a PatchBranchHistory that references a branch earlier created
+  // with CreateBranchHistory, that the Patch applies, or is this an error? Similarly,
+  // if I have a PatchBranchHistory that references a branch later created with CreateBranchHistory,
+  // is this an error?
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
