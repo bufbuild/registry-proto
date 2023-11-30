@@ -41,14 +41,22 @@ service BranchService {
   }
   // Push existing Commits onto Branches.
   //
-  // This operation is atomic. Either all Commits are pushed to the referenced Branches or an error
-  // is returned.
-  rpc PushCommits(PushCommitsRequest) returns (PushCommitsResponse);
-  // Create or update histories for Branches.
+  // This operation is atomic. Either all Commits are pushed to the referenced Branches in the order
+  // provided or an error is returned.
   //
-  // This operation is atomic. Either all Branches have their histories created/update updated or an
-  // error is returned.
-  rpc CreateOrUpdateBranchHistories(CreateOrUpdateBranchHistoriesRequest) returns (CreateOrUpdateBranchHistoriesResponse);
+  // This operation does not allow the caller to assert the state of Branches before pushing any
+  // Commits onto them. As a result, multiple concurrent PushCommits operations that target the same
+  // Branch will all succeed, and the latest Commit on the Branch will be determined by the last
+  // request that succeeded. To deterministically push Commits onto a Branch, use
+  // PatchBranchHistories instead.
+  rpc PushCommits(PushCommitsRequest) returns (PushCommitsResponse);
+  // Patch histories for Branches.
+  //
+  // This operation is atomic. Either all Branches have their histories patched or an error is
+  // returned. Additionally, each patch in the request asserts the expected state of the branch. If
+  // the actual state does not match the expected state, the patch is rejected and an error is
+  // returned.
+  rpc PatchBranchHistories(PatchBranchHistoriesRequest) returns (PatchBranchHistoriesResponse);
 }
 
 message GetBranchesRequest {
@@ -143,9 +151,11 @@ message PushCommitsResponse {
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message CreateOrUpdateBranchHistoriesRequest {
-  // A request to creatqe a new Branch with the expected history.
-  message CreateBranchOp {
+message PatchBranchHistoriesRequest {
+  // A request to create a new Branch with the expected history.
+  //
+  // At the end of this request, the Branch's history looks like: [...imported, ...added].
+  message CreateBranchHistory {
     // The module for which to create the Branch.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The name of the branch to create.
@@ -158,15 +168,20 @@ message CreateOrUpdateBranchHistoriesRequest {
     // and including this Commit.
     //
     // This is primarily designed for use in forking a Branch from an existing Branch instead of
-    // pushing the new Branch's entire history.
+    // providing the new Branch's entire history.
     optional string import_from_commit_id = 3 [(buf.validate.field).string.uuid = true];
     // The IDs of Commits to add to the Branch, ordered in order in which they should be added to
     // the Branch's history.
+    //
+    // If history is also being imported from another Branch (using import_from_commit_id), these
+    // Commits will be added to the Branch's history after the imported history.
     repeated string commit_ids_to_add = 4 [(buf.validate.field).string.uuid = true];
   }
 
   // A request to update an existing Branch's history.
-  message UpdateBranchOp {
+  //
+  // At the end of this request, the Branch's history looks like: [..., latest_commit, ...added].
+  message PatchBranchHistory {
     // The branch to update the history of.
     BranchRef branch_ref = 1 [(buf.validate.field).required = true];
     // The ID of the latest Commit on the Branch.
@@ -184,18 +199,21 @@ message CreateOrUpdateBranchHistoriesRequest {
     repeated string commit_ids_to_remove = 3 [(buf.validate.field).string.uuid = true];
     // The IDs of Commits to add to the Branch, ordered in order in which they should be added to
     // the Branch's history.
+    //
+    // If any Commits are referenced in commit_ids_to_remove, those Commits are removed before
+    // these Commits are added to the Branch.
     repeated string commit_ids_to_add = 4 [(buf.validate.field).string.uuid = true];
   }
 
   message Value {
     oneof request {
       // A request to create a new Branch with the expected history.
-      CreateBranchOp new_branch_op = 1;
+      CreateBranchHistory new_branch_op = 1;
       // A request to patch the history of a Branch.
       //
       // After this request is successful, the history of the Branch will be:
       // [..., head, <commits to add>].
-      UpdateBranchOp existing_branch_op = 2;
+      PatchBranchHistory existing_branch_op = 2;
     }
   }
   // The requests to update Branch histories.
@@ -204,7 +222,7 @@ message CreateOrUpdateBranchHistoriesRequest {
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message CreateOrUpdateBranchHistoriesResponse {
+message PatchBranchHistoriesResponse {
   message Value {
     // The Branch whose history was updated.
     Branch branch = 1 [(buf.validate.field).required = true];
