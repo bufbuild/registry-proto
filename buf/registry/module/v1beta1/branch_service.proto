@@ -145,7 +145,7 @@ message AppendCommitsRequest {
   // The Commits to append with the Branches they should be appended to.
   //
   // Commits will be appended to a given Branch in the order they are provided. That is
-  // [ Value<branch1,commit_id2>, Value<branch2,commit_id1>, Value<branch1, commit_id1>]
+  // [ Value<branch1,commit_id2>, Value<branch2,commit_id1>, Value<branch1, commit_id1> ]
   // will result in branch1 having commit_id2 appended first, commit_id1 appended last,
   // and branch2 having only commit_id1 appended.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
