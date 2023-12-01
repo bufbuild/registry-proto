@@ -127,7 +127,7 @@ message PushRequest {
     //
     // The last Commit will become the head Commit on the Branch.
     //
-    // If the Commit already exists on the Branch, an error is returned.
+    // If any of these Commits already exist on the Branch, an error is returned.
     repeated string commit_ids = 2 [
       (buf.validate.field).repeated.min_items = 1,
       (buf.validate.field).repeated.items = {
