@@ -44,16 +44,15 @@ service BranchService {
   //
   // This operation does not allow the caller to assert the state of Branches before pushing any
   // Commits onto them. As a result, multiple concurrent PushCommits operations that target the same
-  // Branch will all succeed, and the latest Commit on the Branch will be determined by the last
-  // request that succeeded. To deterministically push Commits onto a Branch, use
-  // PatchBranchHistories instead.
+  // Branch will all succeed, and the head Commit on the Branch will be determined by the last
+  // request that succeeded. To deterministically push Commits onto a Branch, use Rebase instead.
   rpc Push(PushRequest) returns (PushResponse);
   // Rebase existing Commits onto Branches.
   //
-  // This operation is atomic. Either all Branches have their histories patched or an error is
-  // returned. Additionally, each patch in the request asserts the expected state of the branch. If
-  // the actual state does not match the expected state, the patch is rejected and an error is
-  // returned.
+  // This operation is atomic. Either all Branches are rebased as represented in the given Operations,
+  // or an error is returned. Additionally, each update in the request asserts the expected head Commit
+  // of the branch. If the actual head Commit does not match the expected head COmmit, all Operations
+  // are rejected and an error is returned.
   rpc Rebase(RebaseRequest) returns (RebaseResponse);
 }
 
@@ -119,10 +118,10 @@ message ListBranchesResponse {
 
 message PushRequest {
   message Value {
-    // The Branch to push the Commit to.
+    // The Branch to push the Commits to.
     //
     // If this is a name reference, and the named Branch does not exist, it will
-    // be created and the given Commit will be the first Commit on the Branch.
+    // be created and the given Commits will be the first Commits on the Branch.
     BranchRef branch_ref = 1 [(buf.validate.field).required = true];
     // The ID of the Commits to push to the Branch, in the order they should be added.
     //
@@ -154,11 +153,11 @@ message RebaseRequest {
   message Operation {
     // An operation to create a Branch.
     message CreateBranch {
-      // The Module for which to create the Branch.
+      // The Module to create the Branch on.
       ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-      // The name of the branch to create.
+      // The name of the Branch to create.
       //
-      // If a branch with this name already exists on the Module, this will result in an error.
+      // If a Branch with this name already exists on the Module, this will result in an error.
       string branch_name = 2 [
         (buf.validate.field).required = true,
         (buf.validate.field).string.max_len = 250
@@ -185,8 +184,6 @@ message RebaseRequest {
     }
 
     // An operation to update an existing branch.
-    //
-    // At the end of this request, the Branch's history looks like: [..., latest_commit, ...added].
     message UpdateBranch {
       // The branch to update.
       BranchRef branch_ref = 1 [(buf.validate.field).required = true];

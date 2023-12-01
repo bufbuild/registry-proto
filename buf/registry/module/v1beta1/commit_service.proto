@@ -78,9 +78,11 @@ message ResolveCommitsRequest {
   //   - If a Commit is referenced, this just references that specific commit.
   //   - If a Tag is referenced, this is interpreted to mean the Commit associated with the Tag.
   //   - If a VCSCommit is referenced, this is interpreted to mean the Commit associated with the VCSCommit.
-  //   - Is a Branch is referenced, this is interpreted to mean the latest Commit on the Branch.
+  //   - Is a Branch is referenced, this is interpreted to mean the head Commit on the Branch.
   //   - If a Digest is referenced, this is interpreted to mean the latest released Commit that has this Digest.
   //     Digests referencing unreleased Commits cannot be referenced.
+  //
+  // TODO: what is "latest released Commit" if we now have "head Commit"?
   repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -110,9 +112,11 @@ message ListCommitHistoryRequest {
   //   - If a Commit is referenced, history is started at this Commit.
   //   - If a Tag is referenced, history is started at the Commit associated with the Tag.
   //   - If a VCSCommit is referenced, history is started at the Commit associated with the VCSCommit.
-  //   - Is a Branch is referenced, history is started at the latest Commit on the Branch.
+  //   - Is a Branch is referenced, history is started at the head Commit on the Branch.
   //   - If a Digest is referenced, history is started at the latest released Commit that has this Digest.
   //     Digests referencing unreleased Commits cannot be referenced.
+  //
+  // TODO: what is "latest released Commit" if we now have "head Commit"?
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // Only return Commits that have one or more associated Tags.
   bool has_tag = 4;
@@ -236,9 +240,11 @@ message GetCommitNodesRequest {
     //   - If a Commit is referenced, files are returned from this Commit.
     //   - If a Tag is referenced, files are returned from the Commit associated with the Tag.
     //   - If a VCSCommit is referenced, files are returned from the Commit associated with the VCSCommit.
-    //   - Is a Branch is referenced, files are returned from the latest Commit on the Branch.
+    //   - Is a Branch is referenced, files are returned from the head Commit on the Branch.
     //   - If a Digest is referenced, files are returned from the latest released Commit that has this Digest.
     //     Digests referencing unreleased Commits cannot be referenced.
+    //
+    // TODO: what is "latest released Commit" if we now have "head Commit"?
     ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
     // Specific file paths to retrieve.
     //
