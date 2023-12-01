@@ -162,7 +162,7 @@ message RebaseRequest {
         (buf.validate.field).required = true,
         (buf.validate.field).string.max_len = 250
       ];
-      // The ID of the Commit for which to start history from. The history of the branch will
+      // The ID of the Commit from which to start history. The history of the branch will
       // reflect the history as if you called ListCommitHistory for this Commit ID.
       //
       // If this is empty, the created Branch will only have the Commits specified in
