@@ -17,7 +17,6 @@ syntax = "proto3";
 package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/branch.proto";
-import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
@@ -133,9 +132,7 @@ message PushRequest {
     repeated string commit_ids = 2 [
       (buf.validate.field).repeated.min_items = 1,
       (buf.validate.field).repeated.items = {
-        string: {
-          uuid: true,
-        }
+        string: {uuid: true}
       }
     ];
   }
@@ -182,13 +179,9 @@ message RebaseRequest {
       //
       // If start_commit_id is not specified, the newly-created Branch will have exactly
       // these Commits, in this order.
-      repeated string add_commit_ids = 4 [
-        (buf.validate.field).repeated.items = {
-          string: {
-            uuid: true,
-          }
-        }
-      ];
+      repeated string add_commit_ids = 4 [(buf.validate.field).repeated.items = {
+        string: {uuid: true}
+      }];
     }
 
     // An operation to update an existing branch.
@@ -212,13 +205,9 @@ message RebaseRequest {
       // Note that it is valid to have one of the remove_commit_ids be equal to the
       // expected_head_commit_id. If this is the case, the Branch will have a different
       // head Commit that add_commit_ids will be applied to.
-      repeated string remove_commit_ids = 3 [
-        (buf.validate.field).repeated.items = {
-          string: {
-            uuid: true,
-          }
-        }
-      ];
+      repeated string remove_commit_ids = 3 [(buf.validate.field).repeated.items = {
+        string: {uuid: true}
+      }];
       // The IDs of the Commits to add to the Branch, in the order they should be added.
       //
       // These are added starting at the head Commit after remove_commit_ids has been applied.
@@ -226,13 +215,9 @@ message RebaseRequest {
       // Note that is is valid to have IDs in both add_commit_ids and remove_commit_ids. If
       // this is the case, the IDs will be removed from the Branch prior to re-adding them after
       // the head Commit via add_commit_ids.
-      repeated string add_commit_ids = 4 [
-        (buf.validate.field).repeated.items = {
-          string: {
-            uuid: true,
-          }
-        }
-      ];
+      repeated string add_commit_ids = 4 [(buf.validate.field).repeated.items = {
+        string: {uuid: true}
+      }];
     }
 
     oneof value {
