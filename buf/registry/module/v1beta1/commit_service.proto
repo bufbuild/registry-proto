@@ -115,12 +115,12 @@ message ListCommitHistoryRequest {
   //   - If a Digest is referenced, history is started at the latest released Commit that has this Digest.
   //     Digests referencing unreleased Commits cannot be referenced.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
+  // Whether to sort the Commits in descending order.
+  bool sort_desc = 4;
   // Only return Commits that have one or more associated Tags.
-  bool has_tag = 4;
+  bool has_tag = 5;
   // Only return Commits that have one or more associated VCSCommits.
-  bool has_vcs_commit = 5;
-  // Whether to sory the Commits in descending order.
-  bool sort_desc = 6;
+  bool has_vcs_commit = 6;
 }
 
 message ListCommitHistoryResponse {
