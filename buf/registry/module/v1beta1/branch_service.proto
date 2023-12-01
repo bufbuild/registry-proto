@@ -125,7 +125,7 @@ message PushRequest {
     BranchRef branch_ref = 1 [(buf.validate.field).required = true];
     // The ID of the Commits to push to the Branch, in the order they should be added.
     //
-    // This Commit will become the head Commit on the Branch.
+    // The last Commit will become the head Commit on the Branch.
     //
     // If the Commit already exists on the Branch, an error is returned.
     repeated string commit_ids = 2 [
