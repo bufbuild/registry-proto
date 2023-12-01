@@ -51,7 +51,7 @@ service BranchService {
   //
   // This operation is atomic. Either all Branches are rebased as represented in the given Operations,
   // or an error is returned. Additionally, each update in the request asserts the expected head Commit
-  // of the branch. If the actual head Commit does not match the expected head COmmit, all Operations
+  // of the branch. If the actual head Commit does not match the expected head Commit, all Operations
   // are rejected and an error is returned.
   rpc Rebase(RebaseRequest) returns (RebaseResponse);
 }
