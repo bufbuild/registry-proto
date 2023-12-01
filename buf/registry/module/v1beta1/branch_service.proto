@@ -38,30 +38,24 @@ service BranchService {
   rpc ListBranches(ListBranchesRequest) returns (ListBranchesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Append existing Commits onto Branches.
+  // Push existing Commits onto Branches.
   //
-  // This operation is atomic. Either all Commits are appended to the referenced Branches in the order
+  // This operation is atomic. Either all Commits are pushed to the referenced Branches in the order
   // provided or an error is returned.
   //
-  // This operation does not allow the caller to assert the state of Branches before appending any
-  // Commits onto them. As a result, multiple concurrent AppendCommits operations that target the same
+  // This operation does not allow the caller to assert the state of Branches before pushing any
+  // Commits onto them. As a result, multiple concurrent PushCommits operations that target the same
   // Branch will all succeed, and the latest Commit on the Branch will be determined by the last
-  // request that succeeded. To deterministically append Commits onto a Branch, use
+  // request that succeeded. To deterministically push Commits onto a Branch, use
   // PatchBranchHistories instead.
-  //
-  // As opposed to most endpoints in the registry API, the returned response Values may not be
-  // the same length as the input request Values. The returned response Values will include
-  // the unique set of Branches that were updated as part of this request. If there were
-  // multiple Commits appended to a single Branch, the length returned response Values will
-  // be less than the length of the input request Values.
-  rpc AppendCommits(AppendCommitsRequest) returns (AppendCommitsResponse);
-  // Patch histories for Branches.
+  rpc Push(PushRequest) returns (PushResponse);
+  // Rebase existing Commits onto Branches.
   //
   // This operation is atomic. Either all Branches have their histories patched or an error is
   // returned. Additionally, each patch in the request asserts the expected state of the branch. If
   // the actual state does not match the expected state, the patch is rejected and an error is
   // returned.
-  rpc PatchBranchHistories(PatchBranchHistoriesRequest) returns (PatchBranchHistoriesResponse);
+  rpc Rebase(RebaseRequest) returns (RebaseResponse);
 }
 
 message GetBranchesRequest {
@@ -124,138 +118,147 @@ message ListBranchesResponse {
   repeated Branch branches = 2;
 }
 
-message AppendCommitsRequest {
+message PushRequest {
   message Value {
-    // The Branch to append the Commit to.
+    // The Branch to push the Commit to.
     //
-    // TODO: Does this branch need to already exist? If not, document, and perhaps
-    // re-evaluate naming of RPC, or (more likely) just document that non-existent
-    // branches will be created.
+    // If this is a name reference, and the named Branch does not exist, it will
+    // be created and the given Commit will be the first Commit on the Branch.
     BranchRef branch_ref = 1 [(buf.validate.field).required = true];
-    // The ID of the Commit to push to the Branch.
+    // The ID of the Commits to push to the Branch, in the order they should be added.
     //
-    // This Commit will become the latest Commit on the Branch.
+    // This Commit will become the head Commit on the Branch.
     //
     // If the Commit already exists on the Branch, an error is returned.
-    string commit_id = 2 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.uuid = true
+    repeated string commit_ids = 2 [
+      (buf.validate.field).repeated.min_items = 1,
+      (buf.validate.field).repeated.items = {
+        string: {
+          uuid: true,
+        }
+      }
     ];
   }
-  // The Commits to append with the Branches they should be appended to.
+  // The Commits to push with the Branches they should be pushed to.
   //
-  // Commits will be appended to a given Branch in the order they are provided. That is
-  // [ Value<branch1,commit_id2>, Value<branch2,commit_id1>, Value<branch1, commit_id1> ]
-  // will result in branch1 having commit_id2 appended first, commit_id1 appended last,
-  // and branch2 having only commit_id1 appended.
+  // All Values should have unique BranchRefs, that is no two Values should have
+  // a BranchRef that refers to the same Branch. An error will be returned if any
+  // two BranchRefs refer to the same Branch.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message AppendCommitsResponse {
-  message Value {
-    // The updated Branch to which a Commit was appended.
-    Branch branch = 1 [(buf.validate.field).required = true];
-  }
-  // The Branches that were appended to. This list will be the unique set of Branches
-  // that were appended to, and the length of values will be less than the length
-  // of the input request values if multiple Commits were appended to a single Branch.
-  // However, the response values will have Branches ordered in the same order that
-  // the Branches first appeared in the request.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+message PushResponse {
+  // The Branches that were pushed to, in the order they appeared in the request.
+  repeated Branch branches = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message PatchBranchHistoriesRequest {
-  // A request to create a new Branch with the expected history.
-  //
-  // At the end of this request, the Branch's history looks like: [...imported, ...added].
-  message CreateBranchHistory {
-    // The module for which to create the Branch.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-    // The name of the branch to create.
-    //
-    // TODO: Especially if we create branches via AppendCommits, why the assymmetry with
-    // using ModuleRef/branch_name here, but BranchRef in PatchBranchHistory? The answer
-    // likely comes down to "we know we don't have a Branch ID in this", but need to check.
-    string branch_name = 2 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 250
-    ];
-    // The ID of another Commit on another Branch from which to import Branch history. The history
-    // of any Branch that contains this Commit will be imported into the newly created Branch, up to
-    // and including this Commit.
-    //
-    // TODO: if Commits are on multiple Branches, how is the history between them resolved? ie
-    // how does this affect ListCommitHistory?
-    //
-    // This is primarily designed for use in forking a Branch from an existing Branch instead of
-    // providing the new Branch's entire history.
-    string import_from_commit_id = 3 [(buf.validate.field).string.uuid = true];
-    // The IDs of Commits to add to the Branch, ordered in order in which they should be added to
-    // the Branch's history.
-    //
-    // If history is also being imported from another Branch (using import_from_commit_id), these
-    // Commits will be added to the Branch's history after the imported history.
-    repeated string commit_ids_to_add = 4 [(buf.validate.field).string.uuid = true];
-  }
-
-  // A request to update an existing Branch's history.
-  //
-  // At the end of this request, the Branch's history looks like: [..., latest_commit, ...added].
-  message PatchBranchHistory {
-    // The branch to update the history of.
-    BranchRef branch_ref = 1 [(buf.validate.field).required = true];
-    // The ID of the latest Commit on the Branch.
-    //
-    // If the ID provided does not match the ID of the latest Commit on the Branch, an error is
-    // returned.
-    string latest_commit_id = 2 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.uuid = true
-    ];
-    // The IDs of Commits to remove from the Branch, ordered in order in which they appear in the
-    // Branch's history.
-    //
-    // These commits must appear in order at the end of the Branch's history.
-    repeated string commit_ids_to_remove = 3 [(buf.validate.field).string.uuid = true];
-    // The IDs of Commits to add to the Branch, ordered in order in which they should be added to
-    // the Branch's history.
-    //
-    // If any Commits are referenced in commit_ids_to_remove, those Commits are removed before
-    // these Commits are added to the Branch.
-    //
-    // TODO: Add starting at latest commit?
-    repeated string commit_ids_to_add = 4 [(buf.validate.field).string.uuid = true];
-  }
-
-  message Value {
-    oneof request {
-      // A request to create a new Branch with the expected history.
-      CreateBranchHistory new_branch_op = 1;
-      // A request to patch the history of a Branch.
+message RebaseRequest {
+  // An operation to apply as part of the rebase.
+  message Operation {
+    // An operation to create a Branch.
+    message CreateBranch {
+      // The Module for which to create the Branch.
+      ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+      // The name of the branch to create.
       //
-      // After this request is successful, the history of the Branch will be:
-      // [..., head, <commits to add>].
-      PatchBranchHistory existing_branch_op = 2;
+      // If a branch with this name already exists on the Module, this will result in an error.
+      string branch_name = 2 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).string.max_len = 250
+      ];
+      // The ID of the Commit for which to start history from. The history of the branch will
+      // reflect the history as if you called ListCommitHistory for this Commit ID.
+      //
+      // If this is empty, the created Branch will only have the Commits specified in
+      // add_commit_ids.
+      //
+      // This is primarily designed for use in forking a Branch instead of
+      // providing the new Branch's entire history.
+      string start_commit_id = 3 [(buf.validate.field).string.uuid = true];
+      // The IDs of the Commits to add to the Branch, in the order they should be added.
+      //
+      // If start_commit_id is specified, these will be appended to the Commit history
+      // that aleady exists up to start_commit_id.
+      //
+      // If start_commit_id is not specified, the newly-created Branch will have exactly
+      // these Commits, in this order.
+      repeated string add_commit_ids = 4 [
+        (buf.validate.field).repeated.items = {
+          string: {
+            uuid: true,
+          }
+        }
+      ];
+    }
+
+    // An operation to update an existing branch.
+    //
+    // At the end of this request, the Branch's history looks like: [..., latest_commit, ...added].
+    message UpdateBranch {
+      // The branch to update.
+      BranchRef branch_ref = 1 [(buf.validate.field).required = true];
+      // The ID of the Commit that the caller expects to be the head Commit on the Branch.
+      //
+      // If this ID does not match the ID of the head Commit on the Branch, an error is
+      // returned.
+      string expected_head_commit_id = 2 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).string.uuid = true
+      ];
+      // The IDs of the Commits to remove from the Branch.
+      //
+      // Commits are removed before any Commits are added from add_commit_ids.
+      //
+      // Note that it is valid to have one of the remove_commit_ids be equal to the
+      // expected_head_commit_id. If this is the case, the Branch will have a different
+      // head Commit that add_commit_ids will be applied to.
+      repeated string remove_commit_ids = 3 [
+        (buf.validate.field).repeated.items = {
+          string: {
+            uuid: true,
+          }
+        }
+      ];
+      // The IDs of the Commits to add to the Branch, in the order they should be added.
+      //
+      // These are added starting at the head Commit after remove_commit_ids has been applied.
+      //
+      // Note that is is valid to have IDs in both add_commit_ids and remove_commit_ids. If
+      // this is the case, the IDs will be removed from the Branch prior to re-adding them after
+      // the head Commit via add_commit_ids.
+      repeated string add_commit_ids = 4 [
+        (buf.validate.field).repeated.items = {
+          string: {
+            uuid: true,
+          }
+        }
+      ];
+    }
+
+    oneof value {
+      option (buf.validate.oneof).required = true;
+      // Create a new branch.
+      CreateBranch create_branch = 1;
+      // Update an existing branch.
+      UpdateBranch patch_branch = 2;
     }
   }
-  // The requests to update Branch histories.
+
+  // The operations to apply.
   //
-  // Branches will be created/updated in the order provided.
-  //
-  // TODO: Does this mean if I have a PatchBranchHistory that references a branch earlier created
-  // with CreateBranchHistory, that the Patch applies, or is this an error? Similarly,
-  // if I have a PatchBranchHistory that references a branch later created with CreateBranchHistory,
-  // is this an error?
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+  // The Operations will be applied in the order they are provided. Notably, this means that
+  // if a CreateBranch Operation precedes a UpdateBranch Operation for the same Branch, the
+  // UpdateBranch Operation is applied to the newly-created Branch, including any new Commits
+  // that were added from the CreateBranch Operation. Conversely, if a UpdateBranch Operation
+  // precedes the CreateBranch operation that creates the Branch, this will result in an error.
+  repeated Operation operations = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message PatchBranchHistoriesResponse {
-  message Value {
-    // The Branch whose history was updated.
-    Branch branch = 1 [(buf.validate.field).required = true];
-    // The new Commits after the previous HEAD, in the order that the Commits appear in history.
-    repeated Commit commits = 3;
-  }
-  // The Branches that were updated, in the order of the request.
-  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+message RebaseResponse {
+  // The Branches that were updated. This list will be the unique set of Branches
+  // that were updated, and the length of values will be less than the length
+  // of the input Operations if multiple Operations were applied for a single Branch.
+  // However, the response Branches ordered in the same order that the Branches
+  // first appeared in the request Operations.
+  repeated Branch branches = 1 [(buf.validate.field).repeated.min_items = 1];
 }
