@@ -38,7 +38,7 @@ service CommitService {
   // Create commits on a Module with associated Content.
   //
   // These commits will not be associated with any Branch or Tag after the completion of
-  // this operation. To associate created Commits, use PushCommits or PatchBranchHistories.
+  // this operation. To associate created Commits, use BranchService.Push or BranchService.Rebase.
   //
   // This operation is atomic. Either all Commits and associated content are created or an error is returned.
   rpc CreateCommits(CreateCommitsRequest) returns (CreateCommitsResponse) {
