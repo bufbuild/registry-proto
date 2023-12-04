@@ -43,7 +43,7 @@ service BranchService {
   // provided or an error is returned.
   //
   // This operation does not allow the caller to assert the state of Branches before pushing any
-  // Commits onto them. As a result, multiple concurrent PushCommits operations that target the same
+  // Commits onto them. As a result, multiple concurrent Push operations that target the same
   // Branch will all succeed, and the head Commit on the Branch will be determined by the last
   // request that succeeded. To deterministically push Commits onto a Branch, use Rebase instead.
   rpc Push(PushRequest) returns (PushResponse);
