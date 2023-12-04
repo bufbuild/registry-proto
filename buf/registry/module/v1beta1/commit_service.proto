@@ -41,9 +41,7 @@ service CommitService {
   // this operation. To associate created Commits, use BranchService.Push or BranchService.Rebase.
   //
   // This operation is atomic. Either all Commits and associated content are created or an error is returned.
-  rpc CreateCommits(CreateCommitsRequest) returns (CreateCommitsResponse) {
-    option idempotency_level = IDEMPOTENT;
-  }
+  rpc CreateCommits(CreateCommitsRequest) returns (CreateCommitsResponse);
   // Get the pointers to the content for a given set of Commits, Modules, Branches, Tags, or VCSCommits.
   //
   // Nodes consist of:
