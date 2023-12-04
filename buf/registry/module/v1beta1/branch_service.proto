@@ -43,16 +43,16 @@ service BranchService {
   // provided or an error is returned.
   //
   // This operation does not allow the caller to assert the state of Branches before pushing any
-  // Commits onto them. As a result, multiple concurrent Push operations that target the same
-  // Branch will all succeed, and the head Commit on the Branch will be determined by the last
-  // request that succeeded. To deterministically push Commits onto a Branch, use Rebase instead.
+  // Commits onto them. As a result, multiple concurrent Push operations that target the same Branch
+  // will all succeed, and the head Commit on the Branch will be determined by the last request that
+  // succeeded. To deterministically push Commits onto a Branch, use Rebase instead.
   rpc Push(PushRequest) returns (PushResponse);
   // Rebase existing Commits onto Branches.
   //
-  // This operation is atomic. Either all Branches are rebased as represented in the given Operations,
-  // or an error is returned. Additionally, each update in the request asserts the expected head Commit
-  // of the branch. If the actual head Commit does not match the expected head Commit, all Operations
-  // are rejected and an error is returned.
+  // This operation is atomic. Either all Branches are rebased as represented in the given
+  // Operations, or an error is returned. Additionally, each Operation in the request asserts the
+  // expected head Commit of the branch. If the actual head Commit does not match the expected head
+  // Commit, all Operations are rejected and an error is returned.
   rpc Rebase(RebaseRequest) returns (RebaseResponse) {
     option idempotency_level = IDEMPOTENT;
   }
@@ -122,8 +122,8 @@ message PushRequest {
   message Value {
     // The Branch to push the Commits to.
     //
-    // If this is a name reference, and the named Branch does not exist, it will
-    // be created and the given Commits will be the first Commits on the Branch.
+    // If this is a name reference, and the named Branch does not exist, it will be created and the
+    // given Commits will be the first Commits on the Branch.
     BranchRef branch_ref = 1 [(buf.validate.field).required = true];
     // The ID of the Commits to push to the Branch, in the order they should be added.
     //
@@ -139,9 +139,9 @@ message PushRequest {
   }
   // The Commits to push with the Branches they should be pushed to.
   //
-  // All Values should have unique BranchRefs, that is no two Values should have
-  // a BranchRef that refers to the same Branch. An error will be returned if any
-  // two BranchRefs refer to the same Branch.
+  // All Values should have unique BranchRefs, that is no two Values should have a BranchRef that
+  // refers to the same Branch. An error will be returned if any two BranchRefs refer to the same
+  // Branch.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
@@ -164,14 +164,15 @@ message RebaseRequest {
         (buf.validate.field).required = true,
         (buf.validate.field).string.max_len = 250
       ];
-      // The ID of the Commit from which to start history. The history of the branch will
-      // reflect the history as if you called ListCommitHistory for this Commit ID.
+      // The ID of a Commit on another Branch from which to start history. The history of the branch
+      // will reflect the history as if you called ListCommitHistory for that Branch, starting at
+      // this Commit.
       //
       // If this is empty, the created Branch will only have the Commits specified in
       // add_commit_ids.
       //
-      // This is primarily designed for use in forking a Branch instead of
-      // providing the new Branch's entire history.
+      // This is primarily designed for use in forking a Branch instead of providing the new
+      // Branch's entire history.
       string base_commit_id = 3 [(buf.validate.field).string.uuid = true];
       // The IDs of the Commits to add to the Branch, in the order they should be added.
       //
@@ -201,6 +202,9 @@ message RebaseRequest {
       //
       // These Commits must appear in order at the end of the Branch's history. Commits are removed
       // from history before any Commits from add_commit_ids are added to history.
+      //
+      // Note that if all Commits on a Branch's history are specified here and add_commit_ids is
+      // empty, the resulting Branch's history is empty, and as a result the Branch is deleted.
       repeated string remove_commit_ids = 3 [(buf.validate.field).repeated.items = {
         string: {uuid: true}
       }];
@@ -236,10 +240,10 @@ message RebaseRequest {
 }
 
 message RebaseResponse {
-  // The Branches that were updated. This list will be the unique set of Branches
-  // that were updated, and the length of values will be less than the length
-  // of the input Operations if multiple Operations were applied for a single Branch.
-  // However, the response Branches ordered in the same order that the Branches
-  // first appeared in the request Operations.
+  // The Branches that were updated. This list will be the unique set of Branches that were updated.
+  // The length of branches will be less than the length of the input Operations if multiple
+  // Operations were applied for a single Branch, or if the set of Operations resulted in a Branch's
+  // deletion. However, the response Branches are ordered in the same order that the Branches first
+  // appeared in the request Operations.
   repeated Branch branches = 1 [(buf.validate.field).repeated.min_items = 1];
 }
