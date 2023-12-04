@@ -170,13 +170,13 @@ message RebaseRequest {
       //
       // This is primarily designed for use in forking a Branch instead of
       // providing the new Branch's entire history.
-      string start_commit_id = 3 [(buf.validate.field).string.uuid = true];
+      string base_commit_id = 3 [(buf.validate.field).string.uuid = true];
       // The IDs of the Commits to add to the Branch, in the order they should be added.
       //
-      // If start_commit_id is specified, these will be appended to the Commit history
-      // that aleady exists up to start_commit_id.
+      // If base_commit_id is specified, these will be appended to the Commit history
+      // that aleady exists up to base_commit_id.
       //
-      // If start_commit_id is not specified, the newly-created Branch will have exactly
+      // If base_commit_id is not specified, the newly-created Branch will have exactly
       // these Commits, in this order.
       repeated string add_commit_ids = 4 [(buf.validate.field).repeated.items = {
         string: {uuid: true}
