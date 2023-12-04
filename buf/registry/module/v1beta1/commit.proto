@@ -30,10 +30,7 @@ message Commit {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
   // The id of the Commit.
-  string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
+  string id = 1 [(buf.validate.field).required = true];
   // The time the Commit was pushed to the BSR.
   //
   // Commits are immutable, so there is no corresponding update_time.

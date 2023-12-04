@@ -65,10 +65,7 @@ message VCSCommit {
     (buf.validate.field).enum.defined_only = true
   ];
   // The id of the Commit associated with the VCSCommit.
-  string commit_id = 8 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
+  string commit_id = 8 [(buf.validate.field).required = true];
   // The Digest of the Commit associated with the VCSCommit.
   buf.registry.storage.v1beta1.Digest commit_digest = 9 [(buf.validate.field).required = true];
   // The URL of of the repository on the VCS.
