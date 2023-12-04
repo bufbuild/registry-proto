@@ -197,11 +197,8 @@ message RebaseRequest {
       ];
       // The IDs of the Commits to remove from the Branch.
       //
-      // Commits are removed before any Commits are added from add_commit_ids.
-      //
-      // Note that it is valid to have one of the remove_commit_ids be equal to the
-      // expected_head_commit_id. If this is the case, the Branch will have a different
-      // head Commit that add_commit_ids will be applied to.
+      // These Commits must appear in order at the end of the Branch's history. Commits are removed
+      // from history before any Commits from add_commit_ids are added to history.
       repeated string remove_commit_ids = 3 [(buf.validate.field).repeated.items = {
         string: {uuid: true}
       }];
@@ -222,7 +219,7 @@ message RebaseRequest {
       // Create a new branch.
       CreateBranch create_branch = 1;
       // Update an existing branch.
-      UpdateBranch patch_branch = 2;
+      UpdateBranch update_branch = 2;
     }
   }
 
