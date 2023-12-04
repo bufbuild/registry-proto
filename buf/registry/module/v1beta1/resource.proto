@@ -95,7 +95,7 @@ message ResourceRef {
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the resource.
-    string id = 1;
+    string id = 1 [(buf.validate.field).string.pattern = "^([0-9a-fA-F]{32})|([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$"];
     // The fully-qualified name of the resource.
     Name name = 2;
   }

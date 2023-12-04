@@ -59,7 +59,10 @@ message Tag {
     (buf.validate.field).string.uuid = true
   ];
   // The id of the Commit associated with the Tag.
-  string commit_id = 7 [(buf.validate.field).required = true];
+  string commit_id = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[0-9a-fA-F]{32}$"
+  ];
   // The Digest of the Commit associated with the Tag.
   buf.registry.storage.v1beta1.Digest commit_digest = 8 [(buf.validate.field).required = true];
   // The id of the User that last updated this Tag on the BSR.

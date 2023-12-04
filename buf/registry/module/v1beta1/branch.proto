@@ -61,7 +61,10 @@ message Branch {
   // TODO: enum?
   bool is_release = 9 [(buf.validate.field).required = true];
   // The id of the latest Commit created on the Branch.
-  string latest_commit_id = 10 [(buf.validate.field).required = true];
+  string latest_commit_id = 10 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[0-9a-fA-F]{32}$"
+  ];
   // The Digest of the latest Commit pushed to the Branch.
   buf.registry.storage.v1beta1.Digest latest_commit_digest = 11 [(buf.validate.field).required = true];
 }
