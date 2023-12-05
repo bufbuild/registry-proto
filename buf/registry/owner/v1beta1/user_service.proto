@@ -85,9 +85,15 @@ message ListUsersRequest {
   // Whether to sort the Users in descending order.
   bool sort_desc = 4;
   // Only return Users of these types.
-  repeated UserType has_types = 5 [(buf.validate.field).enum.defined_only = true];
+  repeated UserType has_types = 5 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true
+  ];
   // Only return Users of these states.
-  repeated UserState has_states = 6 [(buf.validate.field).enum.defined_only = true];
+  repeated UserState has_states = 6 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true
+  ];
 }
 
 message ListUsersResponse {
