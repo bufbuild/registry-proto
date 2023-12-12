@@ -16,16 +16,16 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
+import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
-// A commit on a specific module.
+// A commit on a specific Module.
 //
-// Commits can be associated with multiple Branches.
+// Many CommitDigests may be associated with one Commit.
 message Commit {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
@@ -49,16 +49,25 @@ message Commit {
     (buf.validate.field).string.uuid = true
   ];
   // The digest of the Commit's contents.
-  //
-  // This is a digest of the digest of all files associated with the Commit.
-  buf.registry.storage.v1beta1.Digest digest = 5 [(buf.validate.field).required = true];
+  Digest digest = 5 [(buf.validate.field).required = true];
   // The id of the User that created this Commit on the BSR.
   string created_by_user_id = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // The SPDX license ID of the associated license, if any.
-  //
-  // To retrieve the specific license file, use the ContentService.
-  string spdx_license_id = 7 [(buf.validate.field).string.max_len = 255];
+}
+
+// CommitRef is a reference to a Commit.
+//
+// Currently, this is just an ID, but this structure is in place for symmetry and forwards-compatibility.
+//
+// This is used in requests.
+message CommitRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The id of the Commit.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
 }

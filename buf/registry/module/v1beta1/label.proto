@@ -16,85 +16,84 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
+import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
-// A tag on a specific Module.
+// A label on a specific Module.
 //
-// Many Tags can be associated with a single Commit.
-message Tag {
+// Many Labels can be associated with one Commit.
+message Label {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The id of the Tag.
+  // The id of the Label.
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // The time the Tag was created on the BSR.
+  // The time the Label was created on the BSR.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
-  // The last time the Tag was updated on the BSR.
-  //
-  // Currently, Tags are immutable, but this may change in the near future.
-  // TODO: is this true?
+  // The last time the Label was updated on the BSR.
   google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
-  // The name of the Tag.
+  // The name of the Label.
   //
   // Unique within a given Module.
   string name = 4 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 250
   ];
-  // The id of the User or Organization that owns the Module that the Tag is associated with.
+  // The id of the User or Organization that owns the Module that the Label is associated with.
   string owner_id = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // The id of the Module that the Tag is associated with.
+  // The id of the Module that the Label is associated with.
   string module_id = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // The id of the Commit associated with the Tag.
+  // The id of the Commit currently associated with the Label.
+  //
+  // To get the history of the Commits that have been associated with a Label, use ListLabelHistory.
   string commit_id = 7 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // The Digest of the Commit associated with the Tag.
-  buf.registry.storage.v1beta1.Digest commit_digest = 8 [(buf.validate.field).required = true];
-  // The id of the User that last updated this Tag on the BSR.
+  // The Digest of the content of the Commit associated with the Label.
+  Digest digest = 8 [(buf.validate.field).required = true];
+  // The id of the User that last updated this Label on the BSR.
   string updated_by_user_id = 9 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
 }
 
-// TagRef is a reference to a Tag, either an id or a fully-qualified name.
+// LabelRef is a reference to a Label, either an id or a fully-qualified name.
 //
 // This is used in requests.
-message TagRef {
+message LabelRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
-  // The fully-qualified name of a Tag within a BSR instance.
+  // The fully-qualified name of a Label within a BSR instance.
   //
-  // A Name uniquely identifies a Tag.
-  // This is used for requests when a caller only has the tag name and not the ID.
+  // A Name uniquely identifies a Label.
+  // This is used for requests when a caller only has the label name and not the ID.
   message Name {
-    // The name of the owner of the Module that contains the Tag, either a User or Organization.
+    // The name of the owner of the Module that contains the Label, either a User or Organization.
     string owner = 1 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 32
     ];
-    // The name of the Module that contains the Tag, either a User or Organization.
+    // The name of the Module that contains the Label, either a User or Organization.
     string module = 2 [(buf.validate.field).string = {
       min_len: 2,
       max_len: 100
     }];
-    // The Tag name.
-    string tag = 3 [
+    // The Label name.
+    string label = 3 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 250
     ];
@@ -102,9 +101,9 @@ message TagRef {
 
   oneof value {
     option (buf.validate.oneof).required = true;
-    // The id of the Tag.
+    // The id of the Label.
     string id = 1 [(buf.validate.field).string.uuid = true];
-    // The fully-qualified name of the Tag.
+    // The fully-qualified name of the Label.
     Name name = 2;
   }
 }

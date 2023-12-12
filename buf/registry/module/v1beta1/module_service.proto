@@ -118,10 +118,10 @@ message CreateModulesRequest {
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore_empty = true
     ];
-    // The name of the release Branch of the module.
+    // The name of the default Label of the Module.
     //
-    // If not set, the release branch will be "main" upon creation.
-    string release_branch_name = 6 [(buf.validate.field).string.max_len = 250];
+    // If not set, the default Label will be named "main" upon creation.
+    string default_label_name = 6 [(buf.validate.field).string.max_len = 250];
   }
   // The Modules to create.
   repeated Value values = 1 [
@@ -152,17 +152,17 @@ message UpdateModulesRequest {
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore_empty = true
     ];
-    oneof release_branch_ref {
-      // The id of the release Branch of the Module.
+    oneof default_label_ref {
+      // The id of the default Label of the Module.
       //
-      // This Branch must already exist.
-      // This Branch must be contained within the Module referenced by module_ref.
-      string release_branch_id = 7 [(buf.validate.field).string.uuid = true];
-      // The name of the release Branch of the Module.
+      // This Label must already exist.
+      // This Label must be contained within the Module referenced by module_ref.
+      string default_label_id = 7 [(buf.validate.field).string.uuid = true];
+      // The name of the default Label of the Module.
       //
-      // This Branch must already exist.
-      // This Branch must be contained within the Module referenced by module_ref.
-      string release_branch_name = 8 [(buf.validate.field).string.max_len = 250];
+      // This Label must already exist.
+      // This Label must be contained within the Module referenced by module_ref.
+      string default_label_name = 8 [(buf.validate.field).string.max_len = 250];
     }
   }
   // The Modules to update.

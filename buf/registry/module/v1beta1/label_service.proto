@@ -1,0 +1,160 @@
+// Copyright 2023 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1beta1;
+
+import "buf/registry/module/v1beta1/commit.proto";
+import "buf/registry/module/v1beta1/label.proto";
+import "buf/registry/module/v1beta1/resource.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
+// Operate on Labels.
+service LabelService {
+  // Get Labels by id or name.
+  rpc GetLabels(GetLabelsRequest) returns (GetLabelsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List Labels for a given Module, Commit, or CommitDigest.
+  rpc ListLabels(ListLabelsRequest) returns (ListLabelsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List the history of a Label.
+  rpc ListLabelHistory(ListLabelHistoryRequest) returns (ListLabelHistoryResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create or update Labels on a Module.
+  //
+  // If the label does not exist, it will be created.
+  //
+  // This operation is atomic. Either all Labels are created/updated or an error is returned.
+  rpc CreateOrUpdateLabels(CreateOrUpdateLabelsRequest) returns (CreateOrUpdateLabelsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Delete existing Labels.
+  //
+  // This operation is atomic. Either all Labels are deleted or an error is returned.
+  rpc DeleteLabels(DeleteLabelsRequest) returns (DeleteLabelsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message GetLabelsRequest {
+  // The Labels to request.
+  repeated LabelRef label_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetLabelsResponse {
+  // The retrieved Labels in the same order as requested.
+  repeated Label labels = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message ListLabelsRequest {
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned,
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The reference to list Labels for.
+  //
+  // See the documentation on Ref for resource resolution details.
+  //
+  // Once the resource is resolved, the following Labels are listed:
+  //   - If a Module is referenced, all Labels for the Module are returned.
+  //   - If a Label is referenced, this Label is returned.
+  //   - If a Commit is referenced, all Labels for the Commit are returned.
+  //   - If a CommitDigest is referenced, all Labels that contain a Commit with this CommitDigest are returned.
+  ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
+  // Whether to sort the Labels in descending order.
+  bool sort_desc = 4;
+}
+
+message ListLabelsResponse {
+  // The next page token.
+  //
+  /// If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed Labels.
+  repeated Label labels = 2;
+}
+
+message ListLabelHistoryRequest {
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The Label to list history for.
+  LabelRef label_ref = 3 [(buf.validate.field).required = true];
+  // Whether to sort the Labels in descending order.
+  //
+  // TODO: What is descending in this case? Do we want that to be the non-default?
+  bool sort_desc = 4;
+}
+
+message ListLabelHistoryResponse {
+  // The next page token.
+  //
+  /// If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed Commits that represent the history of the Label.
+  repeated Commit commits = 2;
+}
+
+message CreateOrUpdateLabelsRequest {
+  // An individual request to create or update a Label.
+  message Value {
+    // The Labels to create or update.
+    LabelRef label_ref = 1 [(buf.validate.field).required = true];
+    // The id of the Commit to associate with the Label.
+    //
+    // If the Label already existed, the Label will now point to this Commit.
+    string commit_id = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
+  }
+  // The Labels to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreateOrUpdateLabelsResponse {
+  // The created or updated Labels in the same order as given on the request.
+  repeated Label labels = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeleteLabelsRequest {
+  // The Labels to delete.
+  repeated LabelRef label_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeleteLabelsResponse {}

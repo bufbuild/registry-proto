@@ -16,18 +16,17 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
+import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
-// A reference to any of these resources:
+// A reference to any of:
 //   - Module
+//   - Label
 //   - Commit
-//   - Tag
-//   - Branch
-//   - VCSCommit
+//   - Digest
 //
 // The id or name is resolved to a specific resource.
 // If an id is passed, this is interpreted as being the id of the resource.
@@ -43,24 +42,20 @@ message ResourceRef {
   //
   // The following semantics are applied:
   //   - If the child oneof is not specified, the name is interpreted to reference a Module.
-  //   - If branch_name is specified, the name is interpreted to reference a Branch.
-  //   - If tag_name is specified, the name is interpreted to reference a Tag.
-  //   - If vcs_commit_hash is specified, the name is interpreted to reference a VCSCommit.
+  //   - If label_name is specified, the name is interpreted to reference a Label.
   //   - If digest is specified, the name is interpreted to reference a Commit with this Digest.
   //   - If ref is specified, it is interpreted to be either an id or name.
   //     - If an id, this is equivalent to setting the id field on ResourceRef. However,
   //       backends can choose to validate that the owner and module fields match the resource
   //       referenced, as additional validation.
-  //     - If a name, this is interpreted to be either a Branch name, Tag name,
-  //       VCSCommit hash, or Digest string. A digest string is of the form "typeString:hexValue",
-  //       where typeString is the lowercase of the Type value with TYPE_ stripped, and hexValue
-  //       is the hex-encoded value of the digest.
-  //     - If there is a conflict between names across resources (for example, there is a
-  //       Branch and Tag with the same name), the following order of precedence is applied:
+  //     - If a name, this is interpreted to be either a Label name or Digest string. A Digest string
+  //       is of the form "typeString:hexValue", where typeString is the lowercase of the Type
+  //       value with TYPE_ stripped, and hexValue is the hex-encoded value of the digest.
+  //     - If there is a conflict between names across resources (for example, there is a Commit id
+  //       and Label name of the same value), the following order of precedence is applied:
   //       - Commit
-  //       - VCSCommit
-  //       - Tag
-  //       - Branch
+  //       - Label
+  //       - Digest
   //
   // Names can only be used in requests, and only for read-only RPCs, that is
   // you should not use an arbitrary reference when modifying a specific resource.
@@ -76,19 +71,18 @@ message ResourceRef {
       max_len: 100
     }];
     oneof child {
-      // The name of the Branch.
-      string branch_name = 3 [(buf.validate.field).string.max_len = 250];
-      // The name of the Tag.
-      string tag_name = 4 [(buf.validate.field).string.max_len = 250];
-      // The hash of the VCSCommit.
-      string vcs_commit_hash = 5 [(buf.validate.field).string.pattern = "^[0-9a-fA-F]{40}$"];
-      // The digest of the Commit.
-      buf.registry.storage.v1beta1.Digest digest = 6;
+      // The name of the Label.
+      //
+      // If this value is present but empty, this should be treated as not present, that is
+      // an empty value is the same as a null value.
+      string label_name = 3 [(buf.validate.field).string.max_len = 250];
+      // The digest of the Commit's contents.
+      Digest digest = 4;
       // The untyped reference, applying the semantics as documented on the Name message.
       //
       // If this value is present but empty, this should be treated as not present, that is
       // an empty value is the same as a null value.
-      string ref = 7;
+      string ref = 5;
     }
   }
 
