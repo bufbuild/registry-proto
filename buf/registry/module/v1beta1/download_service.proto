@@ -26,7 +26,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Download contents.
 service DownloadService {
-  // Download the contents of multiple Modules, Commits, Labels, or Digests.
+  // Download the contents of multiple Modules, Labels, Digests, or Commits.
   //
   // Content consists of:
   //   - The Files: .proto files, license files, and documentation files.
@@ -51,18 +51,23 @@ message DownloadRequest {
     // License files are always named LICENSE.
     FILE_TYPE_LICENSE = 3;
   }
+  enum DownloadType {
+    DOWNLOAD_TYPE_UNSPECIFIED = 0;
+    DOWNLOAD_TYPE_REFS = 1;
+    DOWNLOAD_TYPE_FILES = 2;
+    DOWNLOAD_TYPE_FILES
+  }
   // An individual request for content.
   message Value {
     // The reference to get content for.
     //
     // See the documentation on ResourceRef for resource resolution details.
     //
-    // Once the resource is resolved, the following Commits are listed:
-    //   - If a Module is referenced, the content for the Commit of the default Label is returned.
-    //   - If a Label is referenced, the content for the Commit associated with this Label is returned.
+    // Once the resource is resolved, the following content is returned:
+    //   - If a Module is referenced, the content of the default Label is returned.
+    //   - If a Label is referenced, the content associated with this Label is returned.
     //   - If a Commit is referenced, the content for the Commit is returned.
-    //   - If a Digest is referenced, the content for a Commit with the Digest is returned.
-    //     All Commits with the same Digest will have the same Content.
+    //   - If a Digest is referenced, the content the Digest is returned.
     ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
     // Specific file types to request.
     //
@@ -91,15 +96,29 @@ message DownloadRequest {
     //
     // If false, it is an error to specify non-existent file paths.
     bool paths_allow_not_exist = 4;
+    // Whether to exclude the files from the download.
+    //
+    // This will result in only the Modules and Digests being returned.
+    //
+    // This can be used in a few ways:
+    //   - exclude_files=true: This will just give you the digest of the reference.
+    //   - exclude_files=true,include_deps=true: This will give you a dependency graph.
+    bool exclude_files = 4;
     // Whether to include the dependencies in the response.
     bool include_deps = 5;
     // Whether to also include the files of the dependencies in the response.
     //
     // If not set, each Dep in the response will only have its Module and Digest set.
     //
+    // exclude_files must not be set if include_dep_files is set.
     // include_deps must be set if include_dep_files is set.
-    // TODO: validate this.
+    // TODO: validate this. Or turn this all into an enum.
     bool include_dep_files = 6;
+    // The DigestType to return for content and dependencies.
+    //
+    // If this DigestType is not available, an error is returned.
+    // Note that certain DigestTypes may be deprecated over time.
+    DigestType digest_type = 7;
   }
   // The contents to request.
   repeated Value values = 1 [
@@ -114,6 +133,9 @@ message DownloadResponse {
     // The Module of the dependency.
     Module module = 1 [(buf.validate.field).required = true];
     // The Digest of the dependency.
+    //
+    // The DigestType will match the type given on the request. If this DigestType
+    // is not available, an error is returned.
     Digest digest = 2 [(buf.validate.field).required = true];
     // The Files of the dependency, if include_dep_files was set.
     //
@@ -122,20 +144,35 @@ message DownloadResponse {
     // This will consist of the .proto files, license files, and documentation files.
     repeated File files = 3 [(buf.validate.field).repeated.min_items = 1];
   }
-  // A set of content.
+  // A set of content for a given reference or dependency.
+  //
+  // This type is recursive; Content includes the Content of dependencies.
   message Content {
-    // The Files of the reference.
+    // The Module of the content.
+    Module module = 1 [(buf.validate.field).required = true];
+    // The Digest of the content.
+    //
+    // The DigestType will match the type given on the request. If this DigestType
+    // is not available, an error is returned.
+    Digest digest = 2 [(buf.validate.field).required = true];
+    // The Files of the content.
     //
     // This will consist of the .proto files, license files, and documentation files.
-    repeated File files = 1 [(buf.validate.field).repeated.min_items = 1];
+    //
+    // If exclude_files was set, this will be empty.
+    // If on a dependency and include_dep_files was not set, this will be empty.
+    repeated File files = 3;
     // The dependencies of the reference, if include_deps was set.
+    //
+    // This will include all transitive dependencies. Dep.is_direct will denote whether
+    // a dependency was a direct or transitive dependency.
     //
     // If include_deps was not set, this will be empty.
     //
     // If include_dep_files is set, the Deps will have the files of the dependencies as well.
     // The .proto files of the Content and the Deps compromise a self-contained set of .proto
     // files that can be independently built.
-    repeated Dep deps = 2;
+    repeated Dep deps = 3;
   }
   // The Contents of the references in the same order as requested.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];

@@ -107,3 +107,18 @@ message LabelRef {
     Name name = 2;
   }
 }
+
+// A reference to a Label scoped to a Module, either an id or a name.
+//
+// This is used in requests.
+message ScopedLabelRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Label.
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    // The name of the Label.
+    string name = 2;
+  }
+}

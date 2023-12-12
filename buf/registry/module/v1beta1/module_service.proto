@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
+import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/owner/v1beta1/owner.proto";
 import "buf/validate/validate.proto";
@@ -152,18 +153,14 @@ message UpdateModulesRequest {
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore_empty = true
     ];
-    oneof default_label_ref {
-      // The id of the default Label of the Module.
-      //
-      // This Label must already exist.
-      // This Label must be contained within the Module referenced by module_ref.
-      string default_label_id = 7 [(buf.validate.field).string.uuid = true];
-      // The name of the default Label of the Module.
-      //
-      // This Label must already exist.
-      // This Label must be contained within the Module referenced by module_ref.
-      string default_label_name = 8 [(buf.validate.field).string.max_len = 250];
-    }
+    // The default label of the Module.
+    //
+    // This Label must already exist.
+    // This Label must be contained within the Module referenced by module_ref.
+    //
+    // If not present, no update will be performed.
+    // If present but both id and name are empty, no update will be performed.
+    ScopedLabelRef default_scoped_label_ref = 7;
   }
   // The Modules to update.
   repeated Value values = 1 [
