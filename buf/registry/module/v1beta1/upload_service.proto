@@ -16,10 +16,8 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/registry/module/v1beta1/digest.proto";
-import "buf/registry/module/v1beta1/file.proto";
+import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/module.proto";
-import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
@@ -51,35 +49,4 @@ message UploadRequest {
   ];
 }
 
-message UploadResponse {
-  // A dependency of the reference.
-  message Dep {
-    // The Module of the dependency.
-    Module module = 1 [(buf.validate.field).required = true];
-    // The Digest of the dependency.
-    Digest digest = 2 [(buf.validate.field).required = true];
-    // The Files of the dependency, if include_dep_files was set.
-    //
-    // If include_dep_files was not set, this will be empty.
-    //
-    // This will consist of the .proto files, license files, and documentation files.
-    repeated File files = 3 [(buf.validate.field).repeated.min_items = 1];
-  }
-  // A set of content.
-  message Content {
-    // The Files of the reference.
-    //
-    // This will consist of the .proto files, license files, and documentation files.
-    repeated File files = 1 [(buf.validate.field).repeated.min_items = 1];
-    // The dependencies of the reference, if include_deps was set.
-    //
-    // If include_deps was not set, this will be empty.
-    //
-    // If include_dep_files is set, the Deps will have the files of the dependencies as well.
-    // The .proto files of the Content and the Deps compromise a self-contained set of .proto
-    // files that can be independently built.
-    repeated Dep deps = 2;
-  }
-  // The Contents of the references in the same order as requested.
-  repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
-}
+message UploadResponse {}

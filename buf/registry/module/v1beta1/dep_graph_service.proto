@@ -1,0 +1,90 @@
+// Copyright 2023 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1beta1;
+
+import "buf/registry/module/v1beta1/digest.proto";
+import "buf/registry/module/v1beta1/module.proto";
+import "buf/registry/module/v1beta1/resource.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
+// Get dependency graphs.
+service DepGraphService {
+  // Get dependency graphs of multiple Modules, Labels, Digests, or Commits.
+  //
+  // A dependency graph is a directed acyclic graph.
+  rpc GetDepGraphs(GetDepGraphsRequest) returns (GetDepGraphsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message GetDepGraphsRequest {
+  // An individual request for a dependency graph.
+  message Value {
+    // The reference to get content for.
+    //
+    // See the documentation on ResourceRef for resource resolution details.
+    //
+    // Once the resource is resolved, the following content is returned:
+    //   - If a Module is referenced, the content of the default Label is returned.
+    //   - If a Label is referenced, the content associated with this Label is returned.
+    //   - If a Commit is referenced, the content for the Commit is returned.
+    //   - If a Digest is referenced, the content the Digest is returned.
+    ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
+    // The DigestType to return for nodes.
+    //
+    // If this DigestType is not available, an error is returned.
+    // Note that certain DigestTypes may be deprecated over time.
+    //
+    // If not set, the latest DigestType is used.
+    // TODO: should we default?
+    DigestType digest_type = 2;
+  }
+  // The dependency graphs to request.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetDepGraphsResponse {
+  message DepGraph {
+    message Node {
+      // The Module of the node.
+      Module mode = 1 [(buf.validate.field).required = true];
+      // The Digest of the node.
+      //
+      // The DigestType will match the type given on the request. If this DigestType
+      // is not available, an error is returned.
+      Digest digest = 2 [(buf.validate.field).required = true];
+    }
+    // An edge in the dependency graph.
+    message Edge {
+      // The Module of the start of the edge.
+      string from_module_id = 1 [(buf.validate.field).required = true];
+      // The Module of the end of the edge.
+      string to_module_id = 2 [(buf.validate.field).required = true];
+    }
+    // The nodes of the graph.
+    repeated Node nodes = 1;
+    // The edges of the graph.
+    repeated Edge edges = 2;
+  }
+  // The DepGraphs of the references in the same order as requested.
+  repeated DepGraph dep_graphs = 1 [(buf.validate.field).repeated.min_items = 1];
+}
