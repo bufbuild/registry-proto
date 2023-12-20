@@ -73,8 +73,6 @@ message Label {
 
 // LabelRef is a reference to a Label, either an id or a fully-qualified name.
 //
-// If no id or label is set, this is interpreted to mean the default label on a Module.
-//
 // This is used in requests.
 message LabelRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
@@ -95,9 +93,6 @@ message LabelRef {
       max_len: 100
     }];
     // The Label name.
-    //
-    // If this is empty, the LabelRef is interpreted to reference the default
-    // Label on the Module.
     string label = 3 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 250
@@ -105,6 +100,7 @@ message LabelRef {
   }
 
   oneof value {
+    option (buf.validate.oneof).required = true;
     // The id of the Label.
     string id = 1 [(buf.validate.field).string.uuid = true];
     // The fully-qualified name of the Label.
@@ -114,19 +110,15 @@ message LabelRef {
 
 // A reference to a Label scoped to a Module, either an id or a name.
 //
-// If no id or label is set, this is interpreted to mean the default label on a Module.
-//
 // This is used in requests.
 message ScopedLabelRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   oneof value {
+    option (buf.validate.oneof).required = true;
     // The id of the Label.
     string id = 1 [(buf.validate.field).string.uuid = true];
     // The name of the Label.
-    //
-    // If this is empty, the ScopedLabelRef is interpreted to reference the default
-    // Label on the Module.
     string name = 2;
   }
 }

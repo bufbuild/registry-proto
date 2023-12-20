@@ -128,12 +128,6 @@ message CreateOrUpdateLabelsRequest {
   // An individual request to create or update a Label.
   message Value {
     // The Labels to create or update.
-    //
-    // Note that if the name in the LabelRef is not set, this will result in the
-    // default label being updated.
-    //
-    // TODO: Do we instead want to require that users must specify a label name
-    // for this RPC?
     LabelRef label_ref = 1 [(buf.validate.field).required = true];
     // The id of the Commit to associate with the Label.
     //
@@ -157,9 +151,6 @@ message CreateOrUpdateLabelsResponse {
 
 message DeleteLabelsRequest {
   // The Labels to delete.
-  //
-  // Note that the default label cannot be deleted. It is an error to specify
-  // a LabelRef without a name for the label.
   repeated LabelRef label_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
