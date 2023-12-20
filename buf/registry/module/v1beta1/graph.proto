@@ -27,6 +27,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 message Graph {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
+  // TODO: If we end up creating <module_id, Digest> pair in some form like ModuleKey,
+  // this type may be replaced with that.
   message Node {
     // The Module of the node.
     Module mode = 1 [(buf.validate.field).required = true];

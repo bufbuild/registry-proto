@@ -104,6 +104,10 @@ message DownloadRequest {
 // TODO: should we instead combine this and Graph in some way? You could instead have
 // something like ModuleKey in the bufbuild/buf repo, make Deps a graph, and separate
 // out the dependency graph in the DownloadResponse from the actual <ModuleKey, list<Files>> pair.
+//
+// TODO: We may want to deduplicate, especially for deps. Consider the case of a googleapis dep
+// when attempting to download multiple modules. We should only have to download that dep once.
+// Depending on what we change here, it may be nice to make this symmetrical with the UploadService.
 message DownloadResponse {
   // A dependency for a given reference.
   message Dep {

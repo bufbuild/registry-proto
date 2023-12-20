@@ -52,7 +52,6 @@ message GetGraphsRequest {
     // Note that certain DigestTypes may be deprecated over time.
     //
     // If not set, the latest DigestType is used.
-    // TODO: should we default?
     DigestType digest_type = 2;
   }
   // The dependency graphs to request.

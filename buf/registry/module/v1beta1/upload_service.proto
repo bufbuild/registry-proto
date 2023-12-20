@@ -36,6 +36,9 @@ service UploadService {
   rpc Upload(UploadRequest) returns (UploadResponse) {}
 }
 
+// TODO: We may want to do some deduplication for workspace pushes here. Consider the case
+// of a googleapis dependency: we only want to have one copy of the files for that in a given
+// request. Whatever we do, it would be nice to be symmetrical with the DownloadService.
 message UploadRequest {
   // A dependency for a given reference.
   message Dep {
@@ -65,7 +68,11 @@ message UploadRequest {
     //
     // If an id is set, this id must represent a Label that already exists and is
     // owned by the Module.
-    repeated ScopedLabelRef scoped_label_refs = 4;
+    //
+    // Note that at least one label must be referenced. If you want to reference the default
+    // label, do a request against the ModuleService to determine the ID of the default label,
+    // and reference it here.
+    repeated ScopedLabelRef scoped_label_refs = 4 [(buf.validate.field).repeated.min_items = 1];
   }
   // The Contents of the modules to upload data for.
   //
@@ -74,4 +81,7 @@ message UploadRequest {
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message UploadResponse {}
+message UploadResponse {
+  // TODO: Dependending on what we do here, we may want to return Commits in a particular way,
+  // but we may want to deduplicate data above first.
+}
