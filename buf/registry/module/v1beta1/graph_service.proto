@@ -17,23 +17,23 @@ syntax = "proto3";
 package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/digest.proto";
-import "buf/registry/module/v1beta1/module.proto";
+import "buf/registry/module/v1beta1/graph.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
 // Get dependency graphs.
-service DepGraphService {
+service GraphService {
   // Get dependency graphs of multiple Modules, Labels, Digests, or Commits.
   //
   // A dependency graph is a directed acyclic graph.
-  rpc GetDepGraphs(GetDepGraphsRequest) returns (GetDepGraphsResponse) {
+  rpc GetGraphs(GetGraphsRequest) returns (GetGraphsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
-message GetDepGraphsRequest {
+message GetGraphsRequest {
   // An individual request for a dependency graph.
   message Value {
     // The reference to get content for.
@@ -62,29 +62,7 @@ message GetDepGraphsRequest {
   ];
 }
 
-message GetDepGraphsResponse {
-  message DepGraph {
-    message Node {
-      // The Module of the node.
-      Module mode = 1 [(buf.validate.field).required = true];
-      // The Digest of the node.
-      //
-      // The DigestType will match the type given on the request. If this DigestType
-      // is not available, an error is returned.
-      Digest digest = 2 [(buf.validate.field).required = true];
-    }
-    // An edge in the dependency graph.
-    message Edge {
-      // The Module of the start of the edge.
-      string from_module_id = 1 [(buf.validate.field).required = true];
-      // The Module of the end of the edge.
-      string to_module_id = 2 [(buf.validate.field).required = true];
-    }
-    // The nodes of the graph.
-    repeated Node nodes = 1;
-    // The edges of the graph.
-    repeated Edge edges = 2;
-  }
-  // The DepGraphs of the references in the same order as requested.
-  repeated DepGraph dep_graphs = 1 [(buf.validate.field).repeated.min_items = 1];
+message GetGraphsResponse {
+  // The Graphs of the references in the same order as requested.
+  repeated Graph graphs = 1 [(buf.validate.field).repeated.min_items = 1];
 }
