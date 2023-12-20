@@ -95,6 +95,9 @@ message LabelRef {
       max_len: 100
     }];
     // The Label name.
+    //
+    // If this is empty, the LabelRef is interpreted to reference the default
+    // Label on the Module.
     string label = 3 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 250
@@ -121,6 +124,9 @@ message ScopedLabelRef {
     // The id of the Label.
     string id = 1 [(buf.validate.field).string.uuid = true];
     // The name of the Label.
+    //
+    // If this is empty, the ScopedLabelRef is interpreted to reference the default
+    // Label on the Module.
     string name = 2;
   }
 }

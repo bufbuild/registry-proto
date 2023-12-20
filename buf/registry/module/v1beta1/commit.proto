@@ -49,6 +49,11 @@ message Commit {
     (buf.validate.field).string.uuid = true
   ];
   // The digest of the Commit's contents.
+  //
+  // TODO: What to do about requested digest types? We don't actually expose the
+  // ability to switch the requested digest type at this point. It is a little
+  // weird for the digest type to be dynamic on an entity, which would lead to
+  // this being repeated here, but a repeated field on an entity is weird too.
   Digest digest = 5 [(buf.validate.field).required = true];
   // The id of the User that created this Commit on the BSR.
   string created_by_user_id = 6 [

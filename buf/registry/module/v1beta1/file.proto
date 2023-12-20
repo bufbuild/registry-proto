@@ -42,3 +42,18 @@ message File {
   // May be empty.
   bytes content = 2;
 }
+
+// A specific file type.
+enum FileType {
+  FILE_TYPE_UNSPECIFIED = 0;
+  // A .proto file.
+  FILE_TYPE_PROTO = 1;
+  // A documentation file.
+  //
+  // Documentation files are always named README.md, README.markdown, or buf.md.
+  FILE_TYPE_DOC = 2;
+  // A license file.
+  //
+  // License files are always named LICENSE.
+  FILE_TYPE_LICENSE = 3;
+}

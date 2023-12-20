@@ -37,20 +37,6 @@ service DownloadService {
 }
 
 message DownloadRequest {
-  // A specific file type to request.
-  enum FileType {
-    FILE_TYPE_UNSPECIFIED = 0;
-    // A .proto file.
-    FILE_TYPE_PROTO = 1;
-    // A documentation file.
-    //
-    // Documentation files are always named README.md, README.markdown, or buf.md.
-    FILE_TYPE_DOC = 2;
-    // A license file.
-    //
-    // License files are always named LICENSE.
-    FILE_TYPE_LICENSE = 3;
-  }
   // An individual request for content.
   message Value {
     // The reference to get content for.
@@ -78,6 +64,8 @@ message DownloadRequest {
     // be successful if paths_allow_not_exist is set (the dependency list may still be on
     // the response).
     //
+    // Note that paths may reference dependency paths if include_dep_files is set.
+    //
     // The path must be relative, and connect contain any "." or ".." components
     // The separator "/" must be used.
     repeated string paths = 3 [(buf.validate.field).repeated.items = {
@@ -94,23 +82,17 @@ message DownloadRequest {
     //
     // If false, it is an error to specify non-existent file paths.
     bool paths_allow_not_exist = 4;
-    // Whether to include the dependencies in the response.
-    bool include_deps = 5;
     // Whether to also include the files of the dependencies in the response.
     //
     // If not set, each Dep in the response will only have its Module and Digest set.
-    //
-    // include_deps must be set if include_dep_files is set.
-    // TODO: validate this. Or turn this into an enum.
-    bool include_dep_files = 6;
+    bool include_dep_files = 5;
     // The DigestType to return for content and dependencies.
     //
     // If this DigestType is not available, an error is returned.
     // Note that certain DigestTypes may be deprecated over time.
     //
     // If not set, the latest DigestType is used.
-    // TODO: should we default?
-    DigestType digest_type = 7;
+    DigestType digest_type = 6;
   }
   // The contents to request.
   repeated Value values = 1 [
@@ -119,8 +101,11 @@ message DownloadRequest {
   ];
 }
 
+// TODO: should we instead combine this and Graph in some way? You could instead have
+// something like ModuleKey in the bufbuild/buf repo, make Deps a graph, and separate
+// out the dependency graph in the DownloadResponse from the actual <ModuleKey, list<Files>> pair.
 message DownloadResponse {
-  // A dependency of the reference.
+  // A dependency for a given reference.
   message Dep {
     // The Module of the dependency.
     Module module = 1 [(buf.validate.field).required = true];
@@ -133,6 +118,7 @@ message DownloadResponse {
     //
     // This will consist of the .proto files, license files, and documentation files.
     //
+    // If no paths match and paths_allow_not_exist is set, this may be empty.
     // If include_dep_files was not set, this will be empty.
     repeated File files = 3;
   }
@@ -151,11 +137,9 @@ message DownloadResponse {
     //
     // If no paths match and paths_allow_not_exist is set, this may be empty.
     repeated File files = 3;
-    // The dependencies of the reference, if include_deps was set.
+    // The dependencies of the reference.
     //
     // This will include all transitive dependencies.
-    //
-    // If include_deps was not set, this will be empty.
     //
     // If include_dep_files is set, the Deps will have the files of the dependencies as well.
     // The .proto files of the Content and the Deps compromise a self-contained set of .proto
@@ -163,5 +147,8 @@ message DownloadResponse {
     repeated Dep deps = 4;
   }
   // The Contents of the references in the same order as requested.
+  //
+  // A single Content represents a single reference and all of its dependencies. There
+  // is no deduplication across individial Content messages.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
 }

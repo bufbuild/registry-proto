@@ -18,12 +18,15 @@ package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/module.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
 // A dependency graph.
 message Graph {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
   message Node {
     // The Module of the node.
     Module mode = 1 [(buf.validate.field).required = true];
