@@ -62,7 +62,12 @@ message DownloadRequest {
     //
     // If no paths match, an empty Files list will be returned, however the call may still
     // be successful if paths_allow_not_exist is set (the dependency list may still be on
-    // the response).
+    // the response). If a directory "foo/bar" is specified but this directory has no files,
+    // this is considered to be a non-match.
+    //
+    // This field also interacts with file_types - if file_types is set, a path only matches
+    // if it is also of the file type, and if there are no matching paths for the given FileTypes,
+    // an error is returned unless paths_not_allow_exist is set.
     //
     // Note that paths may reference dependency paths if include_dep_files is set.
     //
