@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/commit.proto";
+import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
 
@@ -40,6 +41,13 @@ message GetCommitsRequest {
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
+  // The DigestType to use for Digests returned on Commits.
+  //
+  // If this DigestType is not available, an error is returned.
+  // Note that certain DigestTypes may be deprecated over time.
+  //
+  // If not set, the latest DigestType is used, currently B5.
+  DigestType digest_type = 2;
 }
 
 message GetCommitsResponse {
@@ -67,7 +75,16 @@ message ListCommitsRequest {
   //   - If a Digest is referenced, all Commits with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // Whether to sort the Commits in descending order.
+  //
+  // TODO: What is descending order now?
   bool sort_desc = 4;
+  // The DigestType to use for Digests returned on Commits.
+  //
+  // If this DigestType is not available, an error is returned.
+  // Note that certain DigestTypes may be deprecated over time.
+  //
+  // If not set, the latest DigestType is used, currently B5.
+  DigestType digest_type = 5;
 }
 
 message ListCommitsResponse {

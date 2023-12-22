@@ -96,7 +96,7 @@ message DownloadRequest {
     // If this DigestType is not available, an error is returned.
     // Note that certain DigestTypes may be deprecated over time.
     //
-    // If not set, the latest DigestType is used.
+    // If not set, the latest DigestType is used, currently B5.
     DigestType digest_type = 6;
   }
   // The contents to request.

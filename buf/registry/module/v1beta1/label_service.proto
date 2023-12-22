@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/commit.proto";
+import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
@@ -86,6 +87,8 @@ message ListLabelsRequest {
   //   - If a Digest is referenced, all Labels that contain a Commit with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // Whether to sort the Labels in descending order.
+  //
+  // TODO: What is descending order now?
   bool sort_desc = 4;
 }
 
@@ -113,6 +116,13 @@ message ListLabelHistoryRequest {
   //
   // TODO: What is descending in this case? Do we want that to be the non-default?
   bool sort_desc = 4;
+  // The DigestType to use for Digests returned on Commits.
+  //
+  // If this DigestType is not available, an error is returned.
+  // Note that certain DigestTypes may be deprecated over time.
+  //
+  // If not set, the latest DigestType is used, currently B5.
+  DigestType digest_type = 5;
 }
 
 message ListLabelHistoryResponse {

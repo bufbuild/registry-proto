@@ -84,6 +84,8 @@ message ListModulesRequest {
   // is limited to Users with the necessary permissions.
   repeated buf.registry.owner.v1beta1.OwnerRef owner_refs = 3;
   // Whether to sort the Modules in descending order.
+  //
+  // TODO: What is descending?
   bool sort_desc = 4;
 }
 
