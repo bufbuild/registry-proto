@@ -25,6 +25,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // A commit on a specific Module.
 //
+// Commits are immutable.
+//
 // Many Digests may be associated with one Commit.
 message Commit {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
