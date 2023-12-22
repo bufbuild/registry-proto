@@ -16,8 +16,7 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/registry/module/v1beta1/digest.proto";
-import "buf/registry/module/v1beta1/module.proto";
+import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
@@ -27,23 +26,15 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 message Graph {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // TODO: If we end up creating <module_id, Digest> pair in some form like ModuleKey,
-  // this type may be replaced with that.
-  message Node {
-    // The Module of the node.
-    Module mode = 1 [(buf.validate.field).required = true];
-    // The Digest of the node.
-    Digest digest = 2 [(buf.validate.field).required = true];
-  }
   // An edge in the dependency graph.
   message Edge {
-    // The Module of the start of the edge.
-    string from_module_id = 1 [(buf.validate.field).required = true];
-    // The Module of the end of the edge.
-    string to_module_id = 2 [(buf.validate.field).required = true];
+    // The Commit of the start of the edge.
+    string from_commit_id = 1 [(buf.validate.field).required = true];
+    // The Commit of the end of the edge.
+    string to_commit_id = 2 [(buf.validate.field).required = true];
   }
-  // The nodes of the graph.
-  repeated Node nodes = 1 [(buf.validate.field).repeated.min_items = 1];
+  // The nodes of the graph, each of which are Commits.
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
   // The edges of the graph.
   repeated Edge edges = 2;
 }

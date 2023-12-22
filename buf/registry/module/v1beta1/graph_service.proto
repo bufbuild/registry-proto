@@ -25,43 +25,41 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Get dependency graphs.
 service GraphService {
-  // Get dependency graphs of multiple Modules, Labels, Digests, or Commits.
+  // Get a dependency graph that includes the given Commits.
+  //
+  // Commits will be resolved via the given ResourceRefs, and all Commits will be included in the
+  // graph, along with their dependencies.
   //
   // A dependency graph is a directed acyclic graph.
-  rpc GetGraphs(GetGraphsRequest) returns (GetGraphsResponse) {
+  rpc GetGraph(GetGraphRequest) returns (GetGraphResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
-message GetGraphsRequest {
-  // An individual request for a dependency graph.
-  message Value {
-    // The reference to get content for.
-    //
-    // See the documentation on ResourceRef for resource resolution details.
-    //
-    // Once the resource is resolved, the following content is returned:
-    //   - If a Module is referenced, the content of the default Label is returned.
-    //   - If a Label is referenced, the content associated with this Label is returned.
-    //   - If a Commit is referenced, the content for the Commit is returned.
-    //   - If a Digest is referenced, the content the Digest is returned.
-    ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
-    // The DigestType to return for nodes.
-    //
-    // If this DigestType is not available, an error is returned.
-    // Note that certain DigestTypes may be deprecated over time.
-    //
-    // If not set, the latest DigestType is used.
-    DigestType digest_type = 2;
-  }
-  // The dependency graphs to request.
-  repeated Value values = 1 [
+message GetGraphRequest {
+  // The references to resolve to Commits to include in the graph.
+  //
+  // See the documentation on ResourceRef for resource resolution details.
+  //
+  // Once the resource is resolved, the following Commit is included:
+  //   - If a Module is referenced, the Commit of the default Label is included.
+  //   - If a Label is referenced, the Commit of this Label is included.
+  //   - If a Commit is referenced, the Commit is incuded.
+  //   - If a Digest is referenced, the latest Commit with this Digest is included.
+  repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
+  // The DigestType to return for Commit nodes.
+  //
+  // If this DigestType is not available, an error is returned.
+  // Note that certain DigestTypes may be deprecated over time.
+  //
+  // If not set, the latest DigestType is used.
+  DigestType digest_type = 2;
 }
 
-message GetGraphsResponse {
-  // The Graphs of the references in the same order as requested.
-  repeated Graph graphs = 1 [(buf.validate.field).repeated.min_items = 1];
+message GetGraphResponse {
+  // The Graph calculated for the Commits.
+  Graph graph = 1 [(buf.validate.field).required = true];
 }

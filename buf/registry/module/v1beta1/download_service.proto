@@ -16,9 +16,9 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
+import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/file.proto";
-import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
 
@@ -47,7 +47,9 @@ message DownloadRequest {
     //   - If a Module is referenced, the content of the default Label is returned.
     //   - If a Label is referenced, the content associated with this Label is returned.
     //   - If a Commit is referenced, the content for the Commit is returned.
-    //   - If a Digest is referenced, the content the Digest is returned.
+    //   - If a Digest is referenced, the content the latest Commit with this Digest is returned.
+    // TODO: Is "latest Commit with this Digest" correct? If you're requesting a Digest, it likely
+    // doesn't matter.
     ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
     // Specific file types to request.
     //
@@ -106,46 +108,38 @@ message DownloadRequest {
   ];
 }
 
-// TODO: should we instead combine this and Graph in some way? You could instead have
-// something like ModuleKey in the bufbuild/buf repo, make Deps a graph, and separate
-// out the dependency graph in the DownloadResponse from the actual <ModuleKey, list<Files>> pair.
-//
 // TODO: We may want to deduplicate, especially for deps. Consider the case of a googleapis dep
 // when attempting to download multiple modules. We should only have to download that dep once.
 // Depending on what we change here, it may be nice to make this symmetrical with the UploadService.
 message DownloadResponse {
   // A dependency for a given reference.
   message Dep {
-    // The Module of the dependency.
-    Module module = 1 [(buf.validate.field).required = true];
-    // The Digest of the dependency.
+    // The Commit of the dependency.
     //
     // The DigestType will match the type given on the request. If this DigestType
     // is not available, an error is returned.
-    Digest digest = 2 [(buf.validate.field).required = true];
+    Commit commit = 1 [(buf.validate.field).required = true];
     // The Files of the dependency, if include_dep_files was set.
     //
     // This will consist of the .proto files, license files, and documentation files.
     //
     // If no paths match and paths_allow_not_exist is set, this may be empty.
     // If include_dep_files was not set, this will be empty.
-    repeated File files = 3;
+    repeated File files = 2;
   }
   // A set of content for a given reference.
   message Content {
-    // The Module of the content.
-    Module module = 1 [(buf.validate.field).required = true];
-    // The Digest of the content.
+    // The Commit of the content.
     //
     // The DigestType will match the type given on the request. If this DigestType
     // is not available, an error is returned.
-    Digest digest = 2 [(buf.validate.field).required = true];
+    Commit commit = 1 [(buf.validate.field).required = true];
     // The Files of the content.
     //
     // This will consist of the .proto files, license files, and documentation files.
     //
     // If no paths match and paths_allow_not_exist is set, this may be empty.
-    repeated File files = 3;
+    repeated File files = 2;
     // The dependencies of the reference.
     //
     // This will include all transitive dependencies.
@@ -153,7 +147,7 @@ message DownloadResponse {
     // If include_dep_files is set, the Deps will have the files of the dependencies as well.
     // The .proto files of the Content and the Deps compromise a self-contained set of .proto
     // files that can be independently built.
-    repeated Dep deps = 4;
+    repeated Dep deps = 3;
   }
   // The Contents of the references in the same order as requested.
   //
