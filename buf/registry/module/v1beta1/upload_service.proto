@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
+import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/file.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/module.proto";
@@ -25,7 +26,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Upload contents.
 service UploadService {
-  // Upload contents for a given module.
+  // Upload contents for given set of Modules.
   //
   // Content consists of:
   //   - The Files: .proto files, license files, and documentation files.
@@ -36,19 +37,7 @@ service UploadService {
   rpc Upload(UploadRequest) returns (UploadResponse) {}
 }
 
-// TODO: We may want to do some deduplication for workspace pushes here. Consider the case
-// of a googleapis dependency: we only want to have one copy of the files for that in a given
-// request. Whatever we do, it would be nice to be symmetrical with the DownloadService.
 message UploadRequest {
-  // A dependency for a given reference.
-  message Dep {
-    // The Module of the dependency.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-    // The Files of the dependency.
-    //
-    // This will consist of the .proto files, license files, and documentation files.
-    repeated File files = 2;
-  }
   // A set of content for a given reference.
   message Content {
     // The Module of the content.
@@ -56,32 +45,47 @@ message UploadRequest {
     // The Files of the content.
     //
     // This will consist of the .proto files, license files, and documentation files.
-    repeated File files = 2;
+    repeated File files = 2 [(buf.validate.field).repeated.min_items = 1];
+  }
+  // A reference to upload content for.
+  //
+  // All references and dependencies of references must have associated content.
+  //
+  // TODO: Move scoped_label_refs to top-level, only allow one set of scoped_label_refs
+  // per call?
+  message Reference {
+    // The Module of the reference.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The dependencies of the reference.
     //
     // This will include all transitive dependencies.
     //
-    // The .proto files of the Content and the Deps compromise a self-contained set of .proto
-    // files that can be independently built.
-    repeated Dep deps = 3;
-    // The labels to associate with the content.
+    // Note that if a dependency should have Commits created for it, it should be specified
+    // as a Reference in the references list.
+    repeated ModuleRef dep_module_refs = 2;
+    // The labels to associate with the Commits created by the upload.
     //
     // If an id is set, this id must represent a Label that already exists and is
-    // owned by the Module.
+    // owned by the Module. The Label will point to the newly-created Commits for the References,
+    // or will be updated to point to the pre-existing Commit for the Reference.
     //
     // Note that at least one label must be referenced. If you want to reference the default
     // label, do a request against the ModuleService to determine the ID of the default label,
     // and reference it here.
-    repeated ScopedLabelRef scoped_label_refs = 4 [(buf.validate.field).repeated.min_items = 1];
+    repeated ScopedLabelRef scoped_label_refs = 3 [(buf.validate.field).repeated.min_items = 1];
+    // TODO: git hash, code remote?
   }
-  // The Contents of the modules to upload data for.
-  //
-  // A single Content represents a single module and all of its dependencies. There
-  // is no deduplication across individial Content messages.
+  // The Contents of all references and their dependencies.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
+  // The references to upload content for.
+  repeated Reference references = 2 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message UploadResponse {
-  // TODO: Dependending on what we do here, we may want to return Commits in a particular way,
-  // but we may want to deduplicate data above first.
+  // The commits for each reference and dependency of a reference.
+  //
+  // If a Commit already exists with a Digest that matches the label TODO we really need to review
+  // the logic here, this is not done. We need to specify out the create vs existing logic, really
+  // I just need to review it.
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }
