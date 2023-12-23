@@ -68,6 +68,14 @@ message GetLabelsResponse {
 }
 
 message ListLabelsRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 1;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 2;
+  }
   // The maximum number of items to return.
   //
   // The default value is 10.
@@ -86,10 +94,14 @@ message ListLabelsRequest {
   //   - If a Commit is referenced, all Labels for the Commit are returned.
   //   - If a Digest is referenced, all Labels that contain a Commit with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
-  // Whether to sort the Labels in descending order.
+  // The order to return the Labels.
   //
-  // TODO: What is descending order now?
-  bool sort_desc = 4;
+  // If not specified, defaults to ORDER_CREATE_TIME_ASC.
+  //
+  // TODO: Do we want ORDER_CREATE_TIME_ASC to be the default?
+  // TODO: We are purposefully not making the default the zero enum value, however
+  // we may want to consider this.
+  Order order = 4;
 }
 
 message ListLabelsResponse {
@@ -102,6 +114,16 @@ message ListLabelsResponse {
 }
 
 message ListLabelHistoryRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by association time newest to oldest.
+    //
+    // The Commits most recently associated with the Label will be listed first.
+    ORDER_DESC = 1;
+    // Order by association time oldest to newest.
+    ORDER_ASC = 2;
+  }
   // The maximum number of items to return.
   //
   // The default value is 10.
@@ -112,10 +134,14 @@ message ListLabelHistoryRequest {
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The Label to list history for.
   LabelRef label_ref = 3 [(buf.validate.field).required = true];
-  // Whether to sort the Labels in descending order.
+  // The order to list the Labels.
   //
-  // TODO: What is descending in this case? Do we want that to be the non-default?
-  bool sort_desc = 4;
+  // By default, ORDER_DESC is used.
+  //
+  // TODO: Do we want ORDER_DESC to be the default?
+  // TODO: We are purposefully not making the default the zero enum value, however
+  // we may want to consider this.
+  Order order = 4;
   // The DigestType to use for Digests returned on Commits.
   //
   // If this DigestType is not available, an error is returned.

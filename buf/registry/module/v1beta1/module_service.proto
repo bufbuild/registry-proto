@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/owner/v1beta1/owner.proto";
 import "buf/validate/validate.proto";
@@ -70,6 +69,14 @@ message GetModulesResponse {
 }
 
 message ListModulesRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 1;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 2;
+  }
   // The maximum number of items to return.
   //
   // The default value is 10.
@@ -83,10 +90,14 @@ message ListModulesRequest {
   // If empty, all Modules for all owners are listed, but this functionality
   // is limited to Users with the necessary permissions.
   repeated buf.registry.owner.v1beta1.OwnerRef owner_refs = 3;
-  // Whether to sort the Modules in descending order.
+  // The order to return the Modules.
   //
-  // TODO: What is descending?
-  bool sort_desc = 4;
+  // If not specified, defaults to ORDER_CREATE_TIME_ASC.
+  //
+  // TODO: Do we want ORDER_CREATE_TIME_ASC to be the default?
+  // TODO: We are purposefully not making the default the zero enum value, however
+  // we may want to consider this.
+  Order order = 4;
 }
 
 message ListModulesResponse {
@@ -155,14 +166,10 @@ message UpdateModulesRequest {
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore_empty = true
     ];
-    // The default label of the Module.
+    // The name of the default label of the Module.
     //
-    // This Label must already exist. TODO this probably isnt true anymore
-    // This Label must be contained within the Module referenced by module_ref.
-    //
-    // If not present, no update will be performed.
-    // If present but both id and name are empty, no update will be performed.
-    ScopedLabelRef default_scoped_label_ref = 7;
+    // This label may not yet exist.
+    optional string default_label_name = 7 [(buf.validate.field).string.max_len = 250];
   }
   // The Modules to update.
   repeated Value values = 1 [

@@ -20,6 +20,7 @@ import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/file.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/module.proto";
+import "buf/registry/module/v1beta1/vcs_commit.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
@@ -50,9 +51,6 @@ message UploadRequest {
   // A reference to upload content for.
   //
   // All references and dependencies of references must have associated content.
-  //
-  // TODO: Move scoped_label_refs to top-level, only allow one set of scoped_label_refs
-  // per call?
   message Reference {
     // The Module of the reference.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
@@ -69,11 +67,10 @@ message UploadRequest {
     // owned by the Module. The Label will point to the newly-created Commits for the References,
     // or will be updated to point to the pre-existing Commit for the Reference.
     //
-    // Note that at least one label must be referenced. If you want to reference the default
-    // label, do a request against the ModuleService to determine the ID of the default label,
-    // and reference it here.
-    repeated ScopedLabelRef scoped_label_refs = 3 [(buf.validate.field).repeated.min_items = 1];
-    // TODO: git hash, code remote?
+    // If no labels are referenced, the default Label for the Module is used.
+    repeated ScopedLabelRef scoped_label_refs = 3;
+    // VCS Commit information.
+    VCSCommit vcs_commit = 4;
   }
   // The Contents of all references and their dependencies.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
@@ -82,10 +79,10 @@ message UploadRequest {
 }
 
 message UploadResponse {
-  // The commits for each reference and dependency of a reference.
+  // The Commits for each reference and dependency of a reference.
   //
-  // If a Commit already exists with a Digest that matches the label TODO we really need to review
-  // the logic here, this is not done. We need to specify out the create vs existing logic, really
-  // I just need to review it.
+  // A single Commit will be returned for each Module.
+  //
+  // The Commits will be ordered by Module ID.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }

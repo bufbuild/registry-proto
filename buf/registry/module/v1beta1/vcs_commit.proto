@@ -16,10 +16,7 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/registry/module/v1beta1/digest.proto";
-import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
-import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -32,8 +29,25 @@ enum VCSType {
 
 // VCS commit information.
 //
-// Stored within a Commit, not a resource on its own.
-// TODO: We could go back to these being its own resource, why not?
+// Stored within a Commit, not a resource on its own. Commits <-> VCSCommits are many-to-many,
+// we do not enforce any uniqueness principles here, VCSCommits should just be considered
+// metadata on a given Commit. As such, making them their own entity would result in checks
+// we don't want to enforce. It is still split out into a separate message so that we can
+// enforce required checks on certain fields iff VCSCommit is present.
+//
+// TODO: Below is the explanation, but it's a little unsatisfying. Perhaps we revisit making
+// VCSCommit an entity?
+//
+// Multiple BSR commits may have the same content, but different VCS hashes. This costs some
+// storage, but it allows the BSR to more accurately link back to source control. (For example,
+// git commit A introduces a new service, commit B modifies it, and commit C deletes the
+// service and moves the functionality to a different module. We want the BSR commits created
+// from A and C to link back to the correct git commits and PR discussions.)
+//
+// Multiple BSR commits may have the same VCS hash, but different content. This should only
+// happen when users incorrectly hand-specify the VCS hash — and since commits are immutable and
+// can’t be deleted, we don’t want a manually-created commit to forever block a later,
+// fully-correct commit.
 message VCSCommit {
   // The type of VCS that the Commit originated from.
   VCSType type = 1 [

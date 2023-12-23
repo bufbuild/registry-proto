@@ -24,10 +24,6 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 //
 // A digest represents all content for a single Commit, including its .proto files, documentation
 // files, license files, and dependencies.
-//
-// TODO: should this be named something other than Digest, to make sure it is clear that this
-// is not related to the digest of a single File? This was originally named "CommitDigest" but
-// if we're trying to move away from Commits, this seems wrong.
 message Digest {
   // The type of the Digest.
   DigestType type = 1 [
