@@ -159,7 +159,7 @@ message DownloadResponse {
   // The Contents of the references, ordered by commit_id.
   //
   // If include_dep_content is true, all deps will also have associated Content. Otherwise,
-  // only the Commits associated with the Referencves will have associated Content.
+  // only the Commits associated with the References will have associated Content.
   //
   // TODO: You could instead define that Content is returned in topo sort order, matching
   // what a topo sort of a Graph would be.
