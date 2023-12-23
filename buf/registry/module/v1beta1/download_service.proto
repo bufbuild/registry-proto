@@ -76,7 +76,7 @@ message DownloadRequest {
     //
     // Note that paths may reference dependency paths if include_dep_files is set.
     //
-    // The path must be relative, and connect contain any "." or ".." components
+    // The path must be relative, and cannot contain any "." or ".." components
     // The separator "/" must be used.
     repeated string paths = 3 [(buf.validate.field).repeated.items = {
       string: {
