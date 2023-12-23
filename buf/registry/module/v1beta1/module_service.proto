@@ -157,7 +157,7 @@ message UpdateModulesRequest {
     ];
     // The default label of the Module.
     //
-    // This Label must already exist.
+    // This Label must already exist. TODO this probably isnt true anymore
     // This Label must be contained within the Module referenced by module_ref.
     //
     // If not present, no update will be performed.

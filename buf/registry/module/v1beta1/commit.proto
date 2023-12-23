@@ -64,7 +64,8 @@ message Commit {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // TODO: git hash, code remote
+  // VCS commit information.
+  VCSCommit vcs_commit = 7;
 }
 
 // CommitRef is a reference to a Commit.

@@ -66,6 +66,7 @@ message Module {
     (buf.validate.field).ignore_empty = true
   ];
   // The id of the default label of the Module.
+  // TODO: change to name
   string default_label_id = 10 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
