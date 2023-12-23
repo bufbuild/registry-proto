@@ -115,11 +115,29 @@ message DownloadRequest {
 }
 
 message DownloadResponse {
+  // A single reference as specified on the request.
+  message Reference {
+    // The ID of the Commit associated with the Content.
+    //
+    // The Commit associated with this ID will be present in the commits field.
+    string commit_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
+    // The dependencies of the reference.
+    //
+    // The Commit associated with this ID will be present in the commits field.
+    //
+    // This includes all transitive dependencies.
+    //
+    // If include_dep_content is true, all deps will also have associated Content.
+    repeated string dep_commit_ids = 2 [(buf.validate.field).string.uuid = true];
+  }
   // Content for a single Commit.
   message Content {
     // The ID of the Commit associated with the Content.
     //
-    // The Commit associated with this ID will be present as either a Value or Dep.
+    // The Commit associated with this ID will be present in the commits field.
     string commit_id = 1 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.uuid = true
@@ -131,37 +149,21 @@ message DownloadResponse {
     // If no paths match and paths_allow_not_exist is set, this may be empty.
     repeated File files = 2;
   }
-  // A single reference as specified on the request.
-  message Reference {
-    // The Commit of the reference.
-    //
-    // The DigestType will match the type given on the request. If this DigestType
-    // is not available, an error is returned.
-    //
-    // TODO: Put Commit on Content, commit_id in Reference? The problem with this is
-    // that deps don't necessarily have Content. You could instead make it so that
-    // Content is present for every reference and dependency, but dependencies have
-    // optional Files, but this seems more confusing than saying "deps may not have
-    // content returned, and a Content message doesn't have a switch based on whether
-    // or not you set include_dep_content". In our current world however, this means
-    // that Commit objects are duplicated, however this isn't nearly as expensive
-    // as duplicating Files.
-    Commit commit = 1 [(buf.validate.field).required = true];
-    // The dependencies of the reference.
-    //
-    // This includes all transitive dependencies.
-    //
-    // If include_dep_content is true, all deps will also have associated Content.
-    repeated Commit deps = 2;
-  }
+  // The Commits of the references and dependencies of the references.
+  //
+  // The DigestType will match the type given on the request. If this DigestType
+  // is not available, an error is returned.
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
   // The references in the same order as requested.
-  repeated Reference references = 1 [(buf.validate.field).repeated.min_items = 1];
-  // The Contents of the references, ordered by commit_id.
+  //
+  // TODO: Alternative is sorting by commit_id since we are messing everything up anyways.
+  repeated Reference references = 2 [(buf.validate.field).repeated.min_items = 1];
+  // The Contents of the references, in topo sort order.
   //
   // If include_dep_content is true, all deps will also have associated Content. Otherwise,
   // only the Commits associated with the References will have associated Content.
   //
-  // TODO: You could instead define that Content is returned in topo sort order, matching
-  // what a topo sort of a Graph would be.
-  repeated Content contents = 2 [(buf.validate.field).repeated.min_items = 1];
+  // TODO: Should we do topo sort order? Regardless, that needs more explanation for docs.
+  // Alternative is sorting by commit_id.
+  repeated Content contents = 3 [(buf.validate.field).repeated.min_items = 1];
 }

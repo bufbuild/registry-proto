@@ -39,15 +39,6 @@ service UploadService {
 }
 
 message UploadRequest {
-  // A set of content for a given reference.
-  message Content {
-    // The Module of the content.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-    // The Files of the content.
-    //
-    // This will consist of the .proto files, license files, and documentation files.
-    repeated File files = 2 [(buf.validate.field).repeated.min_items = 1];
-  }
   // A reference to upload content for.
   //
   // All references and dependencies of references must have associated content.
@@ -72,10 +63,19 @@ message UploadRequest {
     // VCS Commit information.
     VCSCommit vcs_commit = 4;
   }
-  // The Contents of all references and their dependencies.
-  repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
+  // A set of content for a given reference.
+  message Content {
+    // The Module of the content.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The Files of the content.
+    //
+    // This will consist of the .proto files, license files, and documentation files.
+    repeated File files = 2 [(buf.validate.field).repeated.min_items = 1];
+  }
   // The references to upload content for.
-  repeated Reference references = 2 [(buf.validate.field).repeated.min_items = 1];
+  repeated Reference references = 1 [(buf.validate.field).repeated.min_items = 1];
+  // The Contents of all references and their dependencies.
+  repeated Content contents = 2 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message UploadResponse {
@@ -83,6 +83,9 @@ message UploadResponse {
   //
   // A single Commit will be returned for each Module.
   //
-  // The Commits will be ordered by Module ID.
+  // The Commits will be in topo sort order.
+  //
+  // TODO: Should we do topo sort order? Regardless, that needs more explanation for docs.
+  // Alternative is sorting by module_id.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }
