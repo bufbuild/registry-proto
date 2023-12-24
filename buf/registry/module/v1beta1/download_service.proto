@@ -111,6 +111,10 @@ message DownloadRequest {
   // Note that certain DigestTypes may be deprecated over time.
   //
   // If not set, the latest DigestType is used, currently B5.
+  //
+  // Note that this DigestType does *not* need to match the DigestType of a Digest specified
+  // on ResourceRef. It is valid to specify i.e. a DigestType of b4 on ResourceRef, but return
+  // a DigestType of b5. This allows using old digests to query, but return new digests.
   DigestType digest_type = 2;
 }
 
