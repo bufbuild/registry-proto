@@ -112,3 +112,40 @@ message ListCommitsResponse {
   // The listed Commits.
   repeated Commit commits = 2;
 }
+
+message ResolveCommitsRequest {
+  // References to request a Commit for.
+  //
+  // See the documentation on ResourceRef for resource resolution details.
+  //
+  // Once the resource is resolved, this reference is interpeted to refer to the following Commit:
+  //   - If a Module is referenced, this is interpreted to mean the latest released Commit on the Module.
+  //   - If a Commit is referenced, this just references that specific commit.
+  //   - If a Tag is referenced, this is interpreted to mean the Commit associated with the Tag.
+  //   - If a VCSCommit is referenced, this is interpreted to mean the Commit associated with the VCSCommit.
+  //   - Is a Branch is referenced, this is interpreted to mean the head Commit on the Branch.
+  //   - If a Digest is referenced, this is interpreted to mean the latest released Commit that has this Digest.
+  //     Digests referencing unreleased Commits cannot be referenced.
+  //
+  // TODO: what is "latest released Commit" if we now have "head Commit"?
+  // The reference to request a Commit for.
+  //
+  // See the documentation on ResourceRef for resource resolution details.
+  //
+  // Resoluation is as follows:
+  //   - If a Module is referenced, the Commit of the default Label is returned.
+  //   - If a Label is referenced, the Commit of this Label is returned.
+  //   - If a Commit is referenced, this Commit is returned.
+  //   - If a Digest is referenced, the latest Commit with this Digest is returned.
+  // TODO: Is "latest Commit with this Digest" correct? If you're requesting a Digest, it likely
+  // doesn't matter.
+  repeated ResourceRef resource_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message ResolveCommitsResponse {
+  // The found Commits in the same order as requested.
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+}
