@@ -33,6 +33,10 @@ service CommitService {
   rpc ListCommits(ListCommitsRequest) returns (ListCommitsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+  // Resolve Commits.
+  rpc ResolveCommits(ResolveCommitsRequest) returns (ResolveCommitsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message GetCommitsRequest {
@@ -78,7 +82,8 @@ message ListCommitsRequest {
   //
   // Once the resource is resolved, the following Commits are listed:
   //   - If a Module is referenced, all Commits for the Module are returned.
-  //   - If a Label is referenced, the Commit associated with this Label is returned.
+  //   - If a Label is referenced, the Commit currently associated with this Label is returned.
+  //     To get the history the the Commits associated with a Label, use LabelService.ListLabelHistory.
   //   - If a Commit is referenced, this Commit is returned.
   //   - If a Digest is referenced, all Commits with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
