@@ -67,7 +67,7 @@ message Module {
   ];
   // The name of the default label of the Module.
   //
-  // This label may not yet exist. When a Module is created, it has not Commits, and Labels
+  // This label may not yet exist. When a Module is created, it has no Commits, and Labels
   // must have a Commit, so this Label is not created when a Module is created. Additionally,
   // a User may modify the name of the default Label without this Label yet being created.
   string default_label_name = 10 [
