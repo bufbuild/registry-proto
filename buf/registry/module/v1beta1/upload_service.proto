@@ -20,6 +20,7 @@ import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/file.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/module.proto";
+import "buf/registry/module/v1beta1/resource.proto";
 import "buf/registry/module/v1beta1/vcs_commit.proto";
 import "buf/validate/validate.proto";
 
@@ -32,16 +33,14 @@ service UploadService {
   // Content consists of:
   //   - The Files: .proto files, license files, and documentation files.
   //   - The dependencies.
-  //
-  // Uploads require all data for dependencies to be pushed from the client-side. A given
-  // upload request must therefore be self-contained.
   rpc Upload(UploadRequest) returns (UploadResponse) {}
 }
 
 message UploadRequest {
   // A reference to upload content for.
   //
-  // All references and dependencies of references must have associated content.
+  // All references must have associated content.
+  // TODO: "Reference" isn't the best name.
   message Reference {
     // The Module of the reference.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
@@ -50,8 +49,20 @@ message UploadRequest {
     // This will include all transitive dependencies.
     //
     // Note that if a dependency should have Commits created for it, it should be specified
-    // as a Reference in the references list.
-    repeated ModuleRef dep_module_refs = 2;
+    // as a Reference in the references list, and have associated Content. In this case, only
+    // the module component of the ResourceRef should be specified, and specifying any other
+    // part of the ResourceRef will result in an error.
+    //
+    // See the documentation on ResourceRef for resource resolution details.
+    //
+    // Resolution is as follows:
+    //   - If a Module is referenced, the Commit of the default Label is used.
+    //   - If a Label is referenced, the Commit of this Label is used.
+    //   - If a Commit is referenced, this Commit is used.
+    //   - If a Digest is referenced, the latest Commit with this Digest is used.
+    // TODO: Is "latest Commit with this Digest" correct? If you're requesting a Digest, it likely
+    // doesn't matter. However, we should probably prefer Commits on the default Label.
+    repeated ResourceRef dep_resource_refs = 2;
     // The labels to associate with the Commits created by the upload.
     //
     // If an id is set, this id must represent a Label that already exists and is
@@ -74,18 +85,14 @@ message UploadRequest {
   }
   // The references to upload content for.
   repeated Reference references = 1 [(buf.validate.field).repeated.min_items = 1];
-  // The Contents of all references and their dependencies.
+  // The Contents of all references.
   repeated Content contents = 2 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message UploadResponse {
-  // The Commits for each reference and dependency of a reference.
+  // The Commits for each reference in the same order as given on the request.
   //
-  // A single Commit will be returned for each Module.
-  //
-  // The Commits will be in topo sort order.
-  //
-  // TODO: Should we do topo sort order? Regardless, that needs more explanation for docs.
-  // Alternative is sorting by module_id.
+  // A single Commit will be returned for each reference. These Commits may or may not be new.
+  // If nothing changed for a given reference, the existing Commit will be returned.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }

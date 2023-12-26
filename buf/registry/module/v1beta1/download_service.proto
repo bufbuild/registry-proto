@@ -120,6 +120,7 @@ message DownloadRequest {
 
 message DownloadResponse {
   // A single reference as specified on the request.
+  // TODO: "Reference" isn't the best name.
   message Reference {
     // The ID of the Commit associated with the Content.
     //
