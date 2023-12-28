@@ -92,7 +92,6 @@ message ListLabelsRequest {
   //   - If a Module is referenced, all Labels for the Module are returned.
   //   - If a Label is referenced, this Label is returned.
   //   - If a Commit is referenced, all Labels for the Commit are returned.
-  //   - If a Digest is referenced, all Labels that contain a Commit with this Digest are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //

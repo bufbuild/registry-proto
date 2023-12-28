@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
@@ -26,7 +25,6 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 //   - Module
 //   - Label
 //   - Commit
-//   - Digest
 //
 // The id or name is resolved to a specific resource.
 // If an id is passed, this is interpreted as being the id of the resource.
@@ -43,18 +41,14 @@ message ResourceRef {
   // The following semantics are applied:
   //   - If the child oneof is not specified, the name is interpreted to reference a Module.
   //   - If label_name is specified, the name is interpreted to reference a Label.
-  //   - If digest is specified, the name is interpreted to reference a Commit with this Digest.
   //   - If ref is specified, it is interpreted to be either an id or name.
   //     - If an id, this is equivalent to setting the id field on ResourceRef. However,
   //       backends can choose to validate that the owner and module fields match the resource
   //       referenced, as additional validation.
-  //     - If a name, this is interpreted to be either a Label name or Digest string. A Digest string
-  //       is of the form "typeString:hexValue", where typeString is the lowercase of the Type
-  //       value with TYPE_ stripped, and hexValue is the hex-encoded value of the digest.
+  //     - If a name, this is interpreted to be a Label name.
   //     - If there is a conflict between names across resources (for example, there is a Commit id
   //       and Label name of the same value), the following order of precedence is applied:
   //       - Commit
-  //       - Digest
   //       - Label
   //
   // Names can only be used in requests, and only for read-only RPCs, that is
@@ -76,13 +70,11 @@ message ResourceRef {
       // If this value is present but empty, this should be treated as not present, that is
       // an empty value is the same as a null value.
       string label_name = 3 [(buf.validate.field).string.max_len = 250];
-      // The digest of the Commit's contents.
-      Digest digest = 4;
       // The untyped reference, applying the semantics as documented on the Name message.
       //
       // If this value is present but empty, this should be treated as not present, that is
       // an empty value is the same as a null value.
-      string ref = 5;
+      string ref = 4;
     }
   }
 

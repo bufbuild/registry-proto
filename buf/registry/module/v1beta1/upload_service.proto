@@ -59,9 +59,6 @@ message UploadRequest {
     //   - If a Module is referenced, the Commit of the default Label is used.
     //   - If a Label is referenced, the Commit of this Label is used.
     //   - If a Commit is referenced, this Commit is used.
-    //   - If a Digest is referenced, the latest Commit with this Digest is used.
-    // TODO: Is "latest Commit with this Digest" correct? If you're requesting a Digest, it likely
-    // doesn't matter. However, we should probably prefer Commits on the default Label.
     repeated ResourceRef dep_resource_refs = 2;
     // The labels to associate with the Commits created by the upload.
     //

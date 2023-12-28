@@ -25,92 +25,10 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Operate on Commits.
 service CommitService {
-  // Get Commits by id.
-  rpc GetCommits(GetCommitsRequest) returns (GetCommitsResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
-  // List Commits by Module or Digest.
-  rpc ListCommits(ListCommitsRequest) returns (ListCommitsResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
   // Resolve Commits.
   rpc ResolveCommits(ResolveCommitsRequest) returns (ResolveCommitsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-}
-
-message GetCommitsRequest {
-  // The Commits to request.
-  repeated CommitRef commit_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
-  ];
-  // The DigestType to use for Digests returned on Commits.
-  //
-  // If this DigestType is not available, an error is returned.
-  // Note that certain DigestTypes may be deprecated over time.
-  //
-  // If not set, the latest DigestType is used, currently B5.
-  DigestType digest_type = 2;
-}
-
-message GetCommitsResponse {
-  // The retrieved Commits in the same order as requested.
-  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
-}
-
-message ListCommitsRequest {
-  // The list order.
-  enum Order {
-    ORDER_UNSPECIFIED = 0;
-    // Order by create_time oldest to newest.
-    ORDER_CREATE_TIME_ASC = 1;
-    // Order by create_time newest to oldest.
-    ORDER_CREATE_TIME_DESC = 2;
-  }
-  // The maximum number of items to return.
-  //
-  // The default value is 10.
-  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
-  // The page to start from.
-  //
-  // If empty, the first page is returned,
-  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
-  // The reference to list Commits for.
-  //
-  // See the documentation on Ref for resource resolution details.
-  //
-  // Once the resource is resolved, the following Commits are listed:
-  //   - If a Module is referenced, all Commits for the Module are returned.
-  //   - If a Label is referenced, the Commit currently associated with this Label is returned.
-  //     To get the history the the Commits associated with a Label, use LabelService.ListLabelHistory.
-  //   - If a Commit is referenced, this Commit is returned.
-  //   - If a Digest is referenced, all Commits with this Digest are returned.
-  ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
-  // The order to return the Commits.
-  //
-  // If not specified, defaults to ORDER_CREATE_TIME_ASC.
-  //
-  // TODO: Do we want ORDER_CREATE_TIME_ASC to be the default?
-  // TODO: We are purposefully not making the default the zero enum value, however
-  // we may want to consider this.
-  Order order = 4;
-  // The DigestType to use for Digests returned on Commits.
-  //
-  // If this DigestType is not available, an error is returned.
-  // Note that certain DigestTypes may be deprecated over time.
-  //
-  // If not set, the latest DigestType is used, currently B5.
-  DigestType digest_type = 5;
-}
-
-message ListCommitsResponse {
-  // The next page token.
-  //
-  // If empty, there are no more pages.
-  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
-  // The listed Commits.
-  repeated Commit commits = 2;
 }
 
 message ResolveCommitsRequest {
@@ -122,13 +40,17 @@ message ResolveCommitsRequest {
   //   - If a Module is referenced, the Commit of the default Label is returned.
   //   - If a Label is referenced, the Commit of this Label is returned.
   //   - If a Commit is referenced, this Commit is returned.
-  //   - If a Digest is referenced, the latest Commit with this Digest is returned.
-  // TODO: Is "latest Commit with this Digest" correct? If you're requesting a Digest, it likely
-  // doesn't matter. However, we should probably prefer Commits on the default Label.
   repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
+  // The DigestType to use for Digests returned on Commits.
+  //
+  // If this DigestType is not available, an error is returned.
+  // Note that certain DigestTypes may be deprecated over time.
+  //
+  // If not set, the latest DigestType is used, currently B5.
+  DigestType digest_type = 2;
 }
 
 message ResolveCommitsResponse {

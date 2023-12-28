@@ -47,12 +47,9 @@ message DownloadRequest {
     // See the documentation on ResourceRef for resource resolution details.
     //
     // Once the resource is resolved, the following content is returned:
-    //   - If a Module is referenced, the content of the default Label is returned.
-    //   - If a Label is referenced, the content associated with this Label is returned.
-    //   - If a Commit is referenced, the content for the Commit is returned.
-    //   - If a Digest is referenced, the content the latest Commit with this Digest is returned.
-    // TODO: Is "latest Commit with this Digest" correct? If you're requesting a Digest, it likely
-    // doesn't matter.
+    //   - If a Module is referenced, the content of the Commit of the default Label is returned.
+    //   - If a Label is referenced, the content of the Commit of this Label is returned.
+    //   - If a Commit is referenced, the content for this Commit is returned.
     ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
     // Specific file types to request.
     //
@@ -111,10 +108,6 @@ message DownloadRequest {
   // Note that certain DigestTypes may be deprecated over time.
   //
   // If not set, the latest DigestType is used, currently B5.
-  //
-  // Note that this DigestType does *not* need to match the DigestType of a Digest specified
-  // on ResourceRef. It is valid to specify i.e. a DigestType of b4 on ResourceRef, but return
-  // a DigestType of b5. This allows using old digests to query, but return new digests.
   DigestType digest_type = 2;
 }
 
