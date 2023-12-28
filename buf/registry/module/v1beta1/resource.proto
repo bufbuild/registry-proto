@@ -64,6 +64,7 @@ message ResourceRef {
       min_len: 2,
       max_len: 100
     }];
+    // If the oneof is present but empty, this should be treated as not present.
     oneof child {
       // The name of the Label.
       //
