@@ -68,18 +68,3 @@ message Commit {
   // VCS commit information.
   VCSCommit vcs_commit = 7;
 }
-
-// CommitRef is a reference to a Commit.
-//
-// Currently, this is just an ID, but this structure is in place for symmetry and forwards-compatibility.
-//
-// This is used in requests.
-message CommitRef {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-
-  // The id of the Commit.
-  string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
-}
