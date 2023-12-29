@@ -16,9 +16,9 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
+import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/file.proto";
-import "buf/registry/module/v1beta1/graph.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
 
@@ -26,14 +26,9 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Download contents.
 service DownloadService {
-  // Download the contents of multiple Modules, Labels, Digests, or Commits.
+  // Download the contents of multiple Modules, Labels, or Commits.
   //
-  // Content consists of:
-  //   - The Files: .proto files, license files, and documentation files.
-  //   - The dependencies.
-  //
-  // You may specify whether to additionally download the Content of dependencies via the
-  // include_dep_content field.
+  // Content consists of the .proto files, license files, and documentation files.
   rpc Download(DownloadRequest) returns (DownloadResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -89,20 +84,13 @@ message DownloadRequest {
     //
     // If false, it is an error to specify non-existent file paths.
     bool paths_allow_not_exist = 4;
-    // Whether to also include the content of the dependencies in the response.
-    //
-    // If not set, each Dep in the response will only have its Commit set.
-    bool include_dep_content = 5;
   }
   // The references to get contents for.
-  //
-  // If include_dep_content is set, all contents for the dependencies of the references
-  // will also be returned.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
-  // The DigestType to return for Commits of required references and dependencies.
+  // The DigestType to return for Commits of references.
   //
   // If this DigestType is not available, an error is returned.
   // Note that certain DigestTypes may be deprecated over time.
@@ -114,13 +102,10 @@ message DownloadRequest {
 message DownloadResponse {
   // Content for a single Commit.
   message Content {
-    // The ID of the Commit associated with the Content.
+    // The Commit associated with the Content.
     //
     // The Commit associated with this ID will be present in the commits field.
-    string commit_id = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.uuid = true
-    ];
+    Commit commit = 1 [(buf.validate.field).required = true];
     // The Files of the content.
     //
     // This will consist of the .proto files, license files, and documentation files.
@@ -128,15 +113,6 @@ message DownloadResponse {
     // If no paths match and paths_allow_not_exist is set, this may be empty.
     repeated File files = 2;
   }
-  // The Graph represending the dependency graph of the references and transitive dependencies
-  // of the references.
-  //
-  // The DigestType on the Commits will match the type given on the request. If this DigestType
-  // is not available, an error is returned.
-  Graph graph = 1 [(buf.validate.field).required = true];
-  // The Contents of the references sorted by commit_id.
-  //
-  // If include_dep_content is true, all Commits in the graph will also have associated Content. Otherwise,
-  // only the Commits associated with the input references will have associated Content.
-  repeated Content contents = 2 [(buf.validate.field).repeated.min_items = 1];
+  // The Contents of the references in the same order as requested.
+  repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
 }

@@ -30,9 +30,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 service UploadService {
   // Upload contents for given set of Modules.
   //
-  // Content consists of:
-  //   - The Files: .proto files, license files, and documentation files.
-  //   - The dependencies.
+  // Content consists of the Files: .proto files, license files, and documentation files.
   rpc Upload(UploadRequest) returns (UploadResponse) {}
 }
 
