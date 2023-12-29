@@ -25,13 +25,13 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Operate on Commits.
 service CommitService {
-  // Resolve Commits.
-  rpc ResolveCommits(ResolveCommitsRequest) returns (ResolveCommitsResponse) {
+  // Get Commits.
+  rpc GetCommits(GetCommitsRequest) returns (GetCommitsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
-message ResolveCommitsRequest {
+message GetCommitsRequest {
   // References to request a Commit for.
   //
   // See the documentation on ResourceRef for resource resolution details.
@@ -40,6 +40,8 @@ message ResolveCommitsRequest {
   //   - If a Module is referenced, the Commit of the default Label is returned.
   //   - If a Label is referenced, the Commit of this Label is returned.
   //   - If a Commit is referenced, this Commit is returned.
+  //
+  // TODO: It's a little incongruent to have a Get request take a ResourceRef.
   repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -53,7 +55,7 @@ message ResolveCommitsRequest {
   DigestType digest_type = 2;
 }
 
-message ResolveCommitsResponse {
+message GetCommitsResponse {
   // The found Commits in the same order as requested.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }
