@@ -39,6 +39,7 @@ message UploadRequest {
   //
   // All references must have associated content.
   // TODO: "Reference" isn't the best name.
+  // TODO: Merge with Content unless there's a good reason not to.
   message Reference {
     // The Module of the reference.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
