@@ -69,6 +69,14 @@ message GetUsersResponse {
 }
 
 message ListUsersRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 1;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 2;
+  }
   // The maximum number of items to return.
   //
   // The default value is 10.
@@ -82,8 +90,14 @@ message ListUsersRequest {
   // If this is empty, all Users for all Organizations are listed, but this functionality
   // is limited to Users with the necessary permissions.
   repeated OrganizationRef organization_refs = 3;
-  // Whether to sort the Users in descending order.
-  bool sort_desc = 4;
+  // The order to return the Users.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_ASC.
+  //
+  // TODO: Do we want ORDER_CREATE_TIME_ASC to be the default?
+  // TODO: We are purposefully not making the default the zero enum value, however
+  // we may want to consider this.
+  Order order = 4;
   // Only return Users of these types.
   repeated UserType has_types = 5 [
     (buf.validate.field).repeated.unique = true,

@@ -1,0 +1,94 @@
+// Copyright 2023 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1beta1;
+
+import "buf/registry/module/v1beta1/commit.proto";
+import "buf/registry/module/v1beta1/file.proto";
+import "buf/registry/module/v1beta1/label.proto";
+import "buf/registry/module/v1beta1/module.proto";
+import "buf/registry/module/v1beta1/resource.proto";
+import "buf/registry/module/v1beta1/vcs_commit.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
+// Upload contents.
+service UploadService {
+  // Upload contents for given set of Modules.
+  //
+  // Content consists of the Files: .proto files, license files, and documentation files.
+  rpc Upload(UploadRequest) returns (UploadResponse) {}
+}
+
+message UploadRequest {
+  // A reference to upload content for.
+  //
+  // All references must have associated content.
+  // TODO: "Reference" isn't the best name.
+  // TODO: Merge with Content unless there's a good reason not to.
+  message Reference {
+    // The Module of the reference.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The dependencies of the reference.
+    //
+    // This will include all transitive dependencies.
+    //
+    // Note that if a dependency should have Commits created for it, it should be specified
+    // as a Reference in the references list, and have associated Content. In this case, only
+    // the module component of the ResourceRef should be specified, and specifying any other
+    // part of the ResourceRef will result in an error.
+    //
+    // See the documentation on ResourceRef for resource resolution details.
+    //
+    // Resolution is as follows:
+    //   - If a Module is referenced, the Commit of the default Label is used.
+    //   - If a Label is referenced, the Commit of this Label is used.
+    //   - If a Commit is referenced, this Commit is used.
+    repeated ResourceRef dep_resource_refs = 2;
+    // The labels to associate with the Commits created by the upload.
+    //
+    // If an id is set, this id must represent a Label that already exists and is
+    // owned by the Module. The Label will point to the newly-created Commits for the References,
+    // or will be updated to point to the pre-existing Commit for the Reference.
+    //
+    // If no labels are referenced, the default Label for the Module is used.
+    repeated ScopedLabelRef scoped_label_refs = 3;
+    // VCS Commit information.
+    VCSCommit vcs_commit = 4;
+  }
+  // A set of content for a given reference.
+  message Content {
+    // The Module of the content.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The Files of the content.
+    //
+    // This will consist of the .proto files, license files, and documentation files.
+    repeated File files = 2 [(buf.validate.field).repeated.min_items = 1];
+  }
+  // The references to upload content for.
+  repeated Reference references = 1 [(buf.validate.field).repeated.min_items = 1];
+  // The Contents of all references.
+  repeated Content contents = 2 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UploadResponse {
+  // The Commits for each reference in the same order as given on the request.
+  //
+  // A single Commit will be returned for each reference. These Commits may or may not be new.
+  // If nothing changed for a given reference, the existing Commit will be returned.
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+}

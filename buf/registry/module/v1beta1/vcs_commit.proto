@@ -16,83 +16,9 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/registry/storage/v1beta1/storage.proto";
 import "buf/validate/validate.proto";
-import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
-
-// VCSCommit is a commit from a specific VCS associated with a specific Module.
-//
-// Many VCSCommits can be associated with a single Commit.
-message VCSCommit {
-  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
-
-  // The id of the VCSCommit.
-  string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
-  // The time the VCSCommit was created on the BSR.
-  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
-  // The last time the VCSCommit was updated on the BSR.
-  //
-  // Currently, VCSCommits are immutable, but this may change in the near future.
-  // TODO: is this true?
-  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
-  // The hash of the VCSCommit.
-  //
-  // VCS-specific.
-  // Unique within a given Module.
-  string hash = 4 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[0-9a-fA-F]{40}$"
-  ];
-  // The id of the User or Organization that owns the Module that the VCSCommit is associated with.
-  string owner_id = 5 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
-  // The id of the Module that the VCSCommit is associated with.
-  string module_id = 6 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
-  // The type of VCS.
-  VCSType type = 7 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).enum.defined_only = true
-  ];
-  // The id of the Commit associated with the VCSCommit.
-  string commit_id = 8 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
-  // The Digest of the Commit associated with the VCSCommit.
-  buf.registry.storage.v1beta1.Digest commit_digest = 9 [(buf.validate.field).required = true];
-  // The URL of of the repository on the VCS.
-  string vcs_repository_url = 10 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uri = true
-  ];
-  // The name of the author of the VCSCommit.
-  //
-  // VCS-specific: not associated with the name of Users on the BSR, for example.
-  string author_name = 11;
-  // The email of the author of the VCSCommit.
-  //
-  // VCS-specific: not associated with the Users on the BSR, for example.
-  string author_email = 12;
-  // The name of the committer of the VCSCommit.
-  //
-  // VCS-specific: not associated with the name of Users on the BSR, for example.
-  string committer_name = 13;
-  // The email of the committer of the VCSCommit.
-  //
-  // VCS-specific: not associated with the Users on the BSR, for example.
-  string committer_email = 14;
-}
 
 // The VCS type, currently only git.
 enum VCSType {
@@ -101,39 +27,38 @@ enum VCSType {
   VCS_TYPE_GIT = 1;
 }
 
-// VCSCommitRef is a reference to a VCSCommit, either an id or a fully-qualified name.
+// VCS commit information.
 //
-// This is used in requests.
-message VCSCommitRef {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-
-  // The fully-qualified name of a VCSCommit within a BSR instance.
-  //
-  // A Name uniquely identifies a VCSCommit.
-  // This is used for requests when a caller only has the VCSCommit hash and not the ID.
-  message Name {
-    // The name of the owner of the Module that contains the VCSCommit, either a user or organization.
-    string owner = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 32
-    ];
-    // The name of the Module that contains the VCSCommit.
-    string module = 2 [(buf.validate.field).string = {
-      min_len: 2,
-      max_len: 100
-    }];
-    // The hash of the VCSCommit.
-    string hash = 3 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.pattern = "^[0-9a-fA-F]{40}$"
-    ];
-  }
-
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // The id of the VCSCommit.
-    string id = 1 [(buf.validate.field).string.uuid = true];
-    // The fully-qualified name of the VCSCommit.
-    Name name = 2;
-  }
+// Stored within a Commit, not a resource on its own. Commits <-> VCSCommits are many-to-many,
+// we do not enforce any uniqueness principles here, VCSCommits should just be considered
+// metadata on a given Commit. As such, making them their own entity would result in checks
+// we don't want to enforce. It is still split out into a separate message so that we can
+// enforce required checks on certain fields iff VCSCommit is present.
+//
+// TODO: Below is the explanation, but it's a little unsatisfying. Perhaps we revisit making
+// VCSCommit an entity?
+//
+// Multiple BSR commits may have the same content, but different VCS hashes. This costs some
+// storage, but it allows the BSR to more accurately link back to source control. (For example,
+// git commit A introduces a new service, commit B modifies it, and commit C deletes the
+// service and moves the functionality to a different module. We want the BSR commits created
+// from A and C to link back to the correct git commits and PR discussions.)
+//
+// Multiple BSR commits may have the same VCS hash, but different content. This should only
+// happen when users incorrectly hand-specify the VCS hash — and since commits are immutable and
+// can’t be deleted, we don’t want a manually-created commit to forever block a later,
+// fully-correct commit.
+message VCSCommit {
+  // The type of VCS that the Commit originated from.
+  VCSType type = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The VCS hash of the Commit.
+  string hash = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[0-9a-fA-F]{40}$"
+  ];
+  // The URL of of the commit within the VCS.
+  string url = 3 [(buf.validate.field).string.uri = true];
 }

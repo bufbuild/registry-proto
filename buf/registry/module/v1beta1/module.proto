@@ -65,10 +65,14 @@ message Module {
     (buf.validate.field).string.max_len = 255,
     (buf.validate.field).ignore_empty = true
   ];
-  // The id of the Branch which releases are generated from.
-  string release_branch_id = 10 [
+  // The name of the default label of the Module.
+  //
+  // This label may not yet exist. When a Module is created, it has no Commits, and Labels
+  // must have a Commit, so this Label is not created when a Module is created. Additionally,
+  // a User may modify the name of the default Label without this Label yet being created.
+  string default_label_name = 10 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.max_len = 250
   ];
 }
 

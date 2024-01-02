@@ -16,46 +16,49 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/digest.proto";
+import "buf/registry/module/v1beta1/graph.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
-// Operate on Commits.
-service CommitService {
-  // Get Commits.
-  rpc GetCommits(GetCommitsRequest) returns (GetCommitsResponse) {
+// Get dependency graphs.
+service GraphService {
+  // Get a dependency graph that includes the given Commits.
+  //
+  // Commits will be resolved via the given ResourceRefs, and all Commits will be included in the
+  // graph, along with their dependencies.
+  //
+  // A dependency graph is a directed acyclic graph.
+  rpc GetGraph(GetGraphRequest) returns (GetGraphResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
-message GetCommitsRequest {
-  // References to request a Commit for.
+message GetGraphRequest {
+  // The references to resolve to Commits to include in the graph.
   //
   // See the documentation on ResourceRef for resource resolution details.
   //
-  // Resolution is as follows:
-  //   - If a Module is referenced, the Commit of the default Label is returned.
-  //   - If a Label is referenced, the Commit of this Label is returned.
-  //   - If a Commit is referenced, this Commit is returned.
-  //
-  // TODO: It's a little incongruent to have a Get request take a ResourceRef.
+  // Once the resource is resolved, the following Commit is included:
+  //   - If a Module is referenced, the Commit of the default Label is included.
+  //   - If a Label is referenced, the Commit of this Label is included.
+  //   - If a Commit is referenced, the Commit is incuded.
   repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
-  // The DigestType to use for Digests returned on Commits.
+  // The DigestType to return for Commit nodes.
   //
   // If this DigestType is not available, an error is returned.
   // Note that certain DigestTypes may be deprecated over time.
   //
-  // If not set, the latest DigestType is used, currently B5.
+  // If not set, the latest DigestType is used.
   DigestType digest_type = 2;
 }
 
-message GetCommitsResponse {
-  // The found Commits in the same order as requested.
-  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+message GetGraphResponse {
+  // The Graph calculated for the Commits.
+  Graph graph = 1 [(buf.validate.field).required = true];
 }
