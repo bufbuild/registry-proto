@@ -49,7 +49,7 @@ message DownloadRequest {
     // Specific file types to request.
     //
     // If not set, all file types are returned.
-    repeated FileType file_types = 2 [(buf.validate.field).enum.defined_only = true];
+    repeated FileType file_types = 2 [(buf.validate.field).repeated.items.enum.defined_only = true];
     // Specific file paths to retrieve.
     //
     // May be directories. For example, path "foo/bar" will result in files "foo/bar/baz.proto",
@@ -84,19 +84,19 @@ message DownloadRequest {
     //
     // If false, it is an error to specify non-existent file paths.
     bool paths_allow_not_exist = 4;
+    // The DigestType to return for the Commit of this reference.
+    //
+    // If this DigestType is not available, an error is returned.
+    // Note that certain DigestTypes may be deprecated over time.
+    //
+    // If not set, the latest DigestType is used, currently B5.
+    DigestType digest_type = 5;
   }
   // The references to get contents for.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
-  // The DigestType to return for Commits of references.
-  //
-  // If this DigestType is not available, an error is returned.
-  // Note that certain DigestTypes may be deprecated over time.
-  //
-  // If not set, the latest DigestType is used, currently B5.
-  DigestType digest_type = 2;
 }
 
 message DownloadResponse {
@@ -105,6 +105,8 @@ message DownloadResponse {
     // The Commit associated with the Content.
     //
     // The Commit associated with this ID will be present in the commits field.
+    //
+    // The Commit will use the DigestType specified in the request value.
     Commit commit = 1 [(buf.validate.field).required = true];
     // The Files of the content.
     //

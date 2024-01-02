@@ -20,7 +20,6 @@ import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/file.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/module.proto";
-import "buf/registry/module/v1beta1/resource.proto";
 import "buf/registry/module/v1beta1/vcs_commit.proto";
 import "buf/validate/validate.proto";
 
@@ -35,30 +34,32 @@ service UploadService {
 }
 
 message UploadRequest {
-  // A reference to upload content for.
-  //
-  // All references must have associated content.
-  // TODO: "Reference" isn't the best name.
-  // TODO: Merge with Content unless there's a good reason not to.
-  message Reference {
+  // A dependency of Content, either referencing another Content message, or referencing
+  // a Commit that already exists.
+  message DepRef {
+    // The Module of the dep.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The commit_id of the Commit, if this is refencing a Commit that already exists.
+    //
+    // If the ModuleRef refers to a Module that has associated Content, this field should *not*
+    // be set, and setting it is an error.
+    string commit_id = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
+  }
+  // Content to upload for a given reference.
+  message Content {
     // The Module of the reference.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The dependencies of the reference.
     //
     // This will include all transitive dependencies.
+    repeated DepRef dep_refs = 2;
+    // The Files of the content.
     //
-    // Note that if a dependency should have Commits created for it, it should be specified
-    // as a Reference in the references list, and have associated Content. In this case, only
-    // the module component of the ResourceRef should be specified, and specifying any other
-    // part of the ResourceRef will result in an error.
-    //
-    // See the documentation on ResourceRef for resource resolution details.
-    //
-    // Resolution is as follows:
-    //   - If a Module is referenced, the Commit of the default Label is used.
-    //   - If a Label is referenced, the Commit of this Label is used.
-    //   - If a Commit is referenced, this Commit is used.
-    repeated ResourceRef dep_resource_refs = 2;
+    // This will consist of the .proto files, license files, and documentation files.
+    repeated File files = 3 [(buf.validate.field).repeated.min_items = 1];
     // The labels to associate with the Commits created by the upload.
     //
     // If an id is set, this id must represent a Label that already exists and is
@@ -66,23 +67,12 @@ message UploadRequest {
     // or will be updated to point to the pre-existing Commit for the Reference.
     //
     // If no labels are referenced, the default Label for the Module is used.
-    repeated ScopedLabelRef scoped_label_refs = 3;
+    repeated ScopedLabelRef scoped_label_refs = 4;
     // VCS Commit information.
-    VCSCommit vcs_commit = 4;
+    VCSCommit vcs_commit = 5;
   }
-  // A set of content for a given reference.
-  message Content {
-    // The Module of the content.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-    // The Files of the content.
-    //
-    // This will consist of the .proto files, license files, and documentation files.
-    repeated File files = 2 [(buf.validate.field).repeated.min_items = 1];
-  }
-  // The references to upload content for.
-  repeated Reference references = 1 [(buf.validate.field).repeated.min_items = 1];
   // The Contents of all references.
-  repeated Content contents = 2 [(buf.validate.field).repeated.min_items = 1];
+  repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message UploadResponse {
