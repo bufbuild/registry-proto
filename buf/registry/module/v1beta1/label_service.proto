@@ -96,7 +96,7 @@ message ListLabelsRequest {
   //   - If a Label is referenced, this Label is returned.
   //   - If a Commit is referenced, all Labels for the Commit are returned.
   //
-  // If an archived Label is referenced but include_archived is false, this will return error.
+  // If an archived Label is referenced but include_archived is false, this will return an error.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //
