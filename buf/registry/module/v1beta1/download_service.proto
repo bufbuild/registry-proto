@@ -114,6 +114,20 @@ message DownloadResponse {
     //
     // If no paths match and paths_allow_not_exist is set, this may be empty.
     repeated File files = 2;
+    // The original buf.yaml file that encapsulated this reference.
+    //
+    // This is used in deprecated digest calculations only. None of the structured
+    // information within this File conveys further information about the reference.
+    File buf_yaml_file = 3 [(buf.validate.field).required = true];
+    // The original buf.lock file that encapsulated this reference.
+    //
+    // This is used in deprecated digest calculations only. None of the structured
+    // information within this File conveys further information about the reference.
+    //
+    // Importantly, this file should *not* used to determine the dependencies of the
+    // reference. To determine the dependencies, use the GraphService with the returned
+    // Commit.
+    File buf_lock_file = 4 [(buf.validate.field).required = true];
   }
   // The Contents of the references in the same order as requested.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
