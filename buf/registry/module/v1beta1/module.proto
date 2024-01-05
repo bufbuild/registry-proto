@@ -79,7 +79,7 @@ message Module {
 // The visibility of a Module, currently either public or private.
 enum ModuleVisibility {
   MODULE_VISIBILITY_UNSPECIFIED = 0;
-  // MODULE_VISIBILITY_PUBLIC says that the module is publicly availabile.
+  // MODULE_VISIBILITY_PUBLIC says that the module is publicly available.
   MODULE_VISIBILITY_PUBLIC = 1;
   // MODULE_VISIBILITY_PRIVATE says that the module is private.
   MODULE_VISIBILITY_PRIVATE = 2;

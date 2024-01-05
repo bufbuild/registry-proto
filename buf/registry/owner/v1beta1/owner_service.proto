@@ -40,6 +40,6 @@ message GetOwnersRequest {
 }
 
 message GetOwnersResponse {
-  // The retreived Users or Organizations in the same order as requested.
+  // The retrieved Users or Organizations in the same order as requested.
   repeated Owner owners = 1 [(buf.validate.field).repeated.min_items = 1];
 }
