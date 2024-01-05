@@ -23,7 +23,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // A file that can be read or written to from disk.
 //
 // A File includes a path and associated content.
-// Files are purposfully simple, and do not include attributes such as permissions.
+// Files are purposefully simple, and do not include attributes such as permissions.
 message File {
   // The path of the File.
   //

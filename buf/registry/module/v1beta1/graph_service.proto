@@ -44,7 +44,7 @@ message GetGraphRequest {
   // Once the resource is resolved, the following Commit is included:
   //   - If a Module is referenced, the Commit of the default Label is included.
   //   - If a Label is referenced, the Commit of this Label is included.
-  //   - If a Commit is referenced, the Commit is incuded.
+  //   - If a Commit is referenced, the Commit is included.
   repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
