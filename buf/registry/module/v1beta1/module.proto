@@ -71,7 +71,9 @@ message Module {
   // must have a Commit, so this Label is not created when a Module is created. Additionally,
   // a User may modify the name of the default Label without this Label yet being created.
   //
-  // This may not point to an archived Label.
+  // This could also be the name of an archived label. An important note, an archived label
+  // will not be considered a valid ResourceRef for resolving a Module. Archived labels
+  // can only be retrieved using LabelService.GetLabels.
   string default_label_name = 10 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 250
