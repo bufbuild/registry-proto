@@ -81,8 +81,11 @@ message UploadRequest {
     //
     // If no labels are referenced, the default Label for the Module is used.
     repeated ScopedLabelRef scoped_label_refs = 6;
-    // VCS Commit information.
-    VCSCommit vcs_commit = 7;
+    // The URL for the source control commit that is associated with the BSR Commit's Contents.
+    //
+    // BSR users can navigate to this link to find source control information that is relevant to this BSR commit
+    // (e.g. commit description, PR discussion, authors, approvers, etc.).
+    string source_control_url = 7 [(buf.validate.field).string.uri = true];
   }
   // The Contents of all references.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
