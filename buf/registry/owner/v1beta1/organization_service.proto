@@ -44,7 +44,7 @@ service OrganizationService {
   rpc UpdateOrganizations(UpdateOrganizationsRequest) returns (UpdateOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
-  // Delete existsing organizations.
+  // Delete existing organizations.
   //
   // This operation is atomic. Either all Organizations are deleted or an error is returned.
   rpc DeleteOrganizations(DeleteOrganizationsRequest) returns (DeleteOrganizationsResponse) {
@@ -124,7 +124,7 @@ message CreateOrganizationsRequest {
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore_empty = true
     ];
-    // The verification status of the Organizatioh.
+    // The verification status of the Organization.
     //
     // If not set, the Organization will default to VERIFICATION_STATUS_UNVERIFIED.
     OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];

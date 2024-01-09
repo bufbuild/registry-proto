@@ -64,7 +64,7 @@ message GetUsersRequest {
 }
 
 message GetUsersResponse {
-  // The retreived Users in the same order as requested.
+  // The retrieved Users in the same order as requested.
   repeated User users = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
