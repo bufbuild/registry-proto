@@ -52,7 +52,7 @@ service LabelService {
   // This operation is atomic. Either all Labels are archived or an error is returned.
   rpc ArchiveLabels(ArchiveLabelsRequest) returns (ArchiveLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
- }
+  }
 }
 
 message GetLabelsRequest {
