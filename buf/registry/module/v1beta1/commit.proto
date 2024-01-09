@@ -64,9 +64,9 @@ message Commit {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // The URL for the source control commit that is associated with the BSR Commit's Contents.
+  // The URL of the source control commit that is associated with the Commit.
   //
-  // BSR users can navigate to this link to find source control information that is relevant to this BSR Commit
+  // BSR users can navigate to this link to find source control information that is relevant to this Commit
   // (e.g. commit description, PR discussion, authors, approvers, etc.).
   string source_control_url = 7 [(buf.validate.field).string.uri = true];
 }
