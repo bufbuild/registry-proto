@@ -20,7 +20,6 @@ import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/file.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/module.proto";
-import "buf/registry/module/v1beta1/vcs_commit.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
@@ -56,7 +55,7 @@ message UploadRequest {
     //
     // This will include all transitive dependencies.
     repeated DepRef dep_refs = 2;
-    // The Files of the content.
+    // The Files of the Content.
     //
     // This will consist of the .proto files, license files, and documentation files.
     repeated File files = 3 [(buf.validate.field).repeated.min_items = 1];
@@ -73,7 +72,7 @@ message UploadRequest {
     // Importantly, this file is *not* used to determine the dependencies of the reference. To
     // specify the dependencies, use the dep_refs fields.
     File buf_lock_file = 5 [(buf.validate.field).required = true];
-    // The labels to associate with the Commits created by the upload.
+    // The labels to associate with the Commit for the Content.
     //
     // If an id is set, this id must represent a Label that already exists and is
     // owned by the Module. The Label will point to the newly-created Commits for the References,
@@ -81,8 +80,15 @@ message UploadRequest {
     //
     // If no labels are referenced, the default Label for the Module is used.
     repeated ScopedLabelRef scoped_label_refs = 6;
-    // VCS Commit information.
-    VCSCommit vcs_commit = 7;
+    // The URL of the source control commit to associate with the Commit for this Content.
+    //
+    // BSR users can navigate to this link to find source control information that is relevant to this Commit
+    // (e.g. commit description, PR discussion, authors, approvers, etc.).
+    string source_control_url = 7 [
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).string.max_len = 255,
+      (buf.validate.field).ignore_empty = true
+    ];
   }
   // The Contents of all references.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
