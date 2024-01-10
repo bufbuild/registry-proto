@@ -39,7 +39,8 @@ message Label {
   google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // Whether or not the Label was archived.
   //
-  // If a Label is archived, the API considers it to not exist, except when calling LabelService.GetLabels.
+  // If a Label is archived, the API considers it to not exist and will not return archived
+  // labels, except when calling LabelService.GetLabels.
   bool archived = 4;
   // The name of the Label.
   //
