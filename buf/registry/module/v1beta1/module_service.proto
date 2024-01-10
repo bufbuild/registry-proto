@@ -135,6 +135,8 @@ message CreateModulesRequest {
     // The name of the default Label of the Module.
     //
     // If not set, the default Label will be named "main" upon creation.
+    //
+    // This may point to an archived Label.
     string default_label_name = 6 [(buf.validate.field).string.max_len = 250];
   }
   // The Modules to create.
@@ -166,9 +168,11 @@ message UpdateModulesRequest {
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore_empty = true
     ];
-    // The name of the default label of the Module.
+    // The name of the default Label of the Module.
     //
-    // This label may not yet exist.
+    // This Label may not yet exist.
+    //
+    // This may point to an archived Label.
     optional string default_label_name = 7 [(buf.validate.field).string.max_len = 250];
   }
   // The Modules to update.
