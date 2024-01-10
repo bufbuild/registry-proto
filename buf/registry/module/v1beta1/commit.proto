@@ -17,7 +17,6 @@ syntax = "proto3";
 package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/digest.proto";
-import "buf/registry/module/v1beta1/vcs_commit.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
@@ -65,6 +64,13 @@ message Commit {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // VCS commit information.
-  VCSCommit vcs_commit = 7;
+  // The URL of the source control commit that is associated with the Commit.
+  //
+  // BSR users can navigate to this link to find source control information that is relevant to this Commit
+  // (e.g. commit description, PR discussion, authors, approvers, etc.).
+  string source_control_url = 7 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).ignore_empty = true
+  ];
 }
