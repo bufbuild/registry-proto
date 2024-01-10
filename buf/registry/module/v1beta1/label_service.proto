@@ -136,7 +136,7 @@ message ListLabelHistoryRequest {
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The Label to list history for.
   //
-  // This can reference archived Labels.
+  // This may reference archived Labels.
   LabelRef label_ref = 3 [(buf.validate.field).required = true];
   // The order to list the Labels.
   //

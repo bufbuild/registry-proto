@@ -168,9 +168,9 @@ message UpdateModulesRequest {
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore_empty = true
     ];
-    // The name of the default label of the Module.
+    // The name of the default Label of the Module.
     //
-    // This label may not yet exist.
+    // This Label may not yet exist.
     //
     // This may not point to an archived Label.
     optional string default_label_name = 7 [(buf.validate.field).string.max_len = 250];
