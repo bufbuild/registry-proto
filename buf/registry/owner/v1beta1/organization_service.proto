@@ -94,7 +94,7 @@ message ListOrganizationsRequest {
   // TODO: Do we want ORDER_CREATE_TIME_ASC to be the default?
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
-  Order order = 4;
+  Order order = 4 [(buf.validate.field).enum.defined_only = true];
 }
 
 message ListOrganizationsResponse {
