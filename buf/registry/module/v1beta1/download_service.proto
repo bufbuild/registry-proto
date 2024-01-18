@@ -66,8 +66,6 @@ message DownloadRequest {
     // if it is also of the file type, and if there are no matching paths for the given FileTypes,
     // an error is returned unless paths_not_allow_exist is set.
     //
-    // Note that paths may reference dependency paths if include_dep_files is set.
-    //
     // The path must be relative, and cannot contain any "." or ".." components
     // The separator "/" must be used.
     repeated string paths = 3 [(buf.validate.field).repeated.items = {
