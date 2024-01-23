@@ -45,6 +45,9 @@ message GetGraphRequest {
   //   - If a Module is referenced, the Commit of the default Label is included.
   //   - If a Label is referenced, the Commit of this Label is included.
   //   - If a Commit is referenced, the Commit is included.
+  //
+  // The specified ResourceRefs must reference unique Modules, that is no two ResourceRefs
+  // may resolve to the same Module.
   repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
