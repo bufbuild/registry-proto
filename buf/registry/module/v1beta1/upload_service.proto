@@ -59,19 +59,19 @@ message UploadRequest {
     //
     // This will consist of the .proto files, license files, and documentation files.
     repeated File files = 3 [(buf.validate.field).repeated.min_items = 1];
-    // The original buf.yaml file that encapsulated this reference.
+    // The original v1beta1 or v1 buf.yaml file that encapsulated this reference, if it existed.
     //
     // This is used in deprecated digest calculations only. None of the structured
     // information within this File will or should convey further information about the reference.
-    File buf_yaml_file = 4 [(buf.validate.field).required = true];
-    // The original buf.lock file that encapsulated this reference.
+    File v1_buf_yaml_file = 4;
+    // The original v1beta1 or v1 buf.lock file that encapsulated this reference, if it existed.
     //
     // This is used in deprecated digest calculations only. None of the structured
     // information within this File will or should convey further information about the reference.
     //
     // Importantly, this file is *not* used to determine the dependencies of the reference. To
     // specify the dependencies, use the dep_refs fields.
-    File buf_lock_file = 5 [(buf.validate.field).required = true];
+    File v1_buf_lock_file = 5;
     // The labels to associate with the Commit for the Content.
     //
     // If an id is set, this id must represent a Label that already exists and is
