@@ -97,7 +97,7 @@ message ListUsersRequest {
   // TODO: Do we want ORDER_CREATE_TIME_ASC to be the default?
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
-  Order order = 4;
+  Order order = 4 [(buf.validate.field).enum.defined_only = true];
   // Only return Users of these types.
   repeated UserType has_types = 5 [
     (buf.validate.field).repeated.unique = true,

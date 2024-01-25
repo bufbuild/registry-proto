@@ -90,7 +90,7 @@ message DownloadRequest {
     // Note that certain DigestTypes may be deprecated over time.
     //
     // If not set, the latest DigestType is used, currently B5.
-    DigestType digest_type = 5;
+    DigestType digest_type = 5 [(buf.validate.field).enum.defined_only = true];
   }
   // The references to get contents for.
   repeated Value values = 1 [

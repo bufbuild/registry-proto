@@ -52,7 +52,7 @@ message GetCommitsRequest {
   // Note that certain DigestTypes may be deprecated over time.
   //
   // If not set, the latest DigestType is used, currently B5.
-  DigestType digest_type = 2;
+  DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
 message GetCommitsResponse {
