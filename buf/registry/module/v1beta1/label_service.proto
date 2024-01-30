@@ -140,9 +140,8 @@ message ListLabelHistoryRequest {
   LabelRef label_ref = 3 [(buf.validate.field).required = true];
   // The order to list the Labels.
   //
-  // By default, ORDER_DESC is used.
+  // If not specified, defaults to ORDER_DESC.
   //
-  // TODO: Do we want ORDER_DESC to be the default?
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
