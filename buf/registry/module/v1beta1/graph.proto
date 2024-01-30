@@ -29,9 +29,15 @@ message Graph {
   // An edge in the dependency graph.
   message Edge {
     // The Commit of the start of the edge.
-    string from_commit_id = 1 [(buf.validate.field).required = true];
+    string from_commit_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
     // The Commit of the end of the edge.
-    string to_commit_id = 2 [(buf.validate.field).required = true];
+    string to_commit_id = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
   }
   // The nodes of the graph, each of which are Commits.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
