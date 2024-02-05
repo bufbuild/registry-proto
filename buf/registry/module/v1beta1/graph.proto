@@ -34,14 +34,14 @@ message Graph {
       (buf.validate.field).string.uuid = true
     ];
   }
-
   // An edge in the dependency graph.
   message Edge {
     // The Node of the start of the edge.
     Node from_node = 1 [(buf.validate.field).required = true];
-    // The Commit of the end of the edge.
+    // The Node of the end of the edge.
     Node to_node = 2 [(buf.validate.field).required = true];
   }
+
   // The nodes of the graph, each of which are Commits.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
   // The edges of the graph.
