@@ -42,6 +42,8 @@ service LabelService {
   //
   // If the Label does not exist, it will be created.
   // If the Label was archived, it will be unarchived.
+  // If the Label already existed, the Commit in the request has to be newer than the Commit that
+  // the Label is currently pointing to, otherwise an error is returned.
   //
   // This operation is atomic. Either all Labels are created/updated or an error is returned.
   rpc CreateOrUpdateLabels(CreateOrUpdateLabelsRequest) returns (CreateOrUpdateLabelsResponse) {
@@ -170,7 +172,9 @@ message CreateOrUpdateLabelsRequest {
     LabelRef label_ref = 1 [(buf.validate.field).required = true];
     // The id of the Commit to associate with the Label.
     //
-    // If the Label already existed, the Label will now point to this Commit.
+    // If the Label already existed, the Label will now point to this Commit, as long as this Commit
+    // is newer than the Commit that the Label is currently pointing to, otherwise an error is
+    // returned.
     // If the Label was archived, it will be unarchived.
     string commit_id = 2 [
       (buf.validate.field).required = true,
