@@ -29,7 +29,10 @@ message Graph {
   // A node in the dependency graph.
   message Node {
     // The commit of the node.
-    string commit_id = 1 [(buf.validate.field).required = true];
+    string commit_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
   }
 
   // An edge in the dependency graph.
