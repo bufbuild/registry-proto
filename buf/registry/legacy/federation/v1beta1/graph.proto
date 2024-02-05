@@ -14,24 +14,41 @@
 
 syntax = "proto3";
 
-package buf.registry.module.v1beta1;
+package buf.registry.legacy.federation.v1beta1;
 
 import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/legacy/federation/v1beta1";
 
-// A dependency graph.
+// A dependency graph that allows for federation.
+//
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
 message Graph {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
+  // A Commit in the dependency graph.
+  //
+  // This wraps the top-level Commit.
+  message Commit {
+    // The top-level Commit.
+    buf.registry.module.v1beta1.Commit commit = 1 [(buf.validate.field).required = true];
+    // The registry hostname of the Commit.
+    string registry = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.hostname = true
+    ];
+  }
   // A node in the dependency graph.
   message Node {
     // The commit of the node.
-    string commit_id = 1 [
+    string commit_id = 1 [(buf.validate.field).required = true];
+    // The registry hostname of the Node.
+    string registry = 2 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.uuid = true
+      (buf.validate.field).string.hostname = true
     ];
   }
   // An edge in the dependency graph.
