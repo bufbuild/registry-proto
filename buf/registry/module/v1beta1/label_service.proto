@@ -38,13 +38,11 @@ service LabelService {
   rpc ListLabelHistory(ListLabelHistoryRequest) returns (ListLabelHistoryResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Create or update Labels on a Module.
+  // Create Labels on a Module.
   //
-  // If the Label does not exist, it will be created.
-  // If the Label was archived, it will be unarchived.
-  //
-  // This operation is atomic. Either all Labels are created/updated or an error is returned.
-  rpc CreateOrUpdateLabels(CreateOrUpdateLabelsRequest) returns (CreateOrUpdateLabelsResponse) {
+  // This operation is atomic. Either all Labels are created or an error is returned.
+  // It will return an error if a Label already exists.
+  rpc CreateLabels(CreateLabelsRequest) returns (CreateLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Archive existing Labels.
@@ -163,15 +161,12 @@ message ListLabelHistoryResponse {
   repeated Commit commits = 2;
 }
 
-message CreateOrUpdateLabelsRequest {
-  // An individual request to create or update a Label.
+message CreateLabelsRequest {
+  // An individual request to create a Label.
   message Value {
-    // The Labels to create or update.
+    // The Labels to create.
     LabelRef label_ref = 1 [(buf.validate.field).required = true];
     // The id of the Commit to associate with the Label.
-    //
-    // If the Label already existed, the Label will now point to this Commit.
-    // If the Label was archived, it will be unarchived.
     string commit_id = 2 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.uuid = true
@@ -184,8 +179,8 @@ message CreateOrUpdateLabelsRequest {
   ];
 }
 
-message CreateOrUpdateLabelsResponse {
-  // The created or updated Labels in the same order as given on the request.
+message CreateLabelsResponse {
+  // The created Labels in the same order as given on the request.
   repeated Label labels = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
