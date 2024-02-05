@@ -1,0 +1,77 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.legacy.federation.v1beta1;
+
+import "buf/registry/legacy/federation/v1beta1/graph.proto";
+import "buf/registry/legacy/federation/v1beta1/resource.proto";
+import "buf/registry/module/v1beta1/digest.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/legacy/federation/v1beta1";
+
+// Get dependency graphs.
+//
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
+service GraphService {
+  // Get a dependency graph that includes the given Commits.
+  //
+  // Commits will be resolved via the given ResourceRefs, and all Commits will be included in the
+  // graph, along with their dependencies.
+  //
+  // A dependency graph is a directed acyclic graph.
+  //
+  // See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+  // and not this package.
+  rpc GetGraph(GetGraphRequest) returns (GetGraphResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
+message GetGraphRequest {
+  // The references to resolve to Commits to include in the graph.
+  //
+  // See the documentation on ResourceRef for resource resolution details.
+  //
+  // Once the resource is resolved, the following Commit is included:
+  //   - If a Module is referenced, the Commit of the default Label is included.
+  //   - If a Label is referenced, the Commit of this Label is included.
+  //   - If a Commit is referenced, the Commit is included.
+  //
+  // The specified ResourceRefs must reference unique Modules, that is no two ResourceRefs
+  // may resolve to the same Module.
+  repeated ResourceRef resource_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+  // The DigestType to return for Commit nodes.
+  //
+  // If this DigestType is not available, an error is returned.
+  // Note that certain DigestTypes may be deprecated over time.
+  //
+  // If not set, the latest DigestType is used.
+  buf.registry.module.v1beta1.DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
+}
+
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
+message GetGraphResponse {
+  // The Graph calculated for the Commits.
+  Graph graph = 1 [(buf.validate.field).required = true];
+}
