@@ -53,7 +53,7 @@ message UploadRequest {
     string commit_id = 2 [(buf.validate.field).string.uuid = true];
     // The registry hostname of the dep.
     string registry = 3 [
-      (buf.validate.field).required = true,
+      (buf.validate.field).required = true
     ];
   }
   // Content to upload for a given reference.
