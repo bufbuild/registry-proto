@@ -38,7 +38,6 @@ message Graph {
     // The registry hostname of the Commit.
     string registry = 2 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.hostname = true
     ];
   }
   // A node in the dependency graph.
@@ -48,7 +47,6 @@ message Graph {
     // The registry hostname of the Node.
     string registry = 2 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.hostname = true
     ];
   }
   // An edge in the dependency graph.

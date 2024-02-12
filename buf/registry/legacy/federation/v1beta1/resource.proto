@@ -96,6 +96,5 @@ message ResourceRef {
   // The registry hostname of the resource.
   string registry = 3 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.hostname = true
   ];
 }
