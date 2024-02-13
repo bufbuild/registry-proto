@@ -21,6 +21,7 @@ import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -96,7 +97,9 @@ message ListLabelsRequest {
   // Once the resource is resolved, the following Labels are listed:
   //   - If a Module is referenced, all Labels for the Module are returned.
   //   - If a Label is referenced, this Label is returned.
-  //   - If a Commit is referenced, all Labels for the Commit are returned.
+  //   - If a Commit is referenced, all Labels for the Commit are returned. Note that this will
+  //     not return any Labels where the Commit is currently rejected or pending, it will only
+  //     return Labels for Commits that are passed or accepted.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //
@@ -106,6 +109,10 @@ message ListLabelsRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  // Only return Labels that have these governance review states.
+  //
+  // By default, Labels with any governance review state are returned.
+  repeated LabelReviewState governance_review_states = 5;
 }
 
 message ListLabelsResponse {
@@ -157,50 +164,21 @@ message ListLabelHistoryRequest {
 }
 
 message ListLabelHistoryResponse {
-  // Whether the Commit was a breaking change.
-  enum BreakingState {
-    BREAKING_STATE_UNSPECIFIED = 0;
-    // The Commit did not represent a breaking change.
-    BREAKING_STATE_NONE = 1;
-    // The Commit represented a breaking change at the WIRE level.
-    BREAKING_STATE_WIRE = 2;
-    // The Commit represented a breaking change at the WIRE_JSON level.
-    BREAKING_STATE_WIRE_JSON = 3;
-    // The Commit represented a breaking change at the PACKAGE level.
-    BREAKING_STATE_PACKAGE = 4;
-    // The Commit represented a breaking change at the FILE level.
-    BREAKING_STATE_FILE = 5;
-  }
-  // The Commit's state in the review flow.
-  enum ReviewState {
-    REVIEW_STATE_UNSPECIFIED = 0;
-    // Review was not enabled at the time this Commit was uploaded.
-    REVIEW_STATE_DISABLED = 1;
-    // The Commit was reviewed and was accepted.
-    REVIEW_STATE_ACCEPTED = 2;
-    // The Commit was reviewed and was rejected.
-    REVIEW_STATE_REJECTED = 3;
-    // The Commit has not yet been reviewed and is pending.
-    REVIEW_STATE_PENDING = 4;
-  }
+
   message Value {
     // The Commit.
     Commit commit = 1 [(buf.validate.field).required = true];
-    // The Commit's breaking state.
+
+    // The Label's review state.
     //
-    // This field will only be returned if breaking change detection is enabled.
+    // This field will only be set if governance is enabled for the Label.
+    LabelReviewState review_state = 2 [(buf.validate.field).enum.defined_only = true];
+    // When the review state was last updated.
     //
-    // Breaking change detection is an enteprise-only feature - contact us to
-    // learn more!
-    BreakingState breaking_state = 2 [(buf.validate.field).enum.defined_only = true];
-    // The Commit's review state.
-    //
-    // The field will only be returned if review flow is enabled.
-    //
-    // Review flow is an enteprise-only feature - contact us to
-    // learn more!
-    ReviewState review_state = 3 [(buf.validate.field).enum.defined_only = true];
+    // This field will only be set if governance is enabled for the Label.
+    google.protobuf.Timestamp review_state_updated_at = 3;
   }
+
   // The next page token.
   //
   /// If empty, there are no more pages.
