@@ -98,7 +98,6 @@ enum LabelReviewState {
   LABEL_REVIEW_STATE_PENDING = 4;
 }
 
-
 // LabelRef is a reference to a Label, either an id or a fully-qualified name.
 //
 // This is used in requests.

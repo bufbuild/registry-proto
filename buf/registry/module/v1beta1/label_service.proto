@@ -164,7 +164,6 @@ message ListLabelHistoryRequest {
 }
 
 message ListLabelHistoryResponse {
-
   message Value {
     // The Commit.
     Commit commit = 1 [(buf.validate.field).required = true];
