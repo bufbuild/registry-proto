@@ -157,12 +157,56 @@ message ListLabelHistoryRequest {
 }
 
 message ListLabelHistoryResponse {
+  // Whether the Commit was a breaking change.
+  enum BreakingState {
+    BREAKING_STATE_UNSPECIFIED = 0;
+    // The Commit did not represent a breaking change.
+    BREAKING_STATE_NONE = 1;
+    // The Commit represented a breaking change at the WIRE level.
+    BREAKING_STATE_WIRE = 2;
+    // The Commit represented a breaking change at the WIRE_JSON level.
+    BREAKING_STATE_WIRE_JSON = 3;
+    // The Commit represented a breaking change at the PACKAGE level.
+    BREAKING_STATE_PACKAGE = 4;
+    // The Commit represented a breaking change at the FILE level.
+    BREAKING_STATE_FILE = 5;
+  }
+  // The Commit's state in the review flow.
+  enum ReviewState {
+    REVIEW_STATE_UNSPECIFIED = 0;
+    // Review was not enabled at the time this Commit was uploaded.
+    REVIEW_STATE_DISABLED = 1;
+    // The Commit was reviewed and was accepted.
+    REVIEW_STATE_ACCEPTED = 2;
+    // The Commit was reviewed and was rejected.
+    REVIEW_STATE_REJECTED = 3;
+    // The Commit has not yet been reviewed and is pending.
+    REVIEW_STATE_PENDING = 4;
+  }
+  message Value {
+    // The Commit.
+    Commit commit = 1 [(buf.validate.field).required = true];
+    // The Commit's breaking state.
+    //
+    // This field will only be returned if breaking change detection is enabled.
+    //
+    // Breaking change detection is an enteprise-only feature - contact us to
+    // learn more!
+    BreakingState breaking_state = 2 [(buf.validate.field).enum.defined_only = true];
+    // The Commit's review state.
+    //
+    // The field will only be returned if review flow is enabled.
+    //
+    // Review flow is an enteprise-only feature - contact us to
+    // learn more!
+    ReviewState review_state = 3 [(buf.validate.field).enum.defined_only = true];
+  }
   // The next page token.
   //
   /// If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
-  // The listed Commits that represent the history of the Label.
-  repeated Commit commits = 2;
+  // The ordered history of the Label.
+  repeated Value values = 2;
 }
 
 message CreateOrUpdateLabelsRequest {
