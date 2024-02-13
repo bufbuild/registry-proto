@@ -112,7 +112,7 @@ message ListLabelsRequest {
   // Only return Labels that have these governance review states.
   //
   // By default, Labels with any governance review state are returned.
-  repeated LabelReviewState governance_review_states = 5;
+  repeated LabelReviewState review_states = 5;
 }
 
 message ListLabelsResponse {

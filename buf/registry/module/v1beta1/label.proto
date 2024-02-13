@@ -73,10 +73,10 @@ message Label {
     (buf.validate.field).string.uuid = true
   ];
 
-  // Whether or not governance is enabled for this Label.
+  // Whether or not governance review is enabled for this Label.
   //
   // Governance is an enterprise-only feature - contact us to learn more!
-  bool governance_enabled = 10;
+  bool review_enabled = 10;
   // The current review state of the Label.
   //
   // This field will only be set if governance is enabled.
