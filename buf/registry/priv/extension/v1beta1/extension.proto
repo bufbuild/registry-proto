@@ -22,7 +22,10 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 extend google.protobuf.MessageOptions {
   // Constraints on a message.
-  MessageConstraints message = 1160;
+  //
+  // Prototyping for now - we will want to change this to a number in Buf's reserved range if
+  // this goes further.
+  MessageConstraints message = 89181;
 }
 
 // Constraints on a message.
