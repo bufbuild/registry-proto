@@ -72,7 +72,6 @@ message Label {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-
   // Whether or not governance review is enabled for this Label.
   //
   // Governance is an enterprise-only feature - contact us to learn more!
