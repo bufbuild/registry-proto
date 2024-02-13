@@ -42,8 +42,6 @@ message UploadRequest {
     //
     // If the ModuleRef refers to a Module that has associated Content, this field should *not*
     // be set, and setting it is an error.
-    //
-    // The commit_id must point to a passed or accepted Commit.
     string commit_id = 2 [(buf.validate.field).string.uuid = true];
   }
   // Content to upload for a given reference.
