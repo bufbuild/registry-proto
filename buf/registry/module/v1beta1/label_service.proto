@@ -111,7 +111,7 @@ message ListLabelsRequest {
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
   // Only return Labels that point to a Commit with these governance review states.
   //
-  // If not set, Labels that point to a Commit with any governance review state are returned. 
+  // If not set, Labels that point to a Commit with any governance review state are returned.
   repeated CommitReviewState commit_review_states = 5;
 }
 
