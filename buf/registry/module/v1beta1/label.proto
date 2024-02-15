@@ -76,25 +76,25 @@ message Label {
   //
   // Governance is an enterprise-only feature - contact us to learn more!
   bool review_enabled = 10;
-  // The current review state of the Label.
+  // The review state of the Commit the Label points to.
   //
-  // This field will only be set if review is enabled.
-  LabelReviewState review_state = 11 [(buf.validate.field).enum.defined_only = true];
+  // This field will only be set if the review flow was enabled on this label when this commit was pushed.
+  CommitReviewState commit_review_state = 11 [(buf.validate.field).enum.defined_only = true];
 }
 
-// The label state in the governance review flow.
+// The state of a Commit in the governance review flow for a particular Label.
 //
 // Governance is an enterprise-only feature - contact us to learn more!
-enum LabelReviewState {
-  LABEL_REVIEW_STATE_UNSPECIFIED = 0;
-  // The last Commit pushed to the Label did not fail any governance checks and therefore did not need review.
-  LABEL_REVIEW_STATE_PASSED = 1;
-  // The last Commit pushed to the Label was reviewed after failing governance checks and was accepted.
-  LABEL_REVIEW_STATE_ACCEPTED = 2;
-  // The last Commit pushed to the Label was reviewed after failing governance checks and was rejected.
-  LABEL_REVIEW_STATE_REJECTED = 3;
-  // The last Commit pushed to the Label has not yet been reviewed after failing governance checks and is pending.
-  LABEL_REVIEW_STATE_PENDING = 4;
+enum CommitReviewState {
+  COMMIT_REVIEW_STATE_UNSPECIFIED = 0;
+  // The Commit did not fail any governance checks and therefore did not need review.
+  COMMIT_REVIEW_STATE_PASSED = 2;
+  // The Commit was reviewed after failing governance checks and was accepted.
+  COMMIT_REVIEW_STATE_ACCEPTED = 3;
+  // The Commit was reviewed after failing governance checks and was rejected.
+  COMMIT_REVIEW_STATE_REJECTED = 4;
+  // The Commit has not yet been reviewed after failing governance checks and is pending.
+  COMMIT_REVIEW_STATE_PENDING = 5;
 }
 
 // LabelRef is a reference to a Label, either an id or a fully-qualified name.

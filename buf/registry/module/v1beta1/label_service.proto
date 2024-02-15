@@ -109,10 +109,10 @@ message ListLabelsRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
-  // Only return Labels that have these governance review states.
+  // Only return Labels that point to a Commit with these governance review states.
   //
-  // By default, Labels with any governance review state are returned.
-  repeated LabelReviewState review_states = 5;
+  // If not set, Labels that point to a Commit with any governance review state are returned. 
+  repeated CommitReviewState commit_review_states = 5;
 }
 
 message ListLabelsResponse {
@@ -168,14 +168,14 @@ message ListLabelHistoryResponse {
     // The Commit.
     Commit commit = 1 [(buf.validate.field).required = true];
 
-    // The Label's review state.
+    // The Commit's review state for this Label.
     //
-    // This field will only be set if governance is enabled for the Label.
-    LabelReviewState review_state = 2 [(buf.validate.field).enum.defined_only = true];
+    // This field will only be set if the governance review flow was enabled on this label when this commit was pushed.
+    CommitReviewState commit_review_state = 2 [(buf.validate.field).enum.defined_only = true];
     // When the review state was last updated.
     //
-    // This field will only be set if governance is enabled for the Label.
-    google.protobuf.Timestamp review_state_updated_at = 3;
+    // This field will only be set if the governance review flow was enabled on this label when this commit was pushed.
+    google.protobuf.Timestamp commit_review_state_updated_at = 3;
   }
 
   // The next page token.
