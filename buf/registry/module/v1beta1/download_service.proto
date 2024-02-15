@@ -112,13 +112,13 @@ message DownloadResponse {
     //
     // If no paths match and paths_allow_not_exist is set, this may be empty.
     repeated File files = 2;
-    // The original v1beta1 or v1 buf.yaml file that encapsulated this reference.
+    // The original v1beta1 or v1 buf.yaml file that encapsulated this reference, if it existed.
     //
     // If the reference was encapsulated by a v2 buf.yaml, this will be a synthesized v1 buf.yaml.
     //
     // This is used in deprecated digest calculations only. None of the structured
     // information within this File conveys further information about the reference.
-    File v1_buf_yaml_file = 3 [(buf.validate.field).required = true];
+    File v1_buf_yaml_file = 3;
     // The original buf.lock file that encapsulated this reference, if it existed.
     //
     // If the reference was encapsulated by a v2 buf.lock with dependencies, this will be a
