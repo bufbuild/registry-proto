@@ -40,9 +40,12 @@ message UploadRequest {
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The commit_id of the Commit, if this is referencing a Commit that already exists.
     //
-    // If the ModuleRef refers to a Module that has associated Content, this field should *not*
-    // be set, and setting it is an error.
-    optional string commit_id = 2 [(buf.validate.field).string.uuid = true];
+    // If the ModuleRef refers to a Module that has associated Content, this field should be empty,
+    // and setting a value is an error.
+    string commit_id = 2 [
+      (buf.validate.field).string.uuid = true,
+      (buf.validate.field).ignore_empty = true
+    ];
   }
   // Content to upload for a given reference.
   message Content {
