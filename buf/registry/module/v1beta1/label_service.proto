@@ -170,11 +170,11 @@ message ListLabelHistoryResponse {
 
     // The Commit's review state for this Label.
     //
-    // This field will only be set if the governance review flow was enabled on this label when this commit was pushed.
+    // This field will only be set if the governance review flow was enabled on this label when this Commit was pushed.
     CommitReviewState commit_review_state = 2 [(buf.validate.field).enum.defined_only = true];
     // When the review state was last updated.
     //
-    // This field will only be set if the governance review flow was enabled on this label when this commit was pushed.
+    // This field will only be set if the governance review flow was enabled on this label when this Commit was pushed.
     google.protobuf.Timestamp commit_review_state_updated_at = 3;
   }
 

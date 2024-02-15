@@ -78,7 +78,7 @@ message Label {
   bool review_enabled = 10;
   // The review state of the Commit the Label points to.
   //
-  // This field will only be set if the review flow was enabled on this label when this commit was pushed.
+  // This field will only be set if the review flow was enabled on this label when this Commit was pushed.
   CommitReviewState commit_review_state = 11 [(buf.validate.field).enum.defined_only = true];
 }
 
