@@ -79,24 +79,40 @@ message Label {
   // The governance workflow state of the Commit the Label points to.
   //
   // This field will only be set if governance workflow was enabled on this Label when this Commit was pushed.
-  GovernanceWorkflowState governance_workflow_state = 11 [(buf.validate.field).enum.defined_only = true];
+  GovernanceWorkflowState governance_workflow_state = 11;
 }
 
 // The state of a Commit in the governance workflow for a particular Label.
 //
 // Governance workflow is an enterprise-only feature - contact us to learn more!
-enum GovernanceWorkflowState {
-  GOVERNANCE_WORKFLOW_STATE_UNSPECIFIED = 0;
+message GovernanceWorkflowState {
+  // The status of the workflow.
+  GovernanceWorkflowStatus status = 1 [(buf.validate.field).enum.defined_only = true];
+
+  // The time the status was last updated.
+  google.protobuf.Timestamp status_updated_at = 3 [(buf.validate.field).required = true];
+
+  // The ids of Commits that have governance workflows blocking this governance workflow.
+  //
+  // This field will only be set if the status is blocked.
+  repeated string blocked_on_commit_ids = 2 [(buf.validate.field).string.uuid = true];
+}
+
+// The status of a GovernanceWorkflowState.
+//
+// Governance workflow is an enterprise-only feature - contact us to learn more!
+enum GovernanceWorkflowStatus {
+  GOVERNANCE_WORKFLOW_STATUS_UNSPECIFIED = 0;
   // The Commit did not fail any governance checks and therefore did not need review.
-  GOVERNANCE_WORKFLOW_STATE_PASSED = 1;
+  GOVERNANCE_WORKFLOW_STATUS_PASSED = 1;
   // The Commit was reviewed after failing governance checks and was accepted.
-  GOVERNANCE_WORKFLOW_STATE_ACCEPTED = 2;
+  GOVERNANCE_WORKFLOW_STATUS_ACCEPTED = 2;
   // The Commit was reviewed after failing governance checks and was rejected.
-  GOVERNANCE_WORKFLOW_STATE_REJECTED = 3;
+  GOVERNANCE_WORKFLOW_STATUS_REJECTED = 3;
   // The Commit has not yet been reviewed after failing governance checks and is pending.
-  GOVERNANCE_WORKFLOW_STATE_PENDING = 4;
-  // TODO: decide how we want to handle the case where a commit is blocked on another commit that is either pending
-  // or rejected
+  GOVERNANCE_WORKFLOW_STATUS_PENDING = 4;
+  // The governance workflow for this Commit is blocked on the governance workflow for another Commit.
+  GOVERNANCE_WORKFLOW_STATUS_BLOCKED = 5;
 }
 
 // LabelRef is a reference to a Label, either an id or a fully-qualified name.

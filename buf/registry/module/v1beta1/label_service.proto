@@ -21,7 +21,6 @@ import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
-import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -109,10 +108,10 @@ message ListLabelsRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
-  // Only return Labels that point to a Commit with these governance workflow states.
+  // Only return Labels that point to a Commit with one of these GovernanceWorkflowStatus values.
   //
-  // If not set, Labels that point to a Commit with any governance workflow state are returned.
-  repeated GovernanceWorkflowState governance_workflow_states = 5;
+  // If not set, Labels that point to a Commit with any GovernanceWorkflowStatus value are returned.
+  repeated GovernanceWorkflowStatus governance_workflow_statuses = 5;
 }
 
 message ListLabelsResponse {
@@ -168,14 +167,10 @@ message ListLabelHistoryResponse {
     // The Commit.
     Commit commit = 1 [(buf.validate.field).required = true];
 
-    // The Commit's governance workflow state for this Label.
+    // The GovernanceWorkflowState for this Commit on this Label.
     //
     // This field will only be set if governance workflow was enabled on this Label when this Commit was pushed.
-    GovernanceWorkflowState governance_workflow_state = 2 [(buf.validate.field).enum.defined_only = true];
-    // When the governance workflow state was last updated.
-    //
-    // This field will only be set if governance workflow was enabled on this Label when this Commit was pushed.
-    google.protobuf.Timestamp governance_workflow_state_updated_at = 3;
+    GovernanceWorkflowState governance_workflow_state = 2;
   }
 
   // The next page token.
