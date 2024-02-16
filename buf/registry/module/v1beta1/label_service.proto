@@ -97,7 +97,7 @@ message ListLabelsRequest {
   //   - If a Module is referenced, all Labels for the Module are returned.
   //   - If a Label is referenced, this Label is returned.
   //   - If a Commit is referenced, all Labels that currently point to the Commit are returned.
-  //     Labels where this Commit has a GovernanceFlowStatus that is neither accepted nor passed will not be returned.
+  //     Labels where this Commit has a PolicyChecksStatus that is neither accepted nor passed will not be returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //
@@ -107,10 +107,10 @@ message ListLabelsRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
-  // Only return Labels that point to a Commit with one of these GovernanceWorkflowStatus values.
+  // Only return Labels that point to a Commit with one of these PolicyChecksStatus values.
   //
-  // If not set, Labels that point to a Commit with any GovernanceWorkflowStatus value are returned.
-  repeated GovernanceWorkflowStatus governance_workflow_statuses = 5;
+  // If not set, Labels that point to a Commit with any PolicyChecksStatus value are returned.
+  repeated PolicyChecksStatus policy_checks_statuses = 5;
 }
 
 message ListLabelsResponse {
@@ -166,12 +166,12 @@ message ListLabelHistoryResponse {
     // The Commit.
     Commit commit = 1 [(buf.validate.field).required = true];
 
-    // The GovernanceWorkflowState for this Commit on this Label.
+    // The PolicyChecksState for this Commit on this Label.
     //
     // This field will be set if either:
-    //   - Governance workflow was enabled on this Label when this Commit was pushed.
-    //   - This Commit depends on a Commit that has a governance workflow state.
-    GovernanceWorkflowState governance_workflow_state = 2;
+    //   - Policy checks were enabled on this Label when this Commit was pushed.
+    //   - This Commit transitively depends on a Commit that has a PolicyChecksState.
+    PolicyChecksState policy_checks_state = 2;
   }
 
   // The next page token.

@@ -61,7 +61,7 @@ message Label {
   ];
   // The id of the Commit currently associated with the Label.
   //
-  // If governance workflow is enabled, this will point to the most recent Commit that passed or was accepted.
+  // If policy checks are enabled, this will point to the most recent Commit that passed or was accepted.
   // To get the history of the Commits that have been associated with a Label, use ListLabelHistory.
   string commit_id = 8 [
     (buf.validate.field).required = true,
@@ -72,55 +72,55 @@ message Label {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // Whether or not governance workflow is enabled for this Label.
+  // Whether or not policy checks are enabled for this Label.
   //
-  // Governance workflow is an enterprise-only feature - contact us to learn more!
-  bool governance_workflow_enabled = 10;
-  // The governance workflow state of the Commit the Label points to.
+  // Policy checks are an enterprise-only feature - contact us to learn more!
+  bool policy_checks_enabled = 10;
+  // The PolicyChecksState for the Commit the Label points to.
   //
   // This field will be set if either:
-  //   - Governance workflow was enabled on this Label when this Commit was pushed.
-  //   - This Commit depends on a Commit that has a governance workflow state.
-  GovernanceWorkflowState governance_workflow_state = 11;
+  //   - Policy checks were enabled on this Label when this Commit was pushed.
+  //   - This Commit transitively depends on a Commit that has a PolicyChecksState.
+  PolicyChecksState policy_checks_state = 11;
 }
 
-// The state of a Commit in the governance workflow for a particular Label.
+// The state of a Commit's policy checks for a particular Label.
 //
-// Governance workflow is an enterprise-only feature - contact us to learn more!
-message GovernanceWorkflowState {
-  // The status of the workflow.
-  GovernanceWorkflowStatus status = 1 [(buf.validate.field).enum.defined_only = true];
+// Policy checks are an enterprise-only feature - contact us to learn more!
+message PolicyChecksState {
+  // The status of the policy checks.
+  PolicyChecksStatus status = 1 [(buf.validate.field).enum.defined_only = true];
 
   // The time the status was last updated.
   google.protobuf.Timestamp status_updated_at = 3 [(buf.validate.field).required = true];
 
-  // The ids of Commits that have governance workflows blocking this governance workflow.
+  // The ids of Commits that have policy checks blocking these policy checks.
   //
   // This field will only be set if the status is blocked.
   repeated string blocked_on_commit_ids = 2 [(buf.validate.field).string.uuid = true];
 }
 
-// The status of a GovernanceWorkflowState.
+// The status of a PolicyChecksState.
 //
-// Governance workflow is an enterprise-only feature - contact us to learn more!
-enum GovernanceWorkflowStatus {
-  GOVERNANCE_WORKFLOW_STATUS_UNSPECIFIED = 0;
-  // The Commit did not fail any governance checks and therefore did not need review.
-  GOVERNANCE_WORKFLOW_STATUS_PASSED = 1;
-  // The Commit was reviewed after failing governance checks and was accepted.
-  GOVERNANCE_WORKFLOW_STATUS_ACCEPTED = 2;
-  // The Commit was reviewed after failing governance checks and was rejected.
-  GOVERNANCE_WORKFLOW_STATUS_REJECTED = 3;
-  // The Commit has not yet been reviewed after failing governance checks and is pending.
-  GOVERNANCE_WORKFLOW_STATUS_PENDING = 4;
-  // The governance workflow for this Commit is blocked on a pending governance workflow for at least one other Commit.
+// Policy checks are an enterprise-only feature - contact us to learn more!
+enum PolicyChecksStatus {
+  POLICY_CHECKS_STATUS_UNSPECIFIED = 0;
+  // The Commit did not fail any policy checks and therefore did not need review.
+  POLICY_CHECKS_STATUS_PASSED = 1;
+  // The Commit was reviewed after failing policy checks and was accepted.
+  POLICY_CHECKS_STATUS_ACCEPTED = 2;
+  // The Commit was reviewed after failing policy checks and was rejected.
+  POLICY_CHECKS_STATUS_REJECTED = 3;
+  // The Commit has not yet been reviewed after failing policy checks and is pending.
+  POLICY_CHECKS_STATUS_PENDING = 4;
+  // The policy checks for this Commit are blocked on pending policy checks for at least one other Commit.
   //
-  // If at least one dependent Commit is rejected, this commit will inherit the rejected status.
+  // If at least one dependent Commit is rejected, this Commit will inherit the rejected status.
   // If all dependent Commits are passed or approved, then the status for this Commit will transition to:
-  //   - Passed if governance workflow is not enabled for this Label.
-  //   - Passed if governance workflow is enabled for this Label and all checks passed.
-  //   - Pending if governance workflow is enabled for this Label and some checks failed.
-  GOVERNANCE_WORKFLOW_STATUS_BLOCKED = 5;
+  //   - Passed if policy checks are not enabled for this Label.
+  //   - Passed if policy checks are enabled for this Label and all checks passed.
+  //   - Pending if policy checks are enabled for this Label and some checks failed.
+  POLICY_CHECKS_STATUS_BLOCKED = 5;
 }
 
 // LabelRef is a reference to a Label, either an id or a fully-qualified name.
