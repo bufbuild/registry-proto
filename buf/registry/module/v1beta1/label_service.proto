@@ -97,7 +97,7 @@ message ListLabelsRequest {
   //   - If a Module is referenced, all Labels for the Module are returned.
   //   - If a Label is referenced, this Label is returned.
   //   - If a Commit is referenced, all Labels that currently point to the Commit are returned.
-  //     Labels where this Commit has a PolicyChecksStatus that is neither accepted nor passed will not be returned.
+  //     Labels where this Commit has a PolicyChecksStatus that is neither approved nor passed will not be returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //
