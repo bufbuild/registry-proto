@@ -78,7 +78,9 @@ message Label {
   bool governance_workflow_enabled = 10;
   // The governance workflow state of the Commit the Label points to.
   //
-  // This field will only be set if governance workflow was enabled on this Label when this Commit was pushed.
+  // This field will be set if either:
+  //   - Governance workflow was enabled on this Label when this Commit was pushed.
+  //   - This Commit depends on a Commit that has a governance workflow state.
   GovernanceWorkflowState governance_workflow_state = 11;
 }
 
@@ -111,7 +113,13 @@ enum GovernanceWorkflowStatus {
   GOVERNANCE_WORKFLOW_STATUS_REJECTED = 3;
   // The Commit has not yet been reviewed after failing governance checks and is pending.
   GOVERNANCE_WORKFLOW_STATUS_PENDING = 4;
-  // The governance workflow for this Commit is blocked on the governance workflow for another Commit.
+  // The governance workflow for this Commit is blocked on a pending governance workflow for at least one other Commit.
+  //
+  // If at least one dependent Commit is rejected, this commit will inherit the rejected status.
+  // If all dependent Commits are passed or approved, then the status for this Commit will transition to:
+  //   - Passed if governance workflow is not enabled for this Label.
+  //   - Passed if governance workflow is enabled for this Label and all checks passed.
+  //   - Pending if governance workflow is enabled for this Label and some checks failed.
   GOVERNANCE_WORKFLOW_STATUS_BLOCKED = 5;
 }
 

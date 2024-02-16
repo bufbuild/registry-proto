@@ -168,7 +168,9 @@ message ListLabelHistoryResponse {
 
     // The GovernanceWorkflowState for this Commit on this Label.
     //
-    // This field will only be set if governance workflow was enabled on this Label when this Commit was pushed.
+    // This field will be set if either:
+    //   - Governance workflow was enabled on this Label when this Commit was pushed.
+    //   - This Commit depends on a Commit that has a governance workflow state.
     GovernanceWorkflowState governance_workflow_state = 2;
   }
 
