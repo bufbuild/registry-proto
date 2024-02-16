@@ -61,7 +61,7 @@ message Label {
   ];
   // The id of the Commit currently associated with the Label.
   //
-  // If governance workflow is enabled, this will point to the most recent Commit that passed or accepted Commit.
+  // If governance workflow is enabled, this will point to the most recent Commit that passed or was accepted.
   // To get the history of the Commits that have been associated with a Label, use ListLabelHistory.
   string commit_id = 8 [
     (buf.validate.field).required = true,
