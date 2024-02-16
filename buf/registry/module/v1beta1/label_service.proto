@@ -110,7 +110,7 @@ message ListLabelsRequest {
   // Only return Labels that point to a Commit with one of these PolicyChecksStatus values.
   //
   // If not set, Labels that point to a Commit with any PolicyChecksStatus value are returned.
-  repeated PolicyChecksStatus policy_checks_statuses = 5;
+  repeated PolicyChecksStatus policy_checks_statuses = 5 [(buf.validate.field).repeated.items.enum.defined_only = true];
 }
 
 message ListLabelsResponse {
