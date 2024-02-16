@@ -76,25 +76,27 @@ message Label {
   //
   // Governance workflow is an enterprise-only feature - contact us to learn more!
   bool governance_workflow_enabled = 10;
-  // The governance workflow review state of the Commit the Label points to.
+  // The governance workflow state of the Commit the Label points to.
   //
-  // This field will only be set if the governance workflow was enabled on this Label when this Commit was pushed.
-  CommitReviewState commit_review_state = 11 [(buf.validate.field).enum.defined_only = true];
+  // This field will only be set if governance workflow was enabled on this Label when this Commit was pushed.
+  GovernanceWorkflowState governance_workflow_state = 11 [(buf.validate.field).enum.defined_only = true];
 }
 
 // The state of a Commit in the governance workflow for a particular Label.
 //
 // Governance workflow is an enterprise-only feature - contact us to learn more!
-enum CommitReviewState {
-  COMMIT_REVIEW_STATE_UNSPECIFIED = 0;
+enum GovernanceWorkflowState {
+  GOVERNANCE_WORKFLOW_STATE_UNSPECIFIED = 0;
   // The Commit did not fail any governance checks and therefore did not need review.
-  COMMIT_REVIEW_STATE_PASSED = 2;
+  GOVERNANCE_WORKFLOW_STATE_PASSED = 1;
   // The Commit was reviewed after failing governance checks and was accepted.
-  COMMIT_REVIEW_STATE_ACCEPTED = 3;
+  GOVERNANCE_WORKFLOW_STATE_ACCEPTED = 2;
   // The Commit was reviewed after failing governance checks and was rejected.
-  COMMIT_REVIEW_STATE_REJECTED = 4;
+  GOVERNANCE_WORKFLOW_STATE_REJECTED = 3;
   // The Commit has not yet been reviewed after failing governance checks and is pending.
-  COMMIT_REVIEW_STATE_PENDING = 5;
+  GOVERNANCE_WORKFLOW_STATE_PENDING = 4;
+  // TODO: decide how we want to handle the case where a commit is blocked on another commit that is either pending
+  // or rejected 
 }
 
 // LabelRef is a reference to a Label, either an id or a fully-qualified name.
