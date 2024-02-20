@@ -130,7 +130,7 @@ message CreateModulesRequest {
     string url = 5 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore_empty = true
+      (buf.validate.field).ignore = IGNORE_DEFAULT
     ];
     // The name of the default Label of the Module.
     //

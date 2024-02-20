@@ -122,7 +122,7 @@ message CreateOrganizationsRequest {
     string url = 3 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore_empty = true
+      (buf.validate.field).ignore = IGNORE_DEFAULT
     ];
     // The verification status of the Organization.
     //
