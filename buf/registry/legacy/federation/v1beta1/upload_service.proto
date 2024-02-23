@@ -44,7 +44,7 @@ message UploadRequest {
   // A dependency of one or more references specified by Contents.
   //
   // Dependencies between Contents are implicit and do not need to be specified. The BSR will detect
-  // dependencies between Contenta via .proto imports.
+  // dependencies between Contents via .proto imports.
   message DepRef {
     // The commit_id of the dependency.
     string commit_id = 1 [
