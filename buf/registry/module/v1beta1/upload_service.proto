@@ -33,37 +33,19 @@ service UploadService {
 }
 
 message UploadRequest {
-  // A dependency of Content, either referencing another Content message, or referencing
-  // a Commit that already exists.
-  message DepRef {
-    // The Module of the dep.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-    // The commit_id of the Commit, if this is referencing a Commit that already exists.
-    //
-    // If the ModuleRef refers to a Module that has associated Content, this field should be empty,
-    // and setting a value is an error.
-    string commit_id = 2 [
-      (buf.validate.field).string.uuid = true,
-      (buf.validate.field).ignore_empty = true
-    ];
-  }
   // Content to upload for a given reference.
   message Content {
     // The Module of the reference.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-    // The dependencies of the reference.
-    //
-    // This will include all transitive dependencies.
-    repeated DepRef dep_refs = 2;
     // The Files of the Content.
     //
     // This will consist of the .proto files, license files, and documentation files.
-    repeated File files = 3 [(buf.validate.field).repeated.min_items = 1];
+    repeated File files = 2 [(buf.validate.field).repeated.min_items = 1];
     // The original v1beta1 or v1 buf.yaml file that encapsulated this reference, if it existed.
     //
     // This is used in deprecated digest calculations only. None of the structured
     // information within this File will or should convey further information about the reference.
-    File v1_buf_yaml_file = 4;
+    File v1_buf_yaml_file = 3;
     // The original v1beta1 or v1 buf.lock file that encapsulated this reference, if it existed.
     //
     // This is used in deprecated digest calculations only. None of the structured
@@ -71,7 +53,7 @@ message UploadRequest {
     //
     // Importantly, this file is *not* used to determine the dependencies of the reference. To
     // specify the dependencies, use the dep_refs fields.
-    File v1_buf_lock_file = 5;
+    File v1_buf_lock_file = 4;
     // The labels to associate with the Commit for the Content.
     //
     // If an id is set, this id must represent a Label that already exists and is
@@ -82,12 +64,12 @@ message UploadRequest {
     //
     // If the Labels do not exist, they will be created.
     // If the Labels were archived, they will be unarchived.
-    repeated ScopedLabelRef scoped_label_refs = 6;
+    repeated ScopedLabelRef scoped_label_refs = 5;
     // The URL of the source control commit to associate with the Commit for this Content.
     //
     // BSR users can navigate to this link to find source control information that is relevant to this Commit
     // (e.g. commit description, PR discussion, authors, approvers, etc.).
-    string source_control_url = 7 [
+    string source_control_url = 6 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
@@ -95,6 +77,16 @@ message UploadRequest {
   }
   // The Contents of all references.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
+  // The dependencies of the references specified by Contents.
+  //
+  // Dependencies between Contents are implicit and do not need to be specified. The BSR will detect
+  // dependencies between Contenta via .proto imports.
+  //
+  // This will include all transitive dependencies.
+  //
+  // Commits should be unique by Module, that is no two dep_commit_ids should have the same Module but
+  // different Commit IDs.
+  repeated string dep_commit_ids = 2 [(buf.validate.field).repeated.items.string.uuid = true];
 }
 
 message UploadResponse {
