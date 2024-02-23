@@ -104,6 +104,9 @@ message UploadRequest {
   //
   // Dependencies between Contents are implicit and do not need to be specified. The BSR will detect
   // dependencies between Contents via .proto imports.
+  //
+  // Commits should be unique by Module, that is no two dep_refs should have the same Module but
+  // different Commit IDs.
   repeated DepRef dep_refs = 2;
 }
 
