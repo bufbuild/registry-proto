@@ -21,7 +21,6 @@ import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
-import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -97,9 +96,8 @@ message ListLabelsRequest {
   // Once the resource is resolved, the following Labels are listed:
   //   - If a Module is referenced, all Labels for the Module are returned.
   //   - If a Label is referenced, this Label is returned.
-  //   - If a Commit is referenced, all Labels for the Commit are returned. Note that this will
-  //     not return any Labels where the Commit is currently rejected or pending, it will only
-  //     return Labels for Commits that are passed or accepted.
+  //   - If a Commit is referenced, all Labels that currently point to the Commit are returned.
+  //     Labels where this Commit has a PolicyCheckStatus that is neither approved nor passed will not be returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //
@@ -109,10 +107,10 @@ message ListLabelsRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
-  // Only return Labels that have these governance review states.
+  // Only return Labels that point to a Commit with one of these PolicyCheckStatus values.
   //
-  // By default, Labels with any governance review state are returned.
-  repeated LabelReviewState review_states = 5;
+  // If not set, Labels that point to a Commit with any PolicyCheckStatus value are returned.
+  repeated PolicyCheckStatus policy_check_statuses = 5 [(buf.validate.field).repeated.items.enum.defined_only = true];
 }
 
 message ListLabelsResponse {
@@ -168,14 +166,12 @@ message ListLabelHistoryResponse {
     // The Commit.
     Commit commit = 1 [(buf.validate.field).required = true];
 
-    // The Label's review state.
+    // The PolicyCheckState for this Commit on this Label.
     //
-    // This field will only be set if governance is enabled for the Label.
-    LabelReviewState review_state = 2 [(buf.validate.field).enum.defined_only = true];
-    // When the review state was last updated.
-    //
-    // This field will only be set if governance is enabled for the Label.
-    google.protobuf.Timestamp review_state_updated_at = 3;
+    // This field will be set if either:
+    //   - Policy checks were enabled on this Label when this Commit was pushed.
+    //   - This Commit transitively depends on a Commit that has a PolicyCheckState.
+    PolicyCheckState policy_check_state = 2;
   }
 
   // The next page token.
