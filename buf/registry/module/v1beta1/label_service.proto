@@ -97,7 +97,7 @@ message ListLabelsRequest {
   //   - If a Module is referenced, all Labels for the Module are returned.
   //   - If a Label is referenced, this Label is returned.
   //   - If a Commit is referenced, all Labels that currently point to the Commit are returned.
-  //     Labels where this Commit has a PolicyChecksStatus that is neither approved nor passed will not be returned.
+  //     Labels where this Commit has a PolicyCheckStatus that is neither approved nor passed will not be returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //
@@ -107,10 +107,10 @@ message ListLabelsRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
-  // Only return Labels that point to a Commit with one of these PolicyChecksStatus values.
+  // Only return Labels that point to a Commit with one of these PolicyCheckStatus values.
   //
-  // If not set, Labels that point to a Commit with any PolicyChecksStatus value are returned.
-  repeated PolicyChecksStatus policy_checks_statuses = 5 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  // If not set, Labels that point to a Commit with any PolicyCheckStatus value are returned.
+  repeated PolicyCheckStatus policy_check_statuses = 5 [(buf.validate.field).repeated.items.enum.defined_only = true];
 }
 
 message ListLabelsResponse {
@@ -166,12 +166,12 @@ message ListLabelHistoryResponse {
     // The Commit.
     Commit commit = 1 [(buf.validate.field).required = true];
 
-    // The PolicyChecksState for this Commit on this Label.
+    // The PolicyCheckState for this Commit on this Label.
     //
     // This field will be set if either:
     //   - Policy checks were enabled on this Label when this Commit was pushed.
-    //   - This Commit transitively depends on a Commit that has a PolicyChecksState.
-    PolicyChecksState policy_checks_state = 2;
+    //   - This Commit transitively depends on a Commit that has a PolicyCheckState.
+    PolicyCheckState policy_check_state = 2;
   }
 
   // The next page token.
