@@ -72,55 +72,45 @@ message Label {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // Whether or not policy checks are enabled for this Label.
+  // The CommitCheckState for the Commit the Label points to.
   //
-  // Policy checks are an enterprise-only feature - contact us to learn more!
-  bool policy_checks_enabled = 10;
-  // The PolicyCheckState for the Commit the Label points to.
+  // The CommitCheckStatus will always be disabled, passed, or approved, since Labels will
+  // never point to pending or rejected Commits.
   //
-  // This field will be set if either:
-  //   - Policy checks were enabled on this Label when this Commit was pushed.
-  //   - This Commit transitively depends on a Commit that has a PolicyCheckState.
-  PolicyCheckState policy_check_state = 11;
+  // TODO: Add custom CEL validation to validate the status field is one of DISABLED, PASSED, APPROVED.
+  CommitCheckState commit_check_state = 10 [(buf.validate.field).required = true];
 }
 
 // The state of a Commit's policy checks for a particular Label.
 //
 // Policy checks are an enterprise-only feature - contact us to learn more!
-message PolicyCheckState {
-  // The status of the policy checks.
-  PolicyCheckStatus status = 1 [(buf.validate.field).enum.defined_only = true];
-
-  // The time the status was last updated.
-  google.protobuf.Timestamp status_updated_at = 3 [(buf.validate.field).required = true];
-
-  // The ids of Commits that have policy checks blocking these policy checks.
+message CommitCheckState {
+  // The status of the policy check.
+  CommitCheckStatus status = 1 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).required = true
+  ];
+  // The time the policy check state was last updated.
   //
-  // This field will only be set if the status is blocked.
-  repeated string blocked_on_commit_ids = 2 [(buf.validate.field).string.uuid = true];
+  // If the status is disabled, this will be equal to the Commit create_time.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
 }
 
-// The status of a PolicyCheckState.
+// A check status for a Commit.
 //
 // Policy checks are an enterprise-only feature - contact us to learn more!
-enum PolicyCheckStatus {
-  POLICY_CHECK_STATUS_UNSPECIFIED = 0;
+enum CommitCheckStatus {
+  COMMIT_CHECK_STATUS_UNSPECIFIED = 0;
+  // Policy checks were not enabled when the Commit was created.
+  COMMIT_CHECK_STATUS_DISABLED = 1;
   // The Commit did not fail any policy checks and therefore did not need review.
-  POLICY_CHECK_STATUS_PASSED = 1;
-  // The Commit was reviewed after failing policy checks and was approved.
-  POLICY_CHECK_STATUS_APPROVED = 2;
-  // The Commit was reviewed after failing policy checks and was rejected.
-  POLICY_CHECK_STATUS_REJECTED = 3;
+  COMMIT_CHECK_STATUS_PASSED = 2;
   // The Commit has not yet been reviewed after failing policy checks and is pending.
-  POLICY_CHECK_STATUS_PENDING = 4;
-  // The policy checks for this Commit are blocked on pending policy checks for at least one other Commit.
-  //
-  // If at least one dependent Commit is rejected, this Commit will inherit the rejected status.
-  // If all dependent Commits are passed or approved, then the status for this Commit will transition to:
-  //   - Passed if policy checks are not enabled for this Label.
-  //   - Passed if policy checks are enabled for this Label and all checks passed.
-  //   - Pending if policy checks are enabled for this Label and some checks failed.
-  POLICY_CHECK_STATUS_BLOCKED = 5;
+  COMMIT_CHECK_STATUS_PENDING = 3;
+  // The Commit was reviewed after failing policy checks and was rejected.
+  COMMIT_CHECK_STATUS_REJECTED = 4;
+  // The Commit was reviewed after failing policy checks and was approved.
+  COMMIT_CHECK_STATUS_APPROVED = 5;
 }
 
 // LabelRef is a reference to a Label, either an id or a fully-qualified name.

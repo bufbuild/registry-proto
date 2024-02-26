@@ -96,8 +96,8 @@ message ListLabelsRequest {
   // Once the resource is resolved, the following Labels are listed:
   //   - If a Module is referenced, all Labels for the Module are returned.
   //   - If a Label is referenced, this Label is returned.
-  //   - If a Commit is referenced, all Labels that currently point to the Commit are returned.
-  //     Labels where this Commit has a PolicyCheckStatus that is neither approved nor passed will not be returned.
+  //   - If a Commit is referenced, all Labels that currently point to the Commit are returned. Note that
+  //     Labels only point to passed or approved Commits, or Commits where policy checks were disabled.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //
@@ -107,10 +107,16 @@ message ListLabelsRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
-  // Only return Labels that point to a Commit with one of these PolicyCheckStatus values.
+  // Only return Labels that point to a Commit with one of these CommitCheckStatus values.
   //
-  // If not set, Labels that point to a Commit with any PolicyCheckStatus value are returned.
-  repeated PolicyCheckStatus policy_check_statuses = 5 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  // If not set, Labels that point to a Commit with any CommitCheckStatus value are returned.
+  //
+  // It is an error to filter on CommitCheckStatuses of pending or rejected, as Labels will only
+  // point to Commits that are passed or approved, or that have policy checks disabled.
+  //
+  // TODO: Add custom CEL validation to validate the status field is one of DISABLED, PASSED, APPROVED.
+  repeated CommitCheckStatus commit_check_statuses = 5 [
+    (buf.validate.field).repeated.items.enum.defined_only = true];
 }
 
 message ListLabelsResponse {
@@ -165,13 +171,8 @@ message ListLabelHistoryResponse {
   message Value {
     // The Commit.
     Commit commit = 1 [(buf.validate.field).required = true];
-
-    // The PolicyCheckState for this Commit on this Label.
-    //
-    // This field will be set if either:
-    //   - Policy checks were enabled on this Label when this Commit was pushed.
-    //   - This Commit transitively depends on a Commit that has a PolicyCheckState.
-    PolicyCheckState policy_check_state = 2;
+    // The CommitCheckState for this Commit on this Label.
+    CommitCheckState commit_check_state = 2 [(buf.validate.field).required = true];
   }
 
   // The next page token.
