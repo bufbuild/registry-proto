@@ -61,6 +61,7 @@ message Label {
   ];
   // The id of the Commit currently associated with the Label.
   //
+  // If policy checks are enabled, this will point to the most recent Commit that passed or was approved.
   // To get the history of the Commits that have been associated with a Label, use ListLabelHistory.
   string commit_id = 8 [
     (buf.validate.field).required = true,
@@ -71,6 +72,45 @@ message Label {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
+  // The CommitCheckState for the Commit the Label points to.
+  //
+  // The CommitCheckStatus will always be disabled, passed, or approved, since Labels will
+  // never point to pending or rejected Commits.
+  //
+  // TODO: Add custom CEL validation to validate the status field is one of DISABLED, PASSED, APPROVED.
+  CommitCheckState commit_check_state = 10 [(buf.validate.field).required = true];
+}
+
+// The state of a Commit's policy checks for a particular Label.
+//
+// Policy checks are an enterprise-only feature - contact us to learn more!
+message CommitCheckState {
+  // The status of the policy check.
+  CommitCheckStatus status = 1 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).required = true
+  ];
+  // The time the policy check state was last updated.
+  //
+  // If the status is disabled, this will be equal to the Commit create_time.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+}
+
+// A check status for a Commit.
+//
+// Policy checks are an enterprise-only feature - contact us to learn more!
+enum CommitCheckStatus {
+  COMMIT_CHECK_STATUS_UNSPECIFIED = 0;
+  // Policy checks were not enabled when the Commit was created.
+  COMMIT_CHECK_STATUS_DISABLED = 1;
+  // The Commit did not fail any policy checks and therefore did not need review.
+  COMMIT_CHECK_STATUS_PASSED = 2;
+  // The Commit has not yet been reviewed after failing policy checks and is pending.
+  COMMIT_CHECK_STATUS_PENDING = 3;
+  // The Commit was reviewed after failing policy checks and was rejected.
+  COMMIT_CHECK_STATUS_REJECTED = 4;
+  // The Commit was reviewed after failing policy checks and was approved.
+  COMMIT_CHECK_STATUS_APPROVED = 5;
 }
 
 // LabelRef is a reference to a Label, either an id or a fully-qualified name.
