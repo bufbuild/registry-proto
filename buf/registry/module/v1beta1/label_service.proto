@@ -115,8 +115,7 @@ message ListLabelsRequest {
   // point to Commits that are passed or approved, or that have policy checks disabled.
   //
   // TODO: Add custom CEL validation to validate the status field is one of DISABLED, PASSED, APPROVED.
-  repeated CommitCheckStatus commit_check_statuses = 5 [
-    (buf.validate.field).repeated.items.enum.defined_only = true];
+  repeated CommitCheckStatus commit_check_statuses = 5 [(buf.validate.field).repeated.items.enum.defined_only = true];
 }
 
 message ListLabelsResponse {
