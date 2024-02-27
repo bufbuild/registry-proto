@@ -82,19 +82,19 @@ message DownloadRequest {
     //
     // If false, it is an error to specify non-existent file paths.
     bool paths_allow_not_exist = 4;
-    // The DigestType to return for the Commit of this reference.
-    //
-    // If this DigestType is not available, an error is returned.
-    // Note that certain DigestTypes may be deprecated over time.
-    //
-    // If not set, the latest DigestType is used, currently B5.
-    DigestType digest_type = 5 [(buf.validate.field).enum.defined_only = true];
   }
   // The references to get contents for.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
+  // The DigestType to return for the Commits of the references.
+  //
+  // If this DigestType is not available, an error is returned.
+  // Note that certain DigestTypes may be deprecated over time.
+  //
+  // If not set, the latest DigestType is used, currently B5.
+  DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
 message DownloadResponse {

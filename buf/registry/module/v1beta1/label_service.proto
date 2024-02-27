@@ -96,7 +96,8 @@ message ListLabelsRequest {
   // Once the resource is resolved, the following Labels are listed:
   //   - If a Module is referenced, all Labels for the Module are returned.
   //   - If a Label is referenced, this Label is returned.
-  //   - If a Commit is referenced, all Labels for the Commit are returned.
+  //   - If a Commit is referenced, all Labels that currently point to the Commit are returned. Note that
+  //     Labels only point to passed or approved Commits, or Commits where policy checks were disabled.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //
@@ -106,6 +107,15 @@ message ListLabelsRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  // Only return Labels that point to a Commit with one of these CommitCheckStatus values.
+  //
+  // If not set, Labels that point to a Commit with any CommitCheckStatus value are returned.
+  //
+  // It is an error to filter on CommitCheckStatuses of pending or rejected, as Labels will only
+  // point to Commits that are passed or approved, or that have policy checks disabled.
+  //
+  // TODO: Add custom CEL validation to validate the status field is one of DISABLED, PASSED, APPROVED.
+  repeated CommitCheckStatus commit_check_statuses = 5 [(buf.validate.field).repeated.items.enum.defined_only = true];
 }
 
 message ListLabelsResponse {
@@ -157,12 +167,19 @@ message ListLabelHistoryRequest {
 }
 
 message ListLabelHistoryResponse {
+  message Value {
+    // The Commit.
+    Commit commit = 1 [(buf.validate.field).required = true];
+    // The CommitCheckState for this Commit on this Label.
+    CommitCheckState commit_check_state = 2 [(buf.validate.field).required = true];
+  }
+
   // The next page token.
   //
   /// If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
-  // The listed Commits that represent the history of the Label.
-  repeated Commit commits = 2;
+  // The ordered history of the Label.
+  repeated Value values = 2;
 }
 
 message CreateOrUpdateLabelsRequest {
