@@ -17,7 +17,6 @@ syntax = "proto3";
 package buf.registry.module.v1;
 
 import "buf/registry/module/v1/commit.proto";
-import "buf/registry/module/v1/digest.proto";
 import "buf/registry/module/v1/file.proto";
 import "buf/registry/module/v1/resource.proto";
 import "buf/validate/validate.proto";
@@ -88,13 +87,6 @@ message DownloadRequest {
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
-  // The DigestType to return for the Commits of the references.
-  //
-  // If this DigestType is not available, an error is returned.
-  // Note that certain DigestTypes may be deprecated over time.
-  //
-  // If not set, the latest DigestType is used, currently B5.
-  DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
 message DownloadResponse {
@@ -112,25 +104,6 @@ message DownloadResponse {
     //
     // If no paths match and paths_allow_not_exist is set, this may be empty.
     repeated File files = 2;
-    // The original v1beta1 or v1 buf.yaml file that encapsulated this reference.
-    //
-    // If the reference was encapsulated by a v2 buf.yaml, this will be a synthesized v1 buf.yaml.
-    //
-    // This is used in deprecated digest calculations only. None of the structured
-    // information within this File conveys further information about the reference.
-    File v1_buf_yaml_file = 3 [(buf.validate.field).required = true];
-    // The original buf.lock file that encapsulated this reference, if it existed.
-    //
-    // If the reference was encapsulated by a v2 buf.lock with dependencies, this will be a
-    // synthesized v1 buf.lock.
-    //
-    // This is used in deprecated digest calculations only. None of the structured
-    // information within this File conveys further information about the reference.
-    //
-    // Importantly, this file should *not* used to determine the dependencies of the
-    // reference. To determine the dependencies, use the GraphService with the returned
-    // Commit.
-    File v1_buf_lock_file = 4;
   }
   // The Contents of the references in the same order as requested.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
