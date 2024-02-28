@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package buf.registry.module.v1;
 
-import "buf/registry/module/v1/digest.proto";
 import "buf/registry/module/v1/graph.proto";
 import "buf/registry/module/v1/resource.proto";
 import "buf/validate/validate.proto";
