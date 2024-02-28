@@ -16,14 +16,17 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/graph.proto";
 import "buf/registry/module/v1beta1/resource.proto";
+import "buf/registry/module/v1beta1/digest.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
 // Get dependency graphs.
+//
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
 service GraphService {
   // Get a dependency graph that includes the given Commits.
   //
@@ -31,11 +34,16 @@ service GraphService {
   // graph, along with their dependencies.
   //
   // A dependency graph is a directed acyclic graph.
+  //
+  // See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+  // and not this package.
   rpc GetGraph(GetGraphRequest) returns (GetGraphResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
 message GetGraphRequest {
   // The references to resolve to Commits to include in the graph.
   //
@@ -61,6 +69,8 @@ message GetGraphRequest {
   DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
 message GetGraphResponse {
   // The Graph calculated for the Commits.
   Graph graph = 1 [(buf.validate.field).required = true];

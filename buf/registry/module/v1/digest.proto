@@ -14,18 +14,16 @@
 
 syntax = "proto3";
 
-package buf.registry.module.v1beta1;
+package buf.registry.module.v1;
 
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
 // A digest of a Commit's content.
 //
 // A digest represents all content for a single Commit, including its .proto files, documentation
 // files, license files, and the digests of its dependencies.
-//
-// TODO: CommitDigest? What to do about naming in bufbuild/buf (ModuleDigest)?
 message Digest {
   // The type of the Digest.
   DigestType type = 1 [

@@ -14,12 +14,26 @@
 
 syntax = "proto3";
 
-package buf.registry.legacy.federation.v1beta1;
+package buf.registry.module.v1;
 
+import "buf/registry/module/v1/commit.proto";
+import "buf/registry/module/v1/label.proto";
+import "buf/registry/module/v1/module.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/legacy/federation/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
+
+// A Module, Label, or Commit.
+message Resource {
+  oneof value {
+    option (buf.validate.oneof).required = true;
+
+    Module module = 1;
+    Label label = 2;
+    Commit commit = 3;
+  }
+}
 
 // A reference to any of:
 //   - Module
@@ -35,9 +49,6 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 //
 // ResourceRefs cannot reference archived Labels. The only way to retrieve an archived Label
 // is to use LabelService.GetLabels.
-//
-// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
-// and not this package.
 message ResourceRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
   option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
@@ -92,7 +103,4 @@ message ResourceRef {
     // The fully-qualified name of the resource.
     Name name = 2;
   }
-
-  // The registry hostname of the resource.
-  string registry = 3 [(buf.validate.field).required = true];
 }

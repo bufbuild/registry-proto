@@ -14,13 +14,13 @@
 
 syntax = "proto3";
 
-package buf.registry.module.v1beta1;
+package buf.registry.module.v1;
 
-import "buf/registry/module/v1beta1/module.proto";
-import "buf/registry/owner/v1beta1/owner.proto";
+import "buf/registry/module/v1/module.proto";
+import "buf/registry/owner/v1/owner.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
 // Operate on Modules.
 service ModuleService {
@@ -89,7 +89,7 @@ message ListModulesRequest {
   //
   // If empty, all Modules for all owners are listed, but this functionality
   // is limited to Users with the necessary permissions.
-  repeated buf.registry.owner.v1beta1.OwnerRef owner_refs = 3;
+  repeated buf.registry.owner.v1.OwnerRef owner_refs = 3;
   // The order to return the Modules.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_ASC.
@@ -113,7 +113,7 @@ message CreateModulesRequest {
   // An individual request to create a Module.
   message Value {
     // The User or Organization to create the Module under.
-    buf.registry.owner.v1beta1.OwnerRef owner_ref = 1 [(buf.validate.field).required = true];
+    buf.registry.owner.v1.OwnerRef owner_ref = 1 [(buf.validate.field).required = true];
     // The name of the Module.
     string name = 2 [(buf.validate.field).string = {
       min_len: 2,

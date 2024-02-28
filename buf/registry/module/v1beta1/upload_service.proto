@@ -25,27 +25,48 @@ import "buf/validate/validate.proto";
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
 // Upload contents.
+//
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
 service UploadService {
   // Upload contents for given set of Modules.
   //
   // Content consists of the Files: .proto files, license files, and documentation files.
+  //
+  // See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+  // and not this package.
   rpc Upload(UploadRequest) returns (UploadResponse) {}
 }
 
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
 message UploadRequest {
+  // A dependency of one or more references specified by Contents.
+  //
+  // Dependencies between Contents are implicit and do not need to be specified. The BSR will detect
+  // dependencies between Contents via .proto imports.
+  message DepRef {
+    // The commit_id of the dependency.
+    string commit_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uuid = true
+    ];
+    // The registry hostname of the dependency.
+    string registry = 2 [(buf.validate.field).required = true];
+  }
   // Content to upload for a given reference.
   message Content {
     // The Module of the reference.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    buf.registry.module.v1beta1.ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The Files of the Content.
     //
     // This will consist of the .proto files, license files, and documentation files.
-    repeated File files = 2 [(buf.validate.field).repeated.min_items = 1];
+    repeated buf.registry.module.v1beta1.File files = 2 [(buf.validate.field).repeated.min_items = 1];
     // The original v1beta1 or v1 buf.yaml file that encapsulated this reference, if it existed.
     //
     // This is used in deprecated digest calculations only. None of the structured
     // information within this File will or should convey further information about the reference.
-    File v1_buf_yaml_file = 3;
+    buf.registry.module.v1beta1.File v1_buf_yaml_file = 3;
     // The original v1beta1 or v1 buf.lock file that encapsulated this reference, if it existed.
     //
     // This is used in deprecated digest calculations only. None of the structured
@@ -53,7 +74,7 @@ message UploadRequest {
     //
     // Importantly, this file is *not* used to determine the dependencies of the reference. To
     // specify the dependencies, use the dep_refs fields.
-    File v1_buf_lock_file = 4;
+    buf.registry.module.v1beta1.File v1_buf_lock_file = 4;
     // The labels to associate with the Commit for the Content.
     //
     // If an id is set, this id must represent a Label that already exists and is
@@ -64,7 +85,7 @@ message UploadRequest {
     //
     // If the Labels do not exist, they will be created.
     // If the Labels were archived, they will be unarchived.
-    repeated ScopedLabelRef scoped_label_refs = 5;
+    repeated buf.registry.module.v1beta1.ScopedLabelRef scoped_label_refs = 5;
     // The URL of the source control commit to associate with the Commit for this Content.
     //
     // BSR users can navigate to this link to find source control information that is relevant to this Commit
@@ -79,20 +100,22 @@ message UploadRequest {
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
   // The dependencies of the references specified by Contents.
   //
-  // Dependencies between Contents are implicit and do not need to be specified. The BSR will detect
-  // dependencies between Contenta via .proto imports.
-  //
   // This will include all transitive dependencies.
   //
-  // Commits should be unique by Module, that is no two dep_commit_ids should have the same Module but
+  // Dependencies between Contents are implicit and do not need to be specified. The BSR will detect
+  // dependencies between Contents via .proto imports.
+  //
+  // Commits should be unique by Module, that is no two dep_refs should have the same Module but
   // different Commit IDs.
-  repeated string dep_commit_ids = 2 [(buf.validate.field).repeated.items.string.uuid = true];
+  repeated DepRef dep_refs = 2;
 }
 
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
 message UploadResponse {
   // The Commits for each reference in the same order as given on the request.
   //
   // A single Commit will be returned for each reference. These Commits may or may not be new.
   // If nothing changed for a given reference, the existing Commit will be returned.
-  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated buf.registry.module.v1beta1.Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }

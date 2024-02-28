@@ -14,34 +14,26 @@
 
 syntax = "proto3";
 
-package buf.registry.module.v1beta1;
+package buf.registry.module.v1;
 
-import "buf/registry/module/v1beta1/commit.proto";
-import "buf/registry/module/v1beta1/digest.proto";
-import "buf/registry/module/v1beta1/resource.proto";
+import "buf/registry/module/v1/digest.proto";
+import "buf/registry/module/v1/resource.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
-// Operate on Commits.
-service CommitService {
-  // Get Commits.
-  rpc GetCommits(GetCommitsRequest) returns (GetCommitsResponse) {
+// Operate on Resources.
+service ResourceService {
+  // Get Resources.
+  rpc GetResources(GetResourcesRequest) returns (GetResourcesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
-message GetCommitsRequest {
-  // References to request a Commit for.
+message GetResourcesRequest {
+  // References to request a Resource for.
   //
   // See the documentation on ResourceRef for resource resolution details.
-  //
-  // Resolution is as follows:
-  //   - If a Module is referenced, the Commit of the default Label is returned.
-  //   - If a Label is referenced, the Commit of this Label is returned.
-  //   - If a Commit is referenced, this Commit is returned.
-  //
-  // TODO: It's a little incongruent to have a Get request take a ResourceRef.
   repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -55,7 +47,7 @@ message GetCommitsRequest {
   DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
-message GetCommitsResponse {
-  // The found Commits in the same order as requested.
-  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+message GetResourcesResponse {
+  // The found Resources in the same order as requested.
+  repeated Resource resources = 1 [(buf.validate.field).repeated.min_items = 1];
 }

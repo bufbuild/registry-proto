@@ -14,14 +14,14 @@
 
 syntax = "proto3";
 
-package buf.registry.owner.v1beta1;
+package buf.registry.owner.v1;
 
-import "buf/registry/owner/v1beta1/organization.proto";
-import "buf/registry/owner/v1beta1/user.proto";
+import "buf/registry/owner/v1/organization.proto";
+import "buf/registry/owner/v1/user.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
 
 // A User or Organization.
 message Owner {
