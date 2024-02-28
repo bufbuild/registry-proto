@@ -1,0 +1,137 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1beta1;
+
+import "buf/registry/module/v1beta1/commit.proto";
+import "buf/registry/module/v1beta1/digest.proto";
+import "buf/registry/module/v1beta1/file.proto";
+import "buf/registry/module/v1beta1/resource.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
+// Download contents.
+service DownloadService {
+  // Download the contents of multiple Modules, Labels, or Commits.
+  //
+  // Content consists of the .proto files, license files, and documentation files.
+  rpc Download(DownloadRequest) returns (DownloadResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message DownloadRequest {
+  // A request for content for a single reference.
+  message Value {
+    // The reference to get content for.
+    //
+    // See the documentation on ResourceRef for resource resolution details.
+    //
+    // Once the resource is resolved, the following content is returned:
+    //   - If a Module is referenced, the content of the Commit of the default Label is returned.
+    //   - If a Label is referenced, the content of the Commit of this Label is returned.
+    //   - If a Commit is referenced, the content for this Commit is returned.
+    ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
+    // Specific file types to request.
+    //
+    // If not set, all file types are returned.
+    repeated FileType file_types = 2 [(buf.validate.field).repeated.items.enum.defined_only = true];
+    // Specific file paths to retrieve.
+    //
+    // May be directories. For example, path "foo/bar" will result in files "foo/bar/baz.proto",
+    // "foo/bar/LICENSE" being downloaded.
+    //
+    // If empty, all file paths for the given reference are retrieved.
+    //
+    // If no paths match, an empty Files list will be returned, however the call may still
+    // be successful if paths_allow_not_exist is set (the dependency list may still be on
+    // the response). If a directory "foo/bar" is specified but this directory has no files,
+    // this is considered to be a non-match.
+    //
+    // This field also interacts with file_types - if file_types is set, a path only matches
+    // if it is also of the file type, and if there are no matching paths for the given FileTypes,
+    // an error is returned unless paths_not_allow_exist is set.
+    //
+    // The path must be relative, and cannot contain any "." or ".." components
+    // The separator "/" must be used.
+    repeated string paths = 3 [(buf.validate.field).repeated.items = {
+      string: {
+        max_len: 4096
+        not_contains: "\\"
+        pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
+      }
+    }];
+    // Whether to allow file paths not to exist within the given module.
+    //
+    // For example, one may want to retrieve the file paths "buf.md" and "README.md",
+    // but only expect one to actually exist.
+    //
+    // If false, it is an error to specify non-existent file paths.
+    bool paths_allow_not_exist = 4;
+  }
+  // The references to get contents for.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+  // The DigestType to return for the Commits of the references.
+  //
+  // If this DigestType is not available, an error is returned.
+  // Note that certain DigestTypes may be deprecated over time.
+  //
+  // If not set, the latest DigestType is used, currently B5.
+  DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
+}
+
+message DownloadResponse {
+  // Content for a single Commit.
+  message Content {
+    // The Commit associated with the Content.
+    //
+    // The Commit associated with this ID will be present in the commits field.
+    //
+    // The Commit will use the DigestType specified in the request value.
+    Commit commit = 1 [(buf.validate.field).required = true];
+    // The Files of the content.
+    //
+    // This will consist of the .proto files, license files, and documentation files.
+    //
+    // If no paths match and paths_allow_not_exist is set, this may be empty.
+    repeated File files = 2;
+    // The original v1beta1 or v1 buf.yaml file that encapsulated this reference.
+    //
+    // If the reference was encapsulated by a v2 buf.yaml, this will be a synthesized v1 buf.yaml.
+    //
+    // This is used in deprecated digest calculations only. None of the structured
+    // information within this File conveys further information about the reference.
+    File v1_buf_yaml_file = 3 [(buf.validate.field).required = true];
+    // The original buf.lock file that encapsulated this reference, if it existed.
+    //
+    // If the reference was encapsulated by a v2 buf.lock with dependencies, this will be a
+    // synthesized v1 buf.lock.
+    //
+    // This is used in deprecated digest calculations only. None of the structured
+    // information within this File conveys further information about the reference.
+    //
+    // Importantly, this file should *not* used to determine the dependencies of the
+    // reference. To determine the dependencies, use the GraphService with the returned
+    // Commit.
+    File v1_buf_lock_file = 4;
+  }
+  // The Contents of the references in the same order as requested.
+  repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
+}

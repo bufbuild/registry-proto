@@ -1,0 +1,75 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1beta1;
+
+import "buf/registry/module/v1beta1/digest.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+
+// A commit on a specific Module.
+//
+// Commits are immutable.
+//
+// Many Commits may be associated with one Digest.
+//
+// Note that the Digest returned on a Commit depends on the requested DigestType in the
+// RPC that returned the Commit.
+message Commit {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Commit.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The time the Commit was pushed to the BSR.
+  //
+  // Commits are immutable, so there is no corresponding update_time.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The id of the User or Organization that owns the Module that the Commit is associated with.
+  string owner_id = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The id of the Module that the Commit is associated with.
+  string module_id = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The Digest of the Commit's contents.
+  //
+  // Note that individual RPCs may request a specific DigestType, and a Digest of
+  // this DigestType will be returned as part of this Commit. This may affect your
+  // caching of returned Commit messages if you require different DigestTypes.
+  Digest digest = 5 [(buf.validate.field).required = true];
+  // The id of the User that created this Commit on the BSR.
+  //
+  // May be empty if the User is no longer available.
+  string created_by_user_id = 6 [(buf.validate.field).string.uuid = true];
+  // The URL of the source control commit that is associated with the Commit.
+  //
+  // BSR users can navigate to this link to find source control information that is relevant to this Commit
+  // (e.g. commit description, PR discussion, authors, approvers, etc.).
+  string source_control_url = 7 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+  ];
+}
