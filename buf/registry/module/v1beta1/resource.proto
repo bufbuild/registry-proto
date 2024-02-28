@@ -49,9 +49,6 @@ message Resource {
 //
 // ResourceRefs cannot reference archived Labels. The only way to retrieve an archived Label
 // is to use LabelService.GetLabels.
-//
-// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
-// and not this package.
 message ResourceRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
   option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
@@ -106,7 +103,4 @@ message ResourceRef {
     // The fully-qualified name of the resource.
     Name name = 2;
   }
-
-  // The registry hostname of the resource.
-  string registry = 3 [(buf.validate.field).required = true];
 }

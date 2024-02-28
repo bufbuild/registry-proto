@@ -41,19 +41,6 @@ message UploadRequest {
     //
     // This will consist of the .proto files, license files, and documentation files.
     repeated File files = 2 [(buf.validate.field).repeated.min_items = 1];
-    // The original v1beta1 or v1 buf.yaml file that encapsulated this reference, if it existed.
-    //
-    // This is used in deprecated digest calculations only. None of the structured
-    // information within this File will or should convey further information about the reference.
-    File v1_buf_yaml_file = 3;
-    // The original v1beta1 or v1 buf.lock file that encapsulated this reference, if it existed.
-    //
-    // This is used in deprecated digest calculations only. None of the structured
-    // information within this File will or should convey further information about the reference.
-    //
-    // Importantly, this file is *not* used to determine the dependencies of the reference. To
-    // specify the dependencies, use the dep_refs fields.
-    File v1_buf_lock_file = 4;
     // The labels to associate with the Commit for the Content.
     //
     // If an id is set, this id must represent a Label that already exists and is
@@ -64,12 +51,12 @@ message UploadRequest {
     //
     // If the Labels do not exist, they will be created.
     // If the Labels were archived, they will be unarchived.
-    repeated ScopedLabelRef scoped_label_refs = 5;
+    repeated ScopedLabelRef scoped_label_refs = 3;
     // The URL of the source control commit to associate with the Commit for this Content.
     //
     // BSR users can navigate to this link to find source control information that is relevant to this Commit
     // (e.g. commit description, PR discussion, authors, approvers, etc.).
-    string source_control_url = 6 [
+    string source_control_url = 4 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
