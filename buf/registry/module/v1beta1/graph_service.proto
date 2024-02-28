@@ -24,9 +24,6 @@ import "buf/validate/validate.proto";
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
 // Get dependency graphs.
-//
-// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
-// and not this package.
 service GraphService {
   // Get a dependency graph that includes the given Commits.
   //
@@ -34,16 +31,11 @@ service GraphService {
   // graph, along with their dependencies.
   //
   // A dependency graph is a directed acyclic graph.
-  //
-  // See the package documentation for more details. You should likely use buf.registry.module.v1beta1
-  // and not this package.
   rpc GetGraph(GetGraphRequest) returns (GetGraphResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
-// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
-// and not this package.
 message GetGraphRequest {
   // The references to resolve to Commits to include in the graph.
   //

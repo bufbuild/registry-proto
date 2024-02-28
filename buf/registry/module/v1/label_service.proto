@@ -17,7 +17,6 @@ syntax = "proto3";
 package buf.registry.module.v1;
 
 import "buf/registry/module/v1/commit.proto";
-import "buf/registry/module/v1/digest.proto";
 import "buf/registry/module/v1/label.proto";
 import "buf/registry/module/v1/resource.proto";
 import "buf/validate/validate.proto";
@@ -157,13 +156,6 @@ message ListLabelHistoryRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
-  // The DigestType to use for Digests returned on Commits.
-  //
-  // If this DigestType is not available, an error is returned.
-  // Note that certain DigestTypes may be deprecated over time.
-  //
-  // If not set, the latest DigestType is used, currently B5.
-  DigestType digest_type = 5 [(buf.validate.field).enum.defined_only = true];
 }
 
 message ListLabelHistoryResponse {
