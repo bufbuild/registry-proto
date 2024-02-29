@@ -164,6 +164,10 @@ message ListLabelHistoryRequest {
   //
   // If not set, the latest DigestType is used, currently B5.
   DigestType digest_type = 5 [(buf.validate.field).enum.defined_only = true];
+  // Only return Commits that have one of these CommitCheckStatus values for this label.
+  //
+  // If not set, Commits with any CommitCheckStatus value are returned.
+  repeated CommitCheckStatus commit_check_statuses = 6 [(buf.validate.field).repeated.items.enum.defined_only = true];
 }
 
 message ListLabelHistoryResponse {

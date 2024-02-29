@@ -156,6 +156,10 @@ message ListLabelHistoryRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  // Only return Commits that have one of these CommitCheckStatus values for this label.
+  //
+  // If not set, Commits with any CommitCheckStatus value are returned.
+  repeated CommitCheckStatus commit_check_statuses = 6 [(buf.validate.field).repeated.items.enum.defined_only = true];
 }
 
 message ListLabelHistoryResponse {
