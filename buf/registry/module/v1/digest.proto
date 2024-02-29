@@ -14,11 +14,11 @@
 
 syntax = "proto3";
 
-package buf.registry.module.v1beta1;
+package buf.registry.module.v1;
 
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
 // A digest of a Commit's content.
 //
@@ -37,8 +37,6 @@ message Digest {
 // The type of Digest.
 enum DigestType {
   DIGEST_TYPE_UNSPECIFIED = 0;
-  // The b4 digest function.
-  DIGEST_TYPE_B4 = 1;
   // The b5 digest function.
-  DIGEST_TYPE_B5 = 2;
+  DIGEST_TYPE_B5 = 1;
 }

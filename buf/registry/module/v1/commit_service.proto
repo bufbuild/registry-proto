@@ -14,14 +14,13 @@
 
 syntax = "proto3";
 
-package buf.registry.module.v1beta1;
+package buf.registry.module.v1;
 
-import "buf/registry/module/v1beta1/commit.proto";
-import "buf/registry/module/v1beta1/digest.proto";
-import "buf/registry/module/v1beta1/resource.proto";
+import "buf/registry/module/v1/commit.proto";
+import "buf/registry/module/v1/resource.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
 // Operate on Commits.
 service CommitService {
@@ -44,13 +43,6 @@ message GetCommitsRequest {
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
-  // The DigestType to use for Digests returned on Commits.
-  //
-  // If this DigestType is not available, an error is returned.
-  // Note that certain DigestTypes may be deprecated over time.
-  //
-  // If not set, the latest DigestType is used, currently B5.
-  DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
 message GetCommitsResponse {

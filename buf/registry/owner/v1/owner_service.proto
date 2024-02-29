@@ -14,12 +14,12 @@
 
 syntax = "proto3";
 
-package buf.registry.owner.v1beta1;
+package buf.registry.owner.v1;
 
-import "buf/registry/owner/v1beta1/owner.proto";
+import "buf/registry/owner/v1/owner.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
 
 // Operate on Users and Organizations in situations where you only
 // know a reference to an owner, without knowing whether or not that

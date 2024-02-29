@@ -1,0 +1,59 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
+
+// A file that can be read or written to from disk.
+//
+// A File includes a path and associated content.
+// Files are purposefully simple, and do not include attributes such as permissions.
+message File {
+  // The path of the File.
+  //
+  // The path must be relative, and cannot contain any "." or ".." components.
+  // The separator "/" must be used.
+  string path = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      max_len: 4096,
+      not_contains: "\\",
+      pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
+    }
+  ];
+  // The content of the File.
+  //
+  // May be empty.
+  bytes content = 2;
+}
+
+// A specific file type.
+enum FileType {
+  FILE_TYPE_UNSPECIFIED = 0;
+  // A .proto file.
+  FILE_TYPE_PROTO = 1;
+  // A documentation file.
+  //
+  // Documentation files are always named README.md, README.markdown, or buf.md.
+  FILE_TYPE_DOC = 2;
+  // A license file.
+  //
+  // License files are always named LICENSE.
+  FILE_TYPE_LICENSE = 3;
+}

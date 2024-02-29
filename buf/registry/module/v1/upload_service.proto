@@ -14,15 +14,15 @@
 
 syntax = "proto3";
 
-package buf.registry.module.v1beta1;
+package buf.registry.module.v1;
 
-import "buf/registry/module/v1beta1/commit.proto";
-import "buf/registry/module/v1beta1/file.proto";
-import "buf/registry/module/v1beta1/label.proto";
-import "buf/registry/module/v1beta1/module.proto";
+import "buf/registry/module/v1/commit.proto";
+import "buf/registry/module/v1/file.proto";
+import "buf/registry/module/v1/label.proto";
+import "buf/registry/module/v1/module.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
 // Upload contents.
 service UploadService {
@@ -33,19 +33,6 @@ service UploadService {
 }
 
 message UploadRequest {
-  // A dependency of one or more references specified by Contents.
-  //
-  // Dependencies between Contents are implicit and do not need to be specified. The BSR will detect
-  // dependencies between Contents via .proto imports.
-  message DepRef {
-    // The commit_id of the dependency.
-    string commit_id = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.uuid = true
-    ];
-    // The registry hostname of the dependency.
-    string registry = 2 [(buf.validate.field).required = true];
-  }
   // Content to upload for a given reference.
   message Content {
     // The Module of the reference.
@@ -79,18 +66,16 @@ message UploadRequest {
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
   // The dependencies of the references specified by Contents.
   //
+  // Dependencies between Contents are implicit and do not need to be specified. The BSR will detect
+  // dependencies between Contenta via .proto imports.
+  //
   // This will include all transitive dependencies.
   //
-  // Dependencies between Contents are implicit and do not need to be specified. The BSR will detect
-  // dependencies between Contents via .proto imports.
-  //
-  // Commits should be unique by Module, that is no two dep_refs should have the same Module but
+  // Commits should be unique by Module, that is no two dep_commit_ids should have the same Module but
   // different Commit IDs.
-  repeated DepRef dep_refs = 2;
+  repeated string dep_commit_ids = 2 [(buf.validate.field).repeated.items.string.uuid = true];
 }
 
-// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
-// and not this package.
 message UploadResponse {
   // The Commits for each reference in the same order as given on the request.
   //

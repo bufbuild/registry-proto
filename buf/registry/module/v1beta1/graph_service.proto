@@ -37,6 +37,15 @@ service GraphService {
 }
 
 message GetGraphRequest {
+  // A ResourceRef to reference a Commit to include in the Graph.
+  //
+  // This wraps the top-level ResourceRef.
+  message ResourceRef {
+    // The top-level ResourceRef.
+    buf.registry.module.v1beta1.ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
+    // The registry hostname of the Resourceref.
+    string registry = 2 [(buf.validate.field).required = true];
+  }
   // The references to resolve to Commits to include in the graph.
   //
   // See the documentation on ResourceRef for resource resolution details.
@@ -61,6 +70,8 @@ message GetGraphRequest {
   DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
+// See the package documentation for more details. You should likely use buf.registry.module.v1beta1
+// and not this package.
 message GetGraphResponse {
   // The Graph calculated for the Commits.
   Graph graph = 1 [(buf.validate.field).required = true];
