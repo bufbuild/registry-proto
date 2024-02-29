@@ -1,0 +1,132 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
+
+// A module within the BSR.
+message Module {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Module.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The time the Module was created on the BSR.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The last time the Module was updated on the BSR.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  // The name of the Module.
+  //
+  // Unique within a given User or Organization.
+  string name = 4 [(buf.validate.field).string = {
+    min_len: 2,
+    max_len: 100
+  }];
+  // The id of the User or Organization that owns the Module.
+  string owner_id = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The Module's visibility, either public or private.
+  ModuleVisibility visibility = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The Module state, either active or deprecated.
+  ModuleState state = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The configurable description of the Module.
+  string description = 8 [(buf.validate.field).string.max_len = 350];
+  // The configurable URL in the description of the Module,
+  string url = 9 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+  ];
+  // The name of the default Label of the Module.
+  //
+  // This Label may not yet exist. When a Module is created, it has no Commits, and Labels
+  // must have a Commit, so this Label is not created when a Module is created. Additionally,
+  // a User may modify the name of the default Label without this Label yet being created.
+  //
+  // This could also be the name of an archived Label. An important note, an archived Label
+  // will not be considered a valid ResourceRef for resolving a Module. Archived Labels
+  // can only be retrieved using LabelService.GetLabels.
+  string default_label_name = 10 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 250
+  ];
+}
+
+// The visibility of a Module, currently either public or private.
+enum ModuleVisibility {
+  MODULE_VISIBILITY_UNSPECIFIED = 0;
+  // MODULE_VISIBILITY_PUBLIC says that the module is publicly available.
+  MODULE_VISIBILITY_PUBLIC = 1;
+  // MODULE_VISIBILITY_PRIVATE says that the module is private.
+  MODULE_VISIBILITY_PRIVATE = 2;
+}
+
+// The state of a Module, currently either active or deprecated.
+enum ModuleState {
+  MODULE_STATE_UNSPECIFIED = 0;
+  // MODULE_STATE_ACTIVE says that the Module is currently active.
+  MODULE_STATE_ACTIVE = 1;
+  // MODULE_STATE_DEPRECATED says that the Module has been deprecated and should not longer be
+  // used.
+  MODULE_STATE_DEPRECATED = 2;
+}
+
+// ModuleRef is a reference to a Module, either an id or a fully-qualified name.
+//
+// This is used in requests.
+message ModuleRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The fully-qualified name of a Module within a BSR instance.
+  //
+  // A Name uniquely identifies a Module.
+  // This is used for requests when a caller only has the module name and not the ID.
+  message Name {
+    // The name of the owner of the Module, either a User or Organization.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 32
+    ];
+    // The name of the Module.
+    string module = 2 [(buf.validate.field).string = {
+      min_len: 2,
+      max_len: 100
+    }];
+  }
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Module.
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    // The fully-qualified name of the Module.
+    Name name = 2;
+  }
+}

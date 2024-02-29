@@ -1,0 +1,45 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1;
+
+import "buf/registry/module/v1/resource.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
+
+// Operate on Resources.
+service ResourceService {
+  // Get Resources.
+  rpc GetResources(GetResourcesRequest) returns (GetResourcesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message GetResourcesRequest {
+  // References to request a Resource for.
+  //
+  // See the documentation on ResourceRef for resource resolution details.
+  repeated ResourceRef resource_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetResourcesResponse {
+  // The found Resources in the same order as requested.
+  repeated Resource resources = 1 [(buf.validate.field).repeated.min_items = 1];
+}

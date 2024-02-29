@@ -1,0 +1,166 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
+
+// A label on a specific Module.
+//
+// Many Labels can be associated with one Commit.
+message Label {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Label.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The time the Label was created on the BSR.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The last time the Label was updated on the BSR.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  // Whether or not the Label was archived.
+  //
+  // If a Label is archived, the API considers it to not exist and will not return archived
+  // Labels, except when calling LabelService.GetLabels.
+  bool archived = 4;
+  // The name of the Label.
+  //
+  // Unique within a given Module.
+  string name = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 250
+  ];
+  // The id of the User or Organization that owns the Module that the Label is associated with.
+  string owner_id = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The id of the Module that the Label is associated with.
+  string module_id = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The id of the Commit currently associated with the Label.
+  //
+  // If policy checks are enabled, this will point to the most recent Commit that passed or was approved.
+  // To get the history of the Commits that have been associated with a Label, use ListLabelHistory.
+  string commit_id = 8 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The id of the User that last updated this Label on the BSR.
+  string updated_by_user_id = 9 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The CommitCheckState for the Commit the Label points to.
+  //
+  // The CommitCheckStatus will always be disabled, passed, or approved, since Labels will
+  // never point to pending or rejected Commits.
+  //
+  // TODO: Add custom CEL validation to validate the status field is one of DISABLED, PASSED, APPROVED.
+  CommitCheckState commit_check_state = 10 [(buf.validate.field).required = true];
+}
+
+// The state of a Commit's policy checks for a particular Label.
+//
+// Policy checks are an enterprise-only feature - contact us to learn more!
+message CommitCheckState {
+  // The status of the policy check.
+  CommitCheckStatus status = 1 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).required = true
+  ];
+  // The time the policy check state was last updated.
+  //
+  // If the status is disabled, this will be equal to the Commit create_time.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+}
+
+// A check status for a Commit.
+//
+// Policy checks are an enterprise-only feature - contact us to learn more!
+enum CommitCheckStatus {
+  COMMIT_CHECK_STATUS_UNSPECIFIED = 0;
+  // Policy checks were not enabled when the Commit was created.
+  COMMIT_CHECK_STATUS_DISABLED = 1;
+  // The Commit did not fail any policy checks and therefore did not need review.
+  COMMIT_CHECK_STATUS_PASSED = 2;
+  // The Commit has not yet been reviewed after failing policy checks and is pending.
+  COMMIT_CHECK_STATUS_PENDING = 3;
+  // The Commit was reviewed after failing policy checks and was rejected.
+  COMMIT_CHECK_STATUS_REJECTED = 4;
+  // The Commit was reviewed after failing policy checks and was approved.
+  COMMIT_CHECK_STATUS_APPROVED = 5;
+}
+
+// LabelRef is a reference to a Label, either an id or a fully-qualified name.
+//
+// This is used in requests.
+message LabelRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The fully-qualified name of a Label within a BSR instance.
+  //
+  // A Name uniquely identifies a Label.
+  // This is used for requests when a caller only has the label name and not the ID.
+  message Name {
+    // The name of the owner of the Module that contains the Label, either a User or Organization.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 32
+    ];
+    // The name of the Module that contains the Label, either a User or Organization.
+    string module = 2 [(buf.validate.field).string = {
+      min_len: 2,
+      max_len: 100
+    }];
+    // The Label name.
+    string label = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 250
+    ];
+  }
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Label.
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    // The fully-qualified name of the Label.
+    Name name = 2;
+  }
+}
+
+// A reference to a Label scoped to a Module, either an id or a name.
+//
+// This is used in requests.
+message ScopedLabelRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Label.
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    // The name of the Label.
+    string name = 2;
+  }
+}
