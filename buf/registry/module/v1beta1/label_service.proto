@@ -144,6 +144,11 @@ message ListLabelHistoryRequest {
   uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
   // The page to start from.
   //
+  // The value may be a page_token returned from ListLabelHistoryResponse,
+  // or it may be a Commit id.
+  //
+  // If a Commit id, the returned history will start at that Commit.
+  //
   // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The Label to list history for.
