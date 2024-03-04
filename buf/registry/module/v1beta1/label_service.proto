@@ -171,7 +171,10 @@ message ListLabelHistoryRequest {
   // The Commit id to start from.
   //
   // It is an error to provide a Commit id that doesn't exist on the Label.
-  string start_commit_id = 7 [(buf.validate.field).string.uuid = true];
+  string start_commit_id = 7 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+  ];
 }
 
 message ListLabelHistoryResponse {
