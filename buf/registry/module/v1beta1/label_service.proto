@@ -168,6 +168,10 @@ message ListLabelHistoryRequest {
   //
   // If not set, Commits with any CommitCheckStatus value are returned.
   repeated CommitCheckStatus commit_check_statuses = 6 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  // The Commit id to start from.
+  //
+  // It is an error to provide a Commit id that doesn't exist on the Label.
+  string start_commit_id = 7 [(buf.validate.field).string.uuid = true];
 }
 
 message ListLabelHistoryResponse {
