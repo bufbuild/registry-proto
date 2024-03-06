@@ -175,6 +175,9 @@ message ListLabelHistoryRequest {
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
+  // Whether or not to only return Commits that represent a change in the Protobuf schema
+  // compared to the previous Commit on this Label.
+  bool only_protobuf_changes = 8;
 }
 
 message ListLabelHistoryResponse {
