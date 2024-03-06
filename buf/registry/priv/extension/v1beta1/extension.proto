@@ -59,7 +59,7 @@ message MessageConstraints {
   // The given message should only be recursively used as part of RPCs that are marked
   // as NO_SIDE_EFFECTS. Typically used to denote that a message should
   // only be used in read-only contexts.
-  ///
+  //
   // This applies to all nested messages within the message that are marked as no_side_effects_only.
   //
   // This is not just for request/response messages, this is also for any message that

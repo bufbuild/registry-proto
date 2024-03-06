@@ -113,7 +113,7 @@ message ListUsersRequest {
 message ListUsersResponse {
   // The next page token.
   //
-  /// If empty, there are no more pages.
+  // If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The list of Users.
   repeated User users = 2;

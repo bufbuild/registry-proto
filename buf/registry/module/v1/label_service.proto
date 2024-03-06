@@ -120,7 +120,7 @@ message ListLabelsRequest {
 message ListLabelsResponse {
   // The next page token.
   //
-  /// If empty, there are no more pages.
+  // If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The listed Labels.
   repeated Label labels = 2;
@@ -176,10 +176,9 @@ message ListLabelHistoryResponse {
     // The CommitCheckState for this Commit on this Label.
     CommitCheckState commit_check_state = 2 [(buf.validate.field).required = true];
   }
-
   // The next page token.
   //
-  /// If empty, there are no more pages.
+  // If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The ordered history of the Label.
   repeated Value values = 2;
