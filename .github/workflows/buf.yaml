@@ -33,6 +33,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs:
       - lint
+      - breaking
     steps:
       - uses: actions/checkout@v4
       - name: Install buf cli
