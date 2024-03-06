@@ -175,9 +175,9 @@ message ListLabelHistoryRequest {
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
-  // Whether or not to only return Commits that represent a change in the Protobuf schema
-  // compared to the previous Commit on this Label.
-  bool only_protobuf_changes = 8;
+  // Whether or not to only return Commits where the content changed
+  // compared to the previous Commit in the history of this Label.
+  bool only_content_changes = 8;
 }
 
 message ListLabelHistoryResponse {
@@ -186,9 +186,9 @@ message ListLabelHistoryResponse {
     Commit commit = 1 [(buf.validate.field).required = true];
     // The CommitCheckState for this Commit on this Label.
     CommitCheckState commit_check_state = 2 [(buf.validate.field).required = true];
-    // Whether or not this Commit represents a change in the Protobuf schema
-    // compared to the previous Commit on this Label.
-    bool protobuf_change = 3;
+    // Whether or not the content of this Commit is different
+    // compared to the previous Commit in the history of this Label.
+    bool content_change = 3;
   }
   // The next page token.
   //
