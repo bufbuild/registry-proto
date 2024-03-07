@@ -178,9 +178,6 @@ message ListLabelHistoryResponse {
     Commit commit = 1 [(buf.validate.field).required = true];
     // The CommitCheckState for this Commit on this Label.
     CommitCheckState commit_check_state = 2 [(buf.validate.field).required = true];
-    // Whether or not the content of this Commit is different
-    // compared to the previous Commit in the history of this Label.
-    bool content_change = 3;
   }
   // The next page token.
   //
