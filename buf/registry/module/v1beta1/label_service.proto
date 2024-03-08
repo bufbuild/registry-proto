@@ -175,9 +175,9 @@ message ListLabelHistoryRequest {
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
-  // Whether or not to only return Commits where the content changed
-  // compared to the previous Commit in the history of this Label.
-  bool only_content_changes = 8;
+  // Only list Commits where the Digest has changed from the previous Commit in the
+  // history of this Label.
+  bool only_commits_with_changed_digests = 8;
 }
 
 message ListLabelHistoryResponse {
