@@ -116,6 +116,8 @@ message ListLabelsRequest {
   //
   // TODO: Add custom CEL validation to validate the status field is one of DISABLED, PASSED, APPROVED.
   repeated CommitCheckStatus commit_check_statuses = 5 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  // Only return Labels with a name that contains this string.
+  string name = 6;
 }
 
 message ListLabelsResponse {
