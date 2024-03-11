@@ -89,7 +89,7 @@ message ListCommitsRequest {
   // TODO: We are purposefully not making the default the zero enum value, however
   // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
-  // Only return Commits with an id that contains this string.
+  // Only return Commits with an id that contains this string using a case-insensitive comparison.
   string id_query = 5 [(buf.validate.field).string.max_len = 32];
 }
 
