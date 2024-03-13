@@ -55,6 +55,12 @@ service LabelService {
   rpc ArchiveLabels(ArchiveLabelsRequest) returns (ArchiveLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
+  // Unarchive existing Labels.
+  //
+  // This operation is atomic. Either all Labels are unarchived or an error is returned.
+  rpc UnarchiveLabels(UnarchiveLabelsRequest) returns (UnarchiveLabelsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
 }
 
 message GetLabelsRequest {
@@ -234,3 +240,13 @@ message ArchiveLabelsRequest {
 }
 
 message ArchiveLabelsResponse {}
+
+message UnarchiveLabelsRequest {
+  // The Labels to unarchive.
+  repeated LabelRef label_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UnarchiveLabelsResponse {}
