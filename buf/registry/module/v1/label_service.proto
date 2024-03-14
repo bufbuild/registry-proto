@@ -40,7 +40,7 @@ service LabelService {
   // Create or update Labels on a Module.
   //
   // If the Label does not exist, it will be created.
-  // If the Label was previously deleted, it will be undeleted first.
+  // If the Label was deleted, it will be undeleted.
   // If the Label already existed, the Commit in the request has to be newer than the Commit that
   // the Label is currently pointing to, otherwise an error is returned.
   //
@@ -201,7 +201,7 @@ message CreateOrUpdateLabelsRequest {
     // If the Label already existed, the Label will now point to this Commit, as long as this Commit
     // is newer than the Commit that the Label is currently pointing to, otherwise an error is
     // returned.
-    // If the Label was previously deleted, it will be undeleted.
+    // If the Label was deleted, it will be undeleted.
     string commit_id = 2 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.uuid = true
