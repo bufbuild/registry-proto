@@ -47,8 +47,7 @@ message Resource {
 // ResourceRefs can only be used in requests, and only for read-only RPCs, that is
 // you should not use an arbitrary reference when modifying a specific resource.
 //
-// ResourceRefs cannot reference archived Labels. The only way to retrieve an archived Label
-// is to use LabelService.GetLabels.
+// ResourceRefs cannot reference archived Labels.
 message ResourceRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
   option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
