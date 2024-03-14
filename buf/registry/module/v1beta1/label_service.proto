@@ -55,6 +55,12 @@ service LabelService {
   rpc DeleteLabels(DeleteLabelsRequest) returns (DeleteLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
+  // Undelete deleted Labels.
+  //
+  // This operation is atomic. Either all Labels are undeleted or an error is returned.
+  rpc UndeleteLabels(UndeleteLabelsRequest) returns (UndeleteLabelsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
 }
 
 message GetLabelsRequest {
@@ -230,3 +236,16 @@ message DeleteLabelsRequest {
 }
 
 message DeleteLabelsResponse {}
+
+message UndeleteLabelsRequest {
+  // The Labels to undelete.
+  repeated LabelRef label_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UndeleteLabelsResponse {
+  // The undeleted Labels in the same order as given on the request.
+  repeated Label labels = 1 [(buf.validate.field).repeated.min_items = 1];
+}

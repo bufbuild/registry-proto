@@ -237,4 +237,7 @@ message UndeleteLabelsRequest {
   ];
 }
 
-message UndeleteLabelsResponse {}
+message UndeleteLabelsResponse {
+  // The undeleted Labels in the same order as given on the request.
+  repeated Label labels = 1 [(buf.validate.field).repeated.min_items = 1];
+}
