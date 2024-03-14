@@ -40,7 +40,7 @@ service LabelService {
   // Create or update Labels on a Module.
   //
   // If the Label does not exist, it will be created.
-  // If the Label was archived, it will be unarchived.
+  // If the Label was previously deleted, it will be undeleted first.
   // If the Label already existed, the Commit in the request has to be newer than the Commit that
   // the Label is currently pointing to, otherwise an error is returned.
   //
@@ -48,18 +48,22 @@ service LabelService {
   rpc CreateOrUpdateLabels(CreateOrUpdateLabelsRequest) returns (CreateOrUpdateLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
-  // Archive existing Labels.
+  // Delete existing Labels.
   //
-  // This operation is atomic. Either all Labels are archived or an error is returned.
-  rpc ArchiveLabels(ArchiveLabelsRequest) returns (ArchiveLabelsResponse) {
+  // This operation is atomic. Either all Labels are deleted or an error is returned.
+  rpc DeleteLabels(DeleteLabelsRequest) returns (DeleteLabelsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Undelete deleted Labels.
+  //
+  // This operation is atomic. Either all Labels are undeleted or an error is returned.
+  rpc UndeleteLabels(UndeleteLabelsRequest) returns (UndeleteLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
 }
 
 message GetLabelsRequest {
   // The Labels to request.
-  //
-  // This may reference archived Labels.
   repeated LabelRef label_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
@@ -148,8 +152,6 @@ message ListLabelHistoryRequest {
   // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The Label to list history for.
-  //
-  // This may reference archived Labels.
   LabelRef label_ref = 3 [(buf.validate.field).required = true];
   // The order to list the Labels.
   //
@@ -199,7 +201,7 @@ message CreateOrUpdateLabelsRequest {
     // If the Label already existed, the Label will now point to this Commit, as long as this Commit
     // is newer than the Commit that the Label is currently pointing to, otherwise an error is
     // returned.
-    // If the Label was archived, it will be unarchived.
+    // If the Label was previously deleted, it will be undeleted.
     string commit_id = 2 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.uuid = true
@@ -217,12 +219,22 @@ message CreateOrUpdateLabelsResponse {
   repeated Label labels = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message ArchiveLabelsRequest {
-  // The Labels to archive.
+message DeleteLabelsRequest {
+  // The Labels to delete.
   repeated LabelRef label_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
 }
 
-message ArchiveLabelsResponse {}
+message DeleteLabelsResponse {}
+
+message UndeleteLabelsRequest {
+  // The Labels to undelete.
+  repeated LabelRef label_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UndeleteLabelsResponse {}

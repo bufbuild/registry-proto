@@ -50,7 +50,7 @@ message UploadRequest {
     // If no labels are referenced, the default Label for the Module is used.
     //
     // If the Labels do not exist, they will be created.
-    // If the Labels were archived, they will be unarchived.
+    // If the Labels were deleted, they will be undeleted.
     repeated ScopedLabelRef scoped_label_refs = 3;
     // The URL of the source control commit to associate with the Commit for this Content.
     //
