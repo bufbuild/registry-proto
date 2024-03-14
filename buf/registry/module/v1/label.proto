@@ -37,8 +37,10 @@ message Label {
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
   // The last time the Label was updated on the BSR.
   google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
-  // Whether or not the Label is archived.
-  bool archived = 4;
+  // The time the Label was archived if it is currently archived.
+  //
+  // If this field is not set, the Label is not currently archived.
+  google.protobuf.Timestamp archived_time = 4;
   // The name of the Label.
   //
   // Unique within a given Module.
