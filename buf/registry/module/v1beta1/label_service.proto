@@ -135,6 +135,8 @@ message ListLabelsRequest {
   // Only return Labels with a name that contains this string using a case-insensitive comparison.
   string name_query = 6 [(buf.validate.field).string.max_len = 250];
   // The archived filter on the returned Labels.
+  //
+  // If not specified, defaults to ARCHIVE_FILTER_ONLY_UNARCHIVED.
   ArchivedFilter archived_filter = 7 [(buf.validate.field).enum.defined_only = true];
 }
 
