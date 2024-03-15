@@ -150,9 +150,6 @@ message ListLabelHistoryRequest {
   // The order to list the Labels.
   //
   // If not specified, defaults to ORDER_DESC.
-  //
-  // TODO: We are purposefully not making the default the zero enum value, however
-  // we may want to consider this.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
   // Only return Commits that have one of these CommitCheckStatus values for this label.
   //
