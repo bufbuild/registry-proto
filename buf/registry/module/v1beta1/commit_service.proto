@@ -91,11 +91,7 @@ message ListCommitsRequest {
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Commits.
   //
-  // If not specified, defaults to ORDER_CREATE_TIME_ASC.
-  //
-  // TODO: Do we want ORDER_CREATE_TIME_ASC to be the default?
-  // TODO: We are purposefully not making the default the zero enum value, however
-  // we may want to consider this.
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
   // The DigestType to use for Digests returned on Commits.
   //
