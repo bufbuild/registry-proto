@@ -58,10 +58,10 @@ message ListCommitsRequest {
   // The list order.
   enum Order {
     ORDER_UNSPECIFIED = 0;
-    // Order by create_time oldest to newest.
-    ORDER_CREATE_TIME_ASC = 1;
     // Order by create_time newest to oldest.
-    ORDER_CREATE_TIME_DESC = 2;
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
   }
   // The maximum number of items to return.
   //
