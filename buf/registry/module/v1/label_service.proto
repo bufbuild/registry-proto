@@ -54,6 +54,12 @@ service LabelService {
   rpc ArchiveLabels(ArchiveLabelsRequest) returns (ArchiveLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
+  // Unarchive existing Labels.
+  //
+  // This operation is atomic. Either all Labels are unarchived or an error is returned.
+  rpc UnarchiveLabels(UnarchiveLabelsRequest) returns (UnarchiveLabelsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
 }
 
 message GetLabelsRequest {
@@ -79,6 +85,16 @@ message ListLabelsRequest {
     ORDER_CREATE_TIME_DESC = 1;
     // Order by create_time oldest to newest.
     ORDER_CREATE_TIME_ASC = 2;
+  }
+  // A filter on whether a Label is archived or not.
+  enum ArchiveFilter {
+    ARCHIVE_FILTER_UNSPECIFIED = 0;
+    // Return only unarchived labels.
+    ARCHIVE_FILTER_UNARCHIVED_ONLY = 1;
+    // Return only archived labels.
+    ARCHIVE_FILTER_ARCHIVED_ONLY = 2;
+    // Return both archived and unarchived labels.
+    ARCHIVE_FILTER_ALL = 3;
   }
   // The maximum number of items to return.
   //
@@ -118,6 +134,10 @@ message ListLabelsRequest {
   }];
   // Only return Labels with a name that contains this string using a case-insensitive comparison.
   string name_query = 6 [(buf.validate.field).string.max_len = 250];
+  // The archive filter on the returned Labels.
+  //
+  // If not specified, defaults to ARCHIVE_FILTER_UNARCHIVED_ONLY.
+  ArchiveFilter archive_filter = 7 [(buf.validate.field).enum.defined_only = true];
 }
 
 message ListLabelsResponse {
@@ -224,3 +244,13 @@ message ArchiveLabelsRequest {
 }
 
 message ArchiveLabelsResponse {}
+
+message UnarchiveLabelsRequest {
+  // The Labels to unarchive.
+  repeated LabelRef label_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UnarchiveLabelsResponse {}
