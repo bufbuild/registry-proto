@@ -87,7 +87,7 @@ message ListLabelsRequest {
     // Order by create_time oldest to newest.
     ORDER_CREATE_TIME_ASC = 2;
   }
-  // The filter on the archived field of a Label.
+  // A filter on whether a Label is archived or not.
   enum ArchiveFilter {
     ARCHIVE_FILTER_UNSPECIFIED = 0;
     // Return only unarchived labels.
