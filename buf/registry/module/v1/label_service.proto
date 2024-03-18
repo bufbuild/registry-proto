@@ -87,14 +87,14 @@ message ListLabelsRequest {
     ORDER_CREATE_TIME_ASC = 2;
   }
   // The filter on the archived field of a Label.
-  enum ArchivedFilter {
-    ARCHIVED_FILTER_UNSPECIFIED = 0;
+  enum ArchiveFilter {
+    ARCHIVE_FILTER_UNSPECIFIED = 0;
     // Return only unarchived labels.
-    ARCHIVED_FILTER_ONLY_UNARCHIVED = 1;
+    ARCHIVE_FILTER_UNARCHIVED_ONLY = 1;
     // Return only archived labels.
-    ARCHIVED_FILTER_ONLY_ARCHIVED = 2;
+    ARCHIVE_FILTER_ARCHIVED_ONLY = 2;
     // Return both archived and unarchived labels.
-    ARCHIVED_FILTER_NONE = 3;
+    ARCHIVE_FILTER_ALL = 3;
   }
   // The maximum number of items to return.
   //
@@ -134,10 +134,10 @@ message ListLabelsRequest {
   }];
   // Only return Labels with a name that contains this string using a case-insensitive comparison.
   string name_query = 6 [(buf.validate.field).string.max_len = 250];
-  // The archived filter on the returned Labels.
+  // The archive filter on the returned Labels.
   //
-  // If not specified, defaults to ARCHIVE_FILTER_ONLY_UNARCHIVED.
-  ArchivedFilter archived_filter = 7 [(buf.validate.field).enum.defined_only = true];
+  // If not specified, defaults to ARCHIVE_FILTER_UNARCHIVED_ONLY.
+  ArchiveFilter archive_filter = 7 [(buf.validate.field).enum.defined_only = true];
 }
 
 message ListLabelsResponse {
