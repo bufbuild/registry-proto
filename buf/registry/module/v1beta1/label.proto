@@ -76,9 +76,14 @@ message Label {
   //
   // The CommitCheckStatus will always be disabled, passed, or approved, since Labels will
   // never point to pending or rejected Commits.
-  //
-  // TODO: Add custom CEL validation to validate the status field is one of DISABLED, PASSED, APPROVED.
-  CommitCheckState commit_check_state = 10 [(buf.validate.field).required = true];
+  CommitCheckState commit_check_state = 10 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "label_commit_check_state_status",
+      message: "commit_check_state must have a status of DISABLED, PASSED, or APPROVED",
+      expression: "this.status in [1, 2, 5]",
+    }
+  ];
 }
 
 // The state of a Commit's policy checks for a particular Label.
