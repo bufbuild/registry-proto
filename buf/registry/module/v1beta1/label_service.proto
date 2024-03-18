@@ -109,9 +109,10 @@ message ListLabelsRequest {
   //
   // It is an error to filter on CommitCheckStatuses of pending or rejected, as Labels will only
   // point to Commits that are passed or approved, or that have policy checks disabled.
-  //
-  // TODO: Add custom CEL validation to validate the status field is one of DISABLED, PASSED, APPROVED.
-  repeated CommitCheckStatus commit_check_statuses = 5 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  repeated CommitCheckStatus commit_check_statuses = 5 [(buf.validate.field).repeated.items.enum = {
+    defined_only: true,
+    in: [1, 2, 5]
+  }];
   // Only return Labels with a name that contains this string using a case-insensitive comparison.
   string name_query = 6 [(buf.validate.field).string.max_len = 250];
 }
