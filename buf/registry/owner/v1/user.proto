@@ -97,7 +97,6 @@ enum UserVerificationStatus {
   // The User is verified.
   USER_VERIFICATION_STATUS_VERIFIED = 2;
   // The User is an official user of the BSR owner.
-  // TODO: should this exist?
   USER_VERIFICATION_STATUS_OFFICIAL = 3;
 }
 
