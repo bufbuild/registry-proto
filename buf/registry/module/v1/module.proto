@@ -29,7 +29,7 @@ message Module {
   // The id of the Module.
   string id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The time the Module was created on the BSR.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
@@ -45,7 +45,7 @@ message Module {
   // The id of the User or Organization that owns the Module.
   string owner_id = 5 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The Module's visibility, either public or private.
   ModuleVisibility visibility = 6 [
@@ -123,7 +123,7 @@ message ModuleRef {
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Module.
-    string id = 1 [(buf.validate.field).string.uuid = true];
+    string id = 1 [(buf.validate.field).string.tuuid = true];
     // The fully-qualified name of the Module.
     Name name = 2;
   }

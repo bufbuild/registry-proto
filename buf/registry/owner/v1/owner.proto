@@ -45,7 +45,7 @@ message OwnerRef {
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the User or Organization.
-    string id = 1 [(buf.validate.field).string.uuid = true];
+    string id = 1 [(buf.validate.field).string.tuuid = true];
     // The name of the User or Organization.
     string name = 2 [(buf.validate.field).string = {
       min_len: 2;
