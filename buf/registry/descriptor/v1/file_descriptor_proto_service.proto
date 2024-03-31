@@ -73,12 +73,12 @@ message GetFileDescriptorProtosRequest {
   // With the new Editions work, options are either runtime-retention or source-retention.
   // Setting this option will exclude the latter.
   bool exclude_source_retention_options = 4;
-  // Exclude FileDescriptorProtoInfos from the response.
+  // Exclude FileDescriptorProtoExtensions from the response.
   //
-  // FileDescriptorProtoInfos contain additional information about FileDescriptorProtos.
+  // FileDescriptorProtoExtensions contain additional information about FileDescriptorProtos.
   // We include this information in a separate message as FileDescriptorProtos are not
   // extendable, and we do not want to modify the FileDescriptorProto shape.
-  bool exclude_file_descriptor_proto_infos = 5;
+  bool exclude_file_descriptor_proto_extensions = 5;
   // Only include specific symbols (and symbols that they reference, if exclude_imports is not set).
   //
   // A symbol is a package, message, enum, service, method, or extension.
