@@ -1,0 +1,74 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.descriptor.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/descriptor/v1";
+
+// Additional information about a FileDescriptorProto.
+//
+// FileDescriptoProtos are not extendable, so we choose to sideband this information as opposed
+// to creating a new FileDescriptoProto type, so that the FileDescriptorProtoService can return
+// standard FileDescriptorProtos that most expect.
+message FileDescriptorProtoExtension {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Commit that the file was created from.
+  //
+  // If the file was created from a Well-Known Type, this will point to
+  // a Commit within a Module that contains only the Well-Known Types. For the public BSR,
+  // this is currently buf.build/protocolbuffers/wellknowntypes.
+  string commit_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // Whether or not the file is an import.
+  //
+  // A file is an import if:
+  //
+  //   - It comes from a dependency of the Module specified via the ResourceRef used in the request.
+  //     For example, if the ResourceRef specifies "buf.build/foo/bar", which depends on
+  //     "buf.build/foo/baz", all files from "buf.build/foo/baz" will be imports.
+  //   - It is a Well-Known Type, and the Well-Known Type was not part of the Module specified
+  //     via the ResourceRef used in the request. Well-Known Types are special in the Protobuf ecosystem,
+  //     and can be imported without being contained in a specified module.
+  //   - It contains symbols that are referenced by symbols specified in the request. For example,
+  //     if the request specified symbol "foo.v1.Foo" contained within "foo.proto", , which has a message
+  //     field of type "baz.v1.Baz", which is contained within "baz.proto", the the file "baz.proto"
+  //     will be marked as an import, regardless of which Module it derived from. If the symbols field
+  //     is not specified on the request, this situation will never occur.
+  //
+  // If exclude_imports was specified on the request, no FileDescriptorProtos will be imports.
+  bool is_import = 2;
+  // The explicitly-specified syntax within the file.
+  //
+  // If the syntax field is not set within a file, this is interpreted as the syntax "proto2".
+  // The protoc compiler does not set the syntax field if the syntax was "proto2", regardless of if
+  // the syntax was explicitly specified or not. This prevents programs (such as linters) from
+  // determining whether or not a syntax was explicitly specified within a file
+  //
+  // As opposed to syntax on a FileDescriptorProto, this field will be empty if no syntax was
+  // explicitly specified, and "proto2" if "proto2" was explicitly specified. Otherwise, this
+  // field matches the semantics of the syntax field on FileDescriptorProtos.
+  string specified_syntax = 3;
+  // The indexes within the dependency field on the FileDescriptorProto that are not used.
+  //
+  // The matches the shape of the public_dependency and weak_dependency fields on FileDescriptorProto.
+  repeated int32 unused_dependency = 4;
+}
