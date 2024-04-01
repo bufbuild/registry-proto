@@ -59,7 +59,7 @@ message ResourceRef {
   //     - If an id, this is equivalent to setting the id field on ResourceRef. However,
   //       backends can choose to validate that the owner and module fields match the resource
   //       referenced, as additional validation.
-  //     - If a name, this is interpreted to be a Label name or an ID of a Commit without any dashes.
+  //     - If a name, this is interpreted to be a Label name.
   //     - If there is a conflict between names across resources (for example, there is a Commit id
   //       and Label name of the same value), the following order of precedence is applied:
   //       - Commit
