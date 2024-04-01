@@ -41,7 +41,7 @@ message UploadRequest {
     // The commit_id of the dependency.
     string commit_id = 1 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.uuid = true
+      (buf.validate.field).string.tuuid = true
     ];
     // The registry hostname of the dependency.
     string registry = 2 [(buf.validate.field).required = true];

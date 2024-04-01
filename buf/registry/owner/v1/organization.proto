@@ -31,7 +31,7 @@ message Organization {
   // The id for the Organization.
   string id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The time the Organization was created.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
@@ -81,7 +81,7 @@ message OrganizationRef {
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Organization.
-    string id = 1 [(buf.validate.field).string.uuid = true];
+    string id = 1 [(buf.validate.field).string.tuuid = true];
     // The name of the Organization.
     string name = 2 [(buf.validate.field).string = {
       min_len: 2;

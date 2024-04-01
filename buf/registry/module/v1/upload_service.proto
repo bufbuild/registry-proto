@@ -73,7 +73,7 @@ message UploadRequest {
   //
   // Commits should be unique by Module, that is no two dep_commit_ids should have the same Module but
   // different Commit IDs.
-  repeated string dep_commit_ids = 2 [(buf.validate.field).repeated.items.string.uuid = true];
+  repeated string dep_commit_ids = 2 [(buf.validate.field).repeated.items.string.tuuid = true];
 }
 
 message UploadResponse {
