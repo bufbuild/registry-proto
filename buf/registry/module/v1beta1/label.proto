@@ -31,7 +31,7 @@ message Label {
   // The id of the Label.
   string id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The time the Label was created on the BSR.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
@@ -51,12 +51,12 @@ message Label {
   // The id of the User or Organization that owns the Module that the Label is associated with.
   string owner_id = 6 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The id of the Module that the Label is associated with.
   string module_id = 7 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The id of the Commit currently associated with the Label.
   //
@@ -64,12 +64,12 @@ message Label {
   // To get the history of the Commits that have been associated with a Label, use ListLabelHistory.
   string commit_id = 8 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The id of the User that last updated this Label on the BSR.
   string updated_by_user_id = 9 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The CommitCheckState for the Commit the Label points to.
   //
@@ -148,7 +148,7 @@ message LabelRef {
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Label.
-    string id = 1 [(buf.validate.field).string.uuid = true];
+    string id = 1 [(buf.validate.field).string.tuuid = true];
     // The fully-qualified name of the Label.
     Name name = 2;
   }
@@ -163,7 +163,7 @@ message ScopedLabelRef {
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Label.
-    string id = 1 [(buf.validate.field).string.uuid = true];
+    string id = 1 [(buf.validate.field).string.tuuid = true];
     // The name of the Label.
     string name = 2;
   }

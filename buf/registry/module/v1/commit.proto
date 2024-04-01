@@ -37,7 +37,7 @@ message Commit {
   // The id of the Commit.
   string id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The time the Commit was pushed to the BSR.
   //
@@ -46,12 +46,12 @@ message Commit {
   // The id of the User or Organization that owns the Module that the Commit is associated with.
   string owner_id = 3 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The id of the Module that the Commit is associated with.
   string module_id = 4 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The Digest of the Commit's contents.
   //
@@ -62,7 +62,7 @@ message Commit {
   // The id of the User that created this Commit on the BSR.
   //
   // May be empty if the User is no longer available.
-  string created_by_user_id = 6 [(buf.validate.field).string.uuid = true];
+  string created_by_user_id = 6 [(buf.validate.field).string.tuuid = true];
   // The URL of the source control commit that is associated with the Commit.
   //
   // BSR users can navigate to this link to find source control information that is relevant to this Commit

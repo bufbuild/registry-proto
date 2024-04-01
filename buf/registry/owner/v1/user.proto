@@ -31,7 +31,7 @@ message User {
   // The id for the User.
   string id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // The time the User was created.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
@@ -109,7 +109,7 @@ message UserRef {
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the User.
-    string id = 1 [(buf.validate.field).string.uuid = true];
+    string id = 1 [(buf.validate.field).string.tuuid = true];
     // The name of the User.
     string name = 2 [(buf.validate.field).string = {
       min_len: 2;

@@ -40,7 +40,7 @@ message Graph {
     // The commit of the node.
     string commit_id = 1 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.uuid = true
+      (buf.validate.field).string.tuuid = true
     ];
     // The registry hostname of the Node.
     string registry = 2 [(buf.validate.field).required = true];
