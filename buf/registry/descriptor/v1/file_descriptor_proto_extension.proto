@@ -36,7 +36,7 @@ message FileDescriptorProtoExtension {
   // this is currently buf.build/protocolbuffers/wellknowntypes.
   string commit_id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.tuuid = true
   ];
   // Whether or not the file is an import.
   //
