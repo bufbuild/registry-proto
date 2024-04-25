@@ -67,10 +67,9 @@ message Label {
     (buf.validate.field).string.tuuid = true
   ];
   // The id of the User that last updated this Label on the BSR.
-  string updated_by_user_id = 9 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.tuuid = true
-  ];
+  //
+  // May be empty if the User is no longer available.
+  string updated_by_user_id = 9 [(buf.validate.field).string.tuuid = true];
   // The CommitCheckState for the Commit the Label points to.
   //
   // The CommitCheckStatus will always be disabled, passed, or approved, since Labels will
