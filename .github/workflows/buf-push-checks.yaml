@@ -1,0 +1,32 @@
+name: Buf push checks
+on:
+  push:
+    branches:
+      - main
+permissions: read-all
+jobs:
+  buf-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Buf setup
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: 1.32.0-beta.1
+      - run: buf --version
+      - name: Buf build
+        run: buf build . --error-format github-actions
+      - name: Buf format
+        if: ${{ !contains(github.event.head_commit.message, 'buf skip format') }}
+        run: buf format . --diff --error-format github-actions --exit-code
+      - name: Buf lint
+        if: ${{ !contains(github.event.head_commit.message, 'buf skip lint') }}
+        run: buf lint . --error-format github-actions
+      - name: Checkout base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ gihub.event.before }}
+          path: .base
+      - name: Buf breaking
+        if: ${{ !contains(github.event.head_commit.message, 'buf skip breaking') }}
+        run: buf breaking . --error-format github-actions --against .base

@@ -1,0 +1,31 @@
+name: Buf PR
+on:
+  pull_request:
+    types: [opened,synchronize,reopened,labeled,unlabeled]
+permissions: read-all
+jobs:
+  buf-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Buf setup
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: 1.32.0-beta.1
+      - run: buf --version
+      - name: Buf build
+        run: buf build . --error-format github-actions
+      - name: Buf format
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'Buf Skip Format') }}
+        run: buf format . --diff --error-format github-actions --exit-code
+      - name: Buf lint
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'Buf Skip Lint') }}
+        run: buf lint . --error-format github-actions
+      - name: Checkout base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .base
+      - name: Buf breaking
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'Buf Skip Breaking') }}
+        run: buf breaking . --error-format github-actions --against .base

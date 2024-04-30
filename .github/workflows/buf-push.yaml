@@ -1,0 +1,16 @@
+name: Buf push
+on:
+  push
+permissions: read-all
+jobs:
+  buf-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Buf setup
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: 1.32.0-beta.1
+      - run: buf --version
+      - name: Buf push
+        run: buf push . --error-format=github-actions --git-metadata

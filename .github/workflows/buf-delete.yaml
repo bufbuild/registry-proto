@@ -1,0 +1,16 @@
+name: Buf delete
+on:
+  delete
+permissions: read-all
+jobs:
+  buf-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Buf setup
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: 1.32.0-beta.1
+      - run: buf --version
+      - name: Buf delete
+        run: echo "Action not supported for buf"
