@@ -1,0 +1,23 @@
+name: buf (Pull Request)
+on:
+  - pull_request
+jobs:
+  buf:
+    runs-on: ubuntu-latest
+    if: ${{ ! contains(github.event.pull_request.labels.*.name, 'Skip Buf Breaking') }}
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+      - name: Checkout PR base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .base
+      - name: Install buf cli
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: 1.32.0-beta.1 # remove this flag when 1.32.0 is released so we go back to always tracking latest.
+                                 # todo: use .bufversion or the env variable?
+          github_token: ${{ github.token }} # is this necessary?
+      - name: buf breaking against PR base
+        run: buf breaking --against .base --error-format github-actions

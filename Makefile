@@ -10,7 +10,8 @@ BIN := .tmp/bin
 export PATH := $(BIN):$(PATH)
 export GOBIN := $(abspath $(BIN))
 
-BUF_VERSION := v1.29.0
+BUF_VERSION_FILE := .bufversion
+BUF_VERSION := $(shell cat ${BUF_VERSION_FILE})
 COPYRIGHT_YEARS := 2023-2024
 
 .PHONY: help
@@ -35,7 +36,7 @@ build: $(BIN)/buf ## Build all APIs
 .PHONY: lint
 lint: $(BIN)/buf ## Lint all APIs
 	buf lint
-	buf format -d --exit-code
+	buf format --diff --exit-code
 
 .PHONY: upgrade
 upgrade: $(BIN)/buf ## Upgrade dependencies

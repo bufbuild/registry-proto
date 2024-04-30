@@ -1,0 +1,24 @@
+name: buf (Push)
+on:
+  - push
+jobs:
+  buf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install buf cli
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: 1.32.0-beta.1 # remove this flag when 1.32.0 is released so we go back to always tracking latest.
+                                 # todo: use .bufversion or the env variable?
+          github_token: ${{ github.token }} # is this necessary?
+      - name: buf build 
+        run: buf build --error-format github-actions
+      - name: buf format
+        run: buf format --diff --exit-code --error-format github-actions
+      - name: buf lint 
+        run: buf lint --error-format github-actions
+      - name: buf push
+        run: buf push --label ${{ github.ref }} --git-metadata --error-format github-actions
+        with:
+          buf_token: ${{ secrets.BUF_TOKEN }}
