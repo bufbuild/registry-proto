@@ -168,8 +168,11 @@ message UpdateModulesRequest {
     //
     // This Label may not yet exist.
     //
-    // This may point to an archived Label.
-    optional string default_label_name = 7 [(buf.validate.field).string.max_len = 250];
+    // This may not point to an archived Label.
+    optional string default_label_name = 7 [
+      (buf.validate.field).string.min_len = 1,
+      (buf.validate.field).string.max_len = 250
+    ];
   }
   // The Modules to update.
   repeated Value values = 1 [
