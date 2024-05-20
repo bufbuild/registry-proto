@@ -23,8 +23,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Additional information about a FileDescriptorProto.
 //
-// FileDescriptoProtos are not extendable, so we choose to sideband this information as opposed
-// to creating a new FileDescriptoProto type, so that the FileDescriptorProtoService can return
+// FileDescriptorProtos are not extendable, so we choose to sideband this information as opposed
+// to creating a new FileDescriptorProto type, so that the FileDescriptorProtoService can return
 // standard FileDescriptorProtos that most expect.
 message FileDescriptorProtoExtension {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
