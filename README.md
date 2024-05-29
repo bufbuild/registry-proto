@@ -10,8 +10,8 @@ and is designed to be suitable for use by any client.
 
 ## Getting started
 
-* [Browse the module documentation](https://buf.build/bufbuild/registry) to learn how to use the API.
-* Use a [Generated SDK](https://buf.build/bufbuild/registry/sdks) for your language,
+- [Browse the module documentation](https://buf.build/bufbuild/registry) to learn how to use the API.
+- Use a [Generated SDK](https://buf.build/bufbuild/registry/sdks) for your language,
   or [generated a client manually](https://buf.build/docs/generate/overview) using the `buf` CLI.
 
 ## Status: Stable
