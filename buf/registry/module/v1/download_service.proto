@@ -49,6 +49,7 @@ message DownloadRequest {
     //
     // If not set, all file types are returned.
     repeated FileType file_types = 2 [
+      (buf.validate.field).repeated.unique = true,
       (buf.validate.field).repeated.items.enum.defined_only = true,
       (buf.validate.field).repeated.items.enum.not_in = 0
     ];
