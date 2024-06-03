@@ -83,7 +83,7 @@ message ListCommitsRequest {
   //
   // See the documentation on Ref for resource resolution details.
   //
-  // Once the resource is resolved, the following Commits are listed:
+  // Once the resource is resolved, the following Commits are listed (subject to any additional filters in the request):
   //   - If a Module is referenced, all Commits for the Module are returned.
   //   - If a Label is referenced, the Commit the Label points to is returned.
   //     Use ListLabelHistory to get the history of Commits for a Label.

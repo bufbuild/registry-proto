@@ -108,7 +108,7 @@ message ListLabelsRequest {
   //
   // See the documentation on Ref for resource resolution details.
   //
-  // Once the resource is resolved, the following Labels are listed:
+  // Once the resource is resolved, the following Labels are listed (subject to any additional filters in the request):
   //   - If a Module is referenced, all Labels for the Module are returned.
   //   - If a Label is referenced, this Label is returned.
   //   - If a Commit is referenced, all Labels that currently point to the Commit are returned. Note that
