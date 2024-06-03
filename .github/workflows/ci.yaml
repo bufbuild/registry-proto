@@ -1,8 +1,6 @@
 name: ci
 on: push
 permissions: read-all
-env:
-  BUF_VERSION: 1.32.2
 jobs:
   ci:
     runs-on: ubuntu-latest

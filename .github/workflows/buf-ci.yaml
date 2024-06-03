@@ -8,8 +8,6 @@ on:
 permissions:
   contents: read
   pull-requests: write
-env:
-  BUF_VERSION: 1.32.2
 jobs:
   buf:
     runs-on: ubuntu-latest
@@ -18,3 +16,4 @@ jobs:
       - uses: bufbuild/buf-action@v0.1
         with:
           token: ${{ secrets.BUF_TOKEN }}
+          version: 1.32.2
