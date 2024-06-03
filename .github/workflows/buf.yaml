@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: bufbuild/buf-setup-action@v1.32.0-beta.1
+      - uses: bufbuild/buf-setup-action@v1.32.2
       - uses: bufbuild/buf-breaking-action@v1
         with:
           against: buf.build/bufbuild/registry
@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install buf cli
-        uses: bufbuild/buf-setup-action@v1.32.0-beta.1
+        uses: bufbuild/buf-setup-action@v1.32.2
         with:
           github_token: ${{ github.token }}
       - uses: bufbuild/buf-push-action@v1
