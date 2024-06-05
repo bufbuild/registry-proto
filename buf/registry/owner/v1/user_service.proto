@@ -130,10 +130,7 @@ message CreateUsersRequest {
     // The type of the User.
     //
     // If not set, the default USER_TYPE_STANDARD is used.
-    UserType type = 2 [
-      (buf.validate.field).enum.defined_only = true,
-      (buf.validate.field).enum.not_in = 0
-    ];
+    UserType type = 2 [(buf.validate.field).enum.defined_only = true];
     // The configurable description of the User.
     string description = 3 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for a User.
