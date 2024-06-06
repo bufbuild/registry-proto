@@ -90,7 +90,7 @@ enum ModuleRole {
   MODULE_ROLE_WRITE = 3;
   // A role that has administrative access to the module.
   MODULE_ROLE_ADMIN = 4;
-  // A role that is the owner of the module.
+  // A role that has owner access to the module.
   MODULE_ROLE_OWNER = 5;
 }
 
