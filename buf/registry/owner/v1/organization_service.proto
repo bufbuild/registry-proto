@@ -152,6 +152,13 @@ message UpdateOrganizationsRequest {
     ];
     // The verification status of the Organization.
     optional OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
+
+    // The base role that Organization members have for repositories in the Organization.
+    optional ModuleRole module_base_role = 8 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0,
+      (buf.validate.field).enum.not_in = 5
+    ];
   }
   // The Organizations to update.
   repeated Value values = 1 [
