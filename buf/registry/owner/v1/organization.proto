@@ -59,6 +59,13 @@ message Organization {
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
+  // The base role that Organization members have for repositories in the Organization.
+  ModuleRole module_base_role = 8 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0,
+    (buf.validate.field).enum.not_in = 5
+  ];
 }
 
 // The verification status of an Organization.
@@ -70,6 +77,21 @@ enum OrganizationVerificationStatus {
   ORGANIZATION_VERIFICATION_STATUS_VERIFIED = 2;
   // The Organization is an official organization of the BSR owner.
   ORGANIZATION_VERIFICATION_STATUS_OFFICIAL = 3;
+}
+
+// An access role to a module.
+enum ModuleRole {
+  MODULE_ROLE_UNSPECIFIED = 0;
+  // A role that has read access to the module.
+  MODULE_ROLE_READ = 1;
+  // A role that has limited write access to the module.
+  MODULE_ROLE_LIMITED_WRITE = 2;
+  // A role that has full write access to the module.
+  MODULE_ROLE_WRITE = 3;
+  // A role that has administrative access to the module.
+  MODULE_ROLE_ADMIN = 4;
+  // A role that is the owner of the module.
+  MODULE_ROLE_OWNER = 5;
 }
 
 // OrganizationRef is a reference to an Organization, either an id or a name.
