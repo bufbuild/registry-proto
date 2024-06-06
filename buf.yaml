@@ -5,10 +5,8 @@ deps:
 lint:
   use:
     - DEFAULT
-    - PACKAGE_NO_IMPORT_CYCLE
     - UNARY_RPC
   disallow_comment_ignores: true
 breaking:
   use:
     - WIRE_JSON
-  ignore_unstable_packages: true
