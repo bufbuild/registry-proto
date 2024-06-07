@@ -63,7 +63,6 @@ message Organization {
   ModuleRole module_base_role = 8 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true,
-    (buf.validate.field).enum.not_in = 0,
     (buf.validate.field).enum.not_in = 5
   ];
 }
