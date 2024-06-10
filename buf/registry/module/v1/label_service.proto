@@ -85,6 +85,10 @@ message ListLabelsRequest {
     ORDER_CREATE_TIME_DESC = 1;
     // Order by create_time oldest to newest.
     ORDER_CREATE_TIME_ASC = 2;
+    // Order by update_time newest to oldest.
+    ORDER_UPDATE_TIME_DESC = 3;
+    // Order by update_time oldest to newest.
+    ORDER_UPDATE_TIME_ASC = 4;
   }
   // A filter on whether a Label is archived or not.
   enum ArchiveFilter {
