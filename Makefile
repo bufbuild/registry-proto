@@ -10,7 +10,6 @@ BIN := .tmp/bin
 export PATH := $(BIN):$(PATH)
 export GOBIN := $(abspath $(BIN))
 
-BUF_VERSION := 1.32.2
 COPYRIGHT_YEARS := 2023-2024
 
 .PHONY: help
@@ -56,8 +55,8 @@ checkgenerate:
 
 $(BIN)/buf: Makefile
 	@mkdir -p $(@D)
-	go install github.com/bufbuild/buf/cmd/buf@v$(BUF_VERSION)
+	go install github.com/bufbuild/buf/cmd/buf@latest
 
 $(BIN)/license-header: Makefile
 	@mkdir -p $(@D)
-	go install github.com/bufbuild/buf/private/pkg/licenseheader/cmd/license-header@v$(BUF_VERSION)
+	go install github.com/bufbuild/buf/private/pkg/licenseheader/cmd/license-header@latest

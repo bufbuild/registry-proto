@@ -15,4 +15,3 @@ jobs:
       - uses: bufbuild/buf-action@v0.1
         with:
           token: ${{ secrets.BUF_TOKEN }}
-          version: 1.32.2
