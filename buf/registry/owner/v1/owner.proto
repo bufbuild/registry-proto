@@ -48,9 +48,9 @@ message OwnerRef {
     string id = 1 [(buf.validate.field).string.tuuid = true];
     // The name of the User or Organization.
     string name = 2 [(buf.validate.field).string = {
-      min_len: 2;
-      max_len: 32;
-      pattern: "^[a-z][a-z0-9-]*[a-z0-9]$";
+      min_len: 2
+      max_len: 32
+      pattern: "^[a-z][a-z0-9-]*[a-z0-9]$"
     }];
   }
 }

@@ -129,7 +129,7 @@ message ListLabelsRequest {
   // It is an error to filter on CommitCheckStatuses of pending or rejected, as Labels will only
   // point to Commits that are passed or approved, or that have policy checks disabled.
   repeated CommitCheckStatus commit_check_statuses = 5 [(buf.validate.field).repeated.items.enum = {
-    defined_only: true,
+    defined_only: true
     in: [
       1,
       2,
