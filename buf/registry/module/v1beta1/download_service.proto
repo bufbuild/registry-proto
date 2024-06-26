@@ -49,7 +49,11 @@ message DownloadRequest {
     // Specific file types to request.
     //
     // If not set, all file types are returned.
-    repeated FileType file_types = 2 [(buf.validate.field).repeated.items.enum.defined_only = true];
+    repeated FileType file_types = 2 [
+      (buf.validate.field).repeated.unique = true,
+      (buf.validate.field).repeated.items.enum.defined_only = true,
+      (buf.validate.field).repeated.items.enum.not_in = 0
+    ];
     // Specific file paths to retrieve.
     //
     // May be directories. For example, path "foo/bar" will result in files "foo/bar/baz.proto",
