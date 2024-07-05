@@ -76,6 +76,15 @@ message Module {
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 250
   ];
+  // The message of deprecating the module. Typically a message redirecting readers
+  // to the module that should be used instead.
+  string deprecation_message = 11 [(buf.validate.field).string.max_len = 255];
+
+  option (buf.validate.message).cel = {
+    id: "deprecation_message_only_if_deprecated"
+    message: "deprecation message is set only if the module is deprecated"
+    expression: "this.deprecation_message == '' || this.state == 2" // 2 is MODULE_STATE_DEPRECATED
+  };
 }
 
 // The visibility of a Module, currently either public or private.
