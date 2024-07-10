@@ -148,7 +148,7 @@ message UpdateOrganizationsRequest {
     optional string url = 3 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore_empty = true
+      (buf.validate.field).ignore = IGNORE_IF_DEFAULT_VALUE
     ];
     // The verification status of the Organization.
     optional OrganizationVerificationStatus verification_status = 4 [
