@@ -1,0 +1,130 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.plugin.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1";
+
+// A plugin within the BSR, such as protoc-gen-go.
+message Plugin {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Plugin.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the Plugin was created on the BSR.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The last time the Plugin was updated on the BSR.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  // The name of the Plugin.
+  //
+  // Unique within a given User or Organization.
+  string name = 4 [(buf.validate.field).string = {
+    min_len: 2
+    max_len: 100
+  }];
+  // The id of the User or Organization that owns the Plugin.
+  string owner_id = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The Plugin's visibility, either public or private.
+  PluginVisibility visibility = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The Plugin's state, either active or deprecated.
+  PluginState state = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The configurable description of the Plugin.
+  string description = 8 [(buf.validate.field).string.max_len = 350];
+  // The configurable URL in the description of the Plugin.
+  string url = 9 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+  ];
+  // Semver-formatted release version of the Plugin.
+  string version = 10;
+  // The revision of the Plugin. This represents the BSR image version of the Plugin.
+  uint32 revision = 11;
+  // The full container image digest associated with this revision.
+  // Ref: https://github.com/opencontainers/image-spec/blob/main/descriptor.md#digests
+  string container_image_digest = 12;
+}
+
+// The visibility of a Plugin, currently either public or private.
+enum PluginVisibility {
+  PLUGIN_VISIBILITY_UNSPECIFIED = 0;
+  // PLUGIN_VISIBILITY_PUBLIC says that the Plugin is publicly available.
+  PLUGIN_VISIBILITY_PUBLIC = 1;
+  // PLUGIN_VISIBILITY_PRIVATE says that the Plugin is private.
+  PLUGIN_VISIBILITY_PRIVATE = 2;
+}
+
+// The state of a Plugin, currently either active or deprecated.
+enum PluginState {
+  PLUGIN_STATE_UNSPECIFIED = 0;
+  // PLUGIN_STATE_ACTIVE says that the Plugin is currently active.
+  PLUGIN_STATE_ACTIVE = 1;
+  // PLUGIN_STATE_DEPRECATED says that the Plugin has been deprecated and should not longer be
+  // used.
+  PLUGIN_STATE_DEPRECATED = 2;
+}
+
+// PluginRef is a reference to a Plugin, either an id or a fully-qualified name and its version and revision details.
+//
+// This is used in requests.
+message PluginRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The fully-qualified name of a Plugin within a BSR instance.
+  //
+  // A Name uniquely identifies a Plugin.
+  // This is used for requests when a caller only has the name of the Plugin and not the ID.
+  message Name {
+    // The name of the owner of the Plugin, either a User or Organization.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 32
+    ];
+    // The name of the Plugin.
+    string plugin = 2 [(buf.validate.field).string = {
+      min_len: 2
+      max_len: 100
+    }];
+  }
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Plugin.
+    string id = 1 [(buf.validate.field).string.tuuid = true];
+    // The fully-qualified name of the Plugin.
+    Name name = 2;
+  }
+  // Semver-formatted release version of the Plugin.
+  string version = 3;
+  // The revision of the Plugin. This represents the BSR image version of the Plugin.
+  uint32 revision = 4;
+}
