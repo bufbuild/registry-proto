@@ -101,8 +101,8 @@ message PluginRef {
 
   // The fully-qualified name of a Plugin within a BSR instance.
   //
-  // A Name uniquely identifies a Plugin.
-  // This is used for requests when a caller only has the name of the Plugin and not the ID.
+  // In combination with its version and revision, a Name uniquely identifies a Plugin.
+  // This is used for requests when a caller only has the name and version components of the Plugin and not the ID.
   message Name {
     // The name of the owner of the Plugin, either a User or Organization.
     string owner = 1 [
