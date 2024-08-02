@@ -57,6 +57,11 @@ message GetCommitsRequest {
   DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
+message GetCommitsResponse {
+  // The found Commits in the same order as requested.
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
 // GetCommitsErrorDetails is the error details for the GetCommits RPC.
 message GetCommitsErrorDetails {
   // This contains the resource_refs that the server is unable to find. This is populated
