@@ -98,3 +98,19 @@ message UploadResponse {
   // If nothing changed for a given reference, the existing Commit will be returned.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }
+
+// UploadErrorDetails is the error details for the Upload RPC.
+message UploadErrorDetails {
+  message DepRef {
+    // The commit_id of the dependency.
+    string commit_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.tuuid = true
+    ];
+    // The registry hostname of the dependency.
+    string registry = 2 [(buf.validate.field).required = true];
+  }
+  // This contains the dep_refs that the server is unable to find. This is populated
+  // when a non-found error is returned by the server.
+  repeated string not_found_dep_refs = 1;
+}
