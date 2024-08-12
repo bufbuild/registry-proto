@@ -112,5 +112,5 @@ message UploadErrorDetails {
   }
   // This contains the dep_refs that the server is unable to find. This is populated
   // when a non-found error is returned by the server.
-  repeated string not_found_dep_refs = 1;
+  repeated DepRef not_found_dep_refs = 1;
 }
