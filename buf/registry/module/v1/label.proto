@@ -67,9 +67,11 @@ message Label {
     (buf.validate.field).string.tuuid = true
   ];
   // The id of the User that last updated this Label on the BSR.
+  //
+  // May be empty if the User is no longer available.
   string updated_by_user_id = 9 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.tuuid = true
+    (buf.validate.field).string.tuuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
   // The CommitCheckState for the Commit the Label points to.
   //
@@ -78,9 +80,9 @@ message Label {
   CommitCheckState commit_check_state = 10 [
     (buf.validate.field).required = true,
     (buf.validate.field).cel = {
-      id: "label_commit_check_state_status",
-      message: "commit_check_state must have a status of DISABLED, PASSED, or APPROVED",
-      expression: "this.status in [1, 2, 5]",
+      id: "label_commit_check_state_status"
+      message: "commit_check_state must have a status of DISABLED, PASSED, or APPROVED"
+      expression: "this.status in [1, 2, 5]"
     }
   ];
 }
@@ -135,7 +137,7 @@ message LabelRef {
     ];
     // The name of the Module that contains the Label, either a User or Organization.
     string module = 2 [(buf.validate.field).string = {
-      min_len: 2,
+      min_len: 2
       max_len: 100
     }];
     // The Label name.

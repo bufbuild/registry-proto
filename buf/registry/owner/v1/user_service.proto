@@ -83,7 +83,7 @@ message ListUsersRequest {
   uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
   // The page to start from.
   //
-  // If empty, the first page is returned,
+  // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The specific Organizations to list Users for.
   //
@@ -97,12 +97,14 @@ message ListUsersRequest {
   // Only return Users of these types.
   repeated UserType has_types = 5 [
     (buf.validate.field).repeated.unique = true,
-    (buf.validate.field).repeated.items.enum.defined_only = true
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
   ];
   // Only return Users of these states.
   repeated UserState has_states = 6 [
     (buf.validate.field).repeated.unique = true,
-    (buf.validate.field).repeated.items.enum.defined_only = true
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
   ];
 }
 
@@ -160,14 +162,17 @@ message UpdateUsersRequest {
     // The User to update.
     UserRef user_ref = 1 [(buf.validate.field).required = true];
     // The state of the User.
-    optional UserState state = 2 [(buf.validate.field).enum.defined_only = true];
+    optional UserState state = 2 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
     // The configurable description of the User.
     optional string description = 3 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for a User.
     optional string url = 4 [
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).cel = {
-        id: "string.uri",
+        id: "string.uri"
         expression: "this == '' || this.isUri() ? '' : 'value must be a valid URI'"
       }
     ];

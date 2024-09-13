@@ -86,6 +86,10 @@ message ListLabelsRequest {
     ORDER_CREATE_TIME_DESC = 1;
     // Order by create_time oldest to newest.
     ORDER_CREATE_TIME_ASC = 2;
+    // Order by update_time newest to oldest.
+    ORDER_UPDATE_TIME_DESC = 3;
+    // Order by update_time oldest to newest.
+    ORDER_UPDATE_TIME_ASC = 4;
   }
   // A filter on whether a Label is archived or not.
   enum ArchiveFilter {
@@ -103,13 +107,13 @@ message ListLabelsRequest {
   uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
   // The page to start from.
   //
-  // If empty, the first page is returned,
+  // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The reference to list Labels for.
   //
   // See the documentation on Ref for resource resolution details.
   //
-  // Once the resource is resolved, the following Labels are listed:
+  // Once the resource is resolved, the following Labels are listed (subject to any additional filters in the request):
   //   - If a Module is referenced, all Labels for the Module are returned.
   //   - If a Label is referenced, this Label is returned.
   //   - If a Commit is referenced, all Labels that currently point to the Commit are returned. Note that
@@ -126,7 +130,7 @@ message ListLabelsRequest {
   // It is an error to filter on CommitCheckStatuses of pending or rejected, as Labels will only
   // point to Commits that are passed or approved, or that have policy checks disabled.
   repeated CommitCheckStatus commit_check_statuses = 5 [(buf.validate.field).repeated.items.enum = {
-    defined_only: true,
+    defined_only: true
     in: [
       1,
       2,
