@@ -54,8 +54,8 @@ message GetFileDescriptorProtosRequest {
   //     via the ResourceRef used in the request. Well-Known Types are special in the Protobuf ecosystem,
   //     and can be imported without being contained in a specified module.
   //   - It contains symbols that are referenced by symbols specified in the request. For example,
-  //     if the request specified symbol "foo.v1.Foo" contained within "foo.proto", , which has a message
-  //     field of type "baz.v1.Baz", which is contained within "baz.proto", the the file "baz.proto"
+  //     if the request specified symbol "foo.v1.Foo" contained within "foo.proto", which has a message
+  //     field of type "baz.v1.Baz", which is contained within "baz.proto", then the file "baz.proto"
   //     will be marked as an import, regardless of which Module it derived from. If the symbols field
   //     is not specified on the request, this situation will never occur.
   //
@@ -102,7 +102,7 @@ message GetFileDescriptorProtosRequest {
   //
   // The filters exclude_imports, exclude_source_code_info, exclude_source_retention_options and
   // symbols continue to be respected even if this field is set. Specifically, if exclude_source_code_info
-  // is set, but this mask includes source_code_info, SourceCodeInfo will continue to be excludeded.
+  // is set, but this mask includes source_code_info, SourceCodeInfo will continue to be excluded.
   google.protobuf.FieldMask field_mask = 7;
 }
 
