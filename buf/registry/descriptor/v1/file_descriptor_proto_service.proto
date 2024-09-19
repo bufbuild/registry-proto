@@ -108,8 +108,8 @@ message GetFileDescriptorProtosRequest {
 
 message GetFileDescriptorProtosResponse {
   option (buf.validate.message).cel = {
-    id: "len_file_descriptor_protos_equals_len_extensions",
-    message: "the length of file_descriptor_protos must equal the length of file_descriptor_proto_extensions if file_descriptor_proto_extensions is present",
+    id: "len_file_descriptor_protos_equals_len_extensions"
+    message: "the length of file_descriptor_protos must equal the length of file_descriptor_proto_extensions if file_descriptor_proto_extensions is present"
     expression: "this.file_descriptor_proto_extensions.size() == 0 || this.file_descriptor_protos.size() == this.file_descriptor_proto_extensions.size()"
   };
 

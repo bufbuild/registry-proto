@@ -56,17 +56,13 @@ message FileDescriptorProtoExtension {
   //
   // If exclude_imports was specified on the request, no FileDescriptorProtos will be imports.
   bool is_import = 2;
-  // The explicitly-specified syntax within the file.
+  // Whether the file did not have a syntax explicitly specified.
   //
-  // If the syntax field is not set within a file, this is interpreted as the syntax "proto2".
-  // The protoc compiler does not set the syntax field if the syntax was "proto2", regardless of if
-  // the syntax was explicitly specified or not. This prevents programs (such as linters) from
-  // determining whether or not a syntax was explicitly specified within a file
-  //
-  // As opposed to syntax on a FileDescriptorProto, this field will be empty if no syntax was
-  // explicitly specified, and "proto2" if "proto2" was explicitly specified. Otherwise, this
-  // field matches the semantics of the syntax field on FileDescriptorProtos.
-  string specified_syntax = 3;
+  // Per the FileDescriptorProto spec, it would be fine in this case to just leave the syntax field
+  // unset to denote this and to set the syntax field to "proto2" if it is specified. However,
+  // protoc does not set the syntax field if it was "proto2". Plugins may want to differentiate
+  // between "proto2" and unset, and this field allows them to.
+  bool is_syntax_unspecified = 3;
   // The indexes within the dependency field on the FileDescriptorProto that are not used.
   //
   // The matches the shape of the public_dependency and weak_dependency fields on FileDescriptorProto.
