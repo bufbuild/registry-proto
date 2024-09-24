@@ -16,34 +16,32 @@ syntax = "proto3";
 
 package buf.registry.descriptor.v1;
 
-import "buf/registry/descriptor/v1/file_descriptor_proto_extension.proto";
 import "buf/registry/module/v1/resource.proto";
 import "buf/validate/validate.proto";
-import "google/protobuf/compiler/plugin.proto";
 import "google/protobuf/descriptor.proto";
 import "google/protobuf/field_mask.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/descriptor/v1";
 
-// Provide compiled FileDescriptorProtos for Modules, Labels, or Commits.
-service FileDescriptorProtoService {
-  // Get compiled FileDescriptorProtos for the given Module, Label, or Commit.
-  rpc GetFileDescriptorProtos(GetFileDescriptorProtosRequest) returns (GetFileDescriptorProtosResponse) {
+// Provide compiled FileDescriptorSets for Modules, Labels, or Commits.
+service FileDescriptorSetService {
+  // Get the compiled FileDescriptorSet for the given Module, Label, or Commit.
+  rpc GetFileDescriptorSet(GetFileDescriptorSetRequest) returns (GetFileDescriptorSetResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
-message GetFileDescriptorProtosRequest {
-  // The reference to get FileDescriptorProtos for.
+message GetFileDescriptorSetRequest {
+  // The reference to get the FileDescriptorSet for.
   //
   // See the documentation on ResourceRef for resource resolution details.
   //
   // Once the resource is resolved, the following content is returned:
-  //   - If a Module is referenced, the FileDescriptorProtos for the Commit of the default Label is returned.
-  //   - If a Label is referenced, the FileDescriptorProtos for the Commit of this Label is returned.
-  //   - If a Commit is referenced, the FileDescriptorProtos for this Commit is returned.
+  //   - If a Module is referenced, the FileDescriptorSet for the Commit of the default Label is returned.
+  //   - If a Label is referenced, the FileDescriptorSet for the Commit of this Label is returned.
+  //   - If a Commit is referenced, the FileDescriptorSet for this Commit is returned.
   buf.registry.module.v1.ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
-  // Exclude imports from the returned FileDescriptorProtos.
+  // Exclude imports from the returned FileDescriptorSet.
   //
   // A file is an import if:
   //
@@ -53,15 +51,15 @@ message GetFileDescriptorProtosRequest {
   //   - It is a Well-Known Type, and the Well-Known Type was not part of the Module specified
   //     via the ResourceRef used in the request. Well-Known Types are special in the Protobuf ecosystem,
   //     and can be imported without being contained in a specified module.
-  //   - It contains symbols that are referenced by symbols specified in the request. For example,
+  //   - It contains types that are referenced by types specified in the request. For example,
   //     if the request specified symbol "foo.v1.Foo" contained within "foo.proto", which has a message
   //     field of type "baz.v1.Baz", which is contained within "baz.proto", then the file "baz.proto"
-  //     will be marked as an import, regardless of which Module it derived from. If the symbols field
+  //     will be marked as an import, regardless of which Module it derived from. If the types field
   //     is not specified on the request, this situation will never occur.
   //
-  // Note that if imports are excluded, the returned FileDescriptorProtos may not (and likely will not)
-  // be self-contained. If imports are included, all symbols referenced within the FileDescriptorProtos
-  // are contained within the returned FileDescriptorProtos.
+  // Note that if imports are excluded, the returned FileDescriptorSet may not (and likely will not)
+  // be self-contained. If imports are included, all types referenced within the FileDescriptorSet
+  // are contained within the returned FileDescriptorSet.
   bool exclude_imports = 2;
   // Exclude SourceCodeInfo from the returned FileDescriptorProtos.
   //
@@ -76,19 +74,17 @@ message GetFileDescriptorProtosRequest {
   // Exclude FileDescriptorProtoExtensions from the response.
   //
   // FileDescriptorProtoExtensions contain additional information about FileDescriptorProtos.
-  // We include this information in a separate message as FileDescriptorProtos are not
-  // extendable, and we do not want to modify the FileDescriptorProto shape.
   bool exclude_file_descriptor_proto_extensions = 5;
-  // Only include specific symbols (and symbols that they reference, if exclude_imports is not set).
+  // Only include specific types (and types that they reference, if exclude_imports is not set).
   //
   // A symbol is a package, message, enum, service, method, or extension.
   //
-  // Symbols are referenced by their fully-qualified name. For example, if "Foo" is a message within
+  // Types are referenced by their fully-qualified name. For example, if "Foo" is a message within
   // the package "foo.v1", the fully-qualified name is "foo.v1.Foo". Fully-qualfied names should
   // not start with a period, that is specify "foo.v1.Foo", not ".foo.v1.Foo".
   //
-  // If no symbols are provided, all symbols are returned.
-  repeated string symbols = 6;
+  // If no types are provided, all types are returned.
+  repeated string types = 6;
   // An explicit, opt-in field mask for the fields populated on the returned FileDescriptorProtos.
   //
   // For example, if you would only like to return the names of messages, use the mask:
@@ -101,30 +97,12 @@ message GetFileDescriptorProtosRequest {
   //   }
   //
   // The filters exclude_imports, exclude_source_code_info, exclude_source_retention_options and
-  // symbols continue to be respected even if this field is set. Specifically, if exclude_source_code_info
+  // types continue to be respected even if this field is set. Specifically, if exclude_source_code_info
   // is set, but this mask includes source_code_info, SourceCodeInfo will continue to be excluded.
   google.protobuf.FieldMask field_mask = 7;
 }
 
-message GetFileDescriptorProtosResponse {
-  option (buf.validate.message).cel = {
-    id: "len_file_descriptor_protos_equals_len_extensions"
-    message: "the length of file_descriptor_protos must equal the length of file_descriptor_proto_extensions if file_descriptor_proto_extensions is present"
-    expression: "this.file_descriptor_proto_extensions.size() == 0 || this.file_descriptor_protos.size() == this.file_descriptor_proto_extensions.size()"
-  };
-
-  // The FileDescriptorProtos representing the referenced Module, Label, or Commit.
-  repeated google.protobuf.FileDescriptorProto file_descriptor_protos = 1 [(buf.validate.field).required = true];
-  // Additional information about each FileDescriptorProto.
-  //
-  // We include this information in a separate message as FileDescriptorProtos are not
-  // extendable, and we do not want to modify the FileDescriptorProto shape.
-  //
-  // If present, the length of this field will be equal to the length of the file_descriptor_protos field, and each
-  // value corresponds to its corresponding value at the same index within file_descriptor_protos.
-  repeated FileDescriptorProtoExtension file_descriptor_proto_extensions = 2;
-  // The version of the compiler used to create the FileDescriptorProtos.
-  //
-  // This will match the semantics used within CodeGeneratorRequests.
-  google.protobuf.compiler.Version compiler_version = 3 [(buf.validate.field).required = true];
+message GetFileDescriptorSetResponse {
+  // The FileDescriptorSet representing the referenced Module, Label, or Commit.
+  google.protobuf.FileDescriptorSet file_descriptor_set = 1 [(buf.validate.field).required = true];
 }
