@@ -19,7 +19,7 @@ package buf.registry.owner.v1;
 import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/owner/v1/user.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
 
@@ -28,7 +28,7 @@ message Owner {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
   oneof value {
-    option (buf.validate.oneof).required = true;
+    option (protovalidate.v1.oneof).required = true;
     // The User.
     User user = 1;
     // The Organization.
@@ -43,11 +43,11 @@ message OwnerRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   oneof value {
-    option (buf.validate.oneof).required = true;
+    option (protovalidate.v1.oneof).required = true;
     // The id of the User or Organization.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
+    string id = 1 [(protovalidate.v1.field).string.tuuid = true];
     // The name of the User or Organization.
-    string name = 2 [(buf.validate.field).string = {
+    string name = 2 [(protovalidate.v1.field).string = {
       min_len: 2
       max_len: 32
       pattern: "^[a-z][a-z0-9-]*[a-z0-9]$"

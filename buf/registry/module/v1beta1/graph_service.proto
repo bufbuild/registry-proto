@@ -19,7 +19,7 @@ package buf.registry.module.v1beta1;
 import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/graph.proto";
 import "buf/registry/module/v1beta1/resource.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -42,9 +42,9 @@ message GetGraphRequest {
   // This wraps the top-level ResourceRef.
   message ResourceRef {
     // The top-level ResourceRef.
-    buf.registry.module.v1beta1.ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
+    buf.registry.module.v1beta1.ResourceRef resource_ref = 1 [(protovalidate.v1.field).required = true];
     // The registry hostname of the Resourceref.
-    string registry = 2 [(buf.validate.field).required = true];
+    string registry = 2 [(protovalidate.v1.field).required = true];
   }
   // The references to resolve to Commits to include in the graph.
   //
@@ -58,8 +58,8 @@ message GetGraphRequest {
   // The specified ResourceRefs must reference unique Modules, that is no two ResourceRefs
   // may resolve to the same Module.
   repeated ResourceRef resource_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
   // The DigestType to return for Commit nodes.
   //
@@ -67,12 +67,12 @@ message GetGraphRequest {
   // Note that certain DigestTypes may be deprecated over time.
   //
   // If not set, the latest DigestType is used.
-  DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
+  DigestType digest_type = 2 [(protovalidate.v1.field).enum.defined_only = true];
 }
 
 // See the package documentation for more details. You should likely use buf.registry.module.v1beta1
 // and not this package.
 message GetGraphResponse {
   // The Graph calculated for the Commits.
-  Graph graph = 1 [(buf.validate.field).required = true];
+  Graph graph = 1 [(protovalidate.v1.field).required = true];
 }

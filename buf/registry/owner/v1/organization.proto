@@ -17,8 +17,8 @@ syntax = "proto3";
 package buf.registry.owner.v1;
 
 import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
 
@@ -30,34 +30,34 @@ message Organization {
 
   // The id for the Organization.
   string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.tuuid = true
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).string.tuuid = true
   ];
   // The time the Organization was created.
-  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp create_time = 2 [(protovalidate.v1.field).required = true];
   // The last time the Organization was updated.
-  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp update_time = 3 [(protovalidate.v1.field).required = true];
   // The name of the Organization.
   //
   // A name uniquely identifies an Organization, however name is mutable.
   string name = 4 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.min_len = 2,
-    (buf.validate.field).string.max_len = 32,
-    (buf.validate.field).string.pattern = "^[a-z][a-z0-9-]*[a-z0-9]$"
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).string.min_len = 2,
+    (protovalidate.v1.field).string.max_len = 32,
+    (protovalidate.v1.field).string.pattern = "^[a-z][a-z0-9-]*[a-z0-9]$"
   ];
   // The configurable description of the Organization.
-  string description = 5 [(buf.validate.field).string.max_len = 350];
+  string description = 5 [(protovalidate.v1.field).string.max_len = 350];
   // The configurable URL that represents the homepage for an Organization.
   string url = 6 [
-    (buf.validate.field).string.uri = true,
-    (buf.validate.field).string.max_len = 255,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    (protovalidate.v1.field).string.uri = true,
+    (protovalidate.v1.field).string.max_len = 255,
+    (protovalidate.v1.field).ignore = IGNORE_IF_UNPOPULATED
   ];
   // The verification status of the Organization.
   OrganizationVerificationStatus verification_status = 7 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).enum.defined_only = true
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).enum.defined_only = true
   ];
 }
 
@@ -79,11 +79,11 @@ message OrganizationRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   oneof value {
-    option (buf.validate.oneof).required = true;
+    option (protovalidate.v1.oneof).required = true;
     // The id of the Organization.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
+    string id = 1 [(protovalidate.v1.field).string.tuuid = true];
     // The name of the Organization.
-    string name = 2 [(buf.validate.field).string = {
+    string name = 2 [(protovalidate.v1.field).string = {
       min_len: 2
       max_len: 32
       pattern: "^[a-z][a-z0-9-]*[a-z0-9]$"

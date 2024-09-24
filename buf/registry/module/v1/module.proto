@@ -17,8 +17,8 @@ syntax = "proto3";
 package buf.registry.module.v1;
 
 import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
@@ -28,42 +28,42 @@ message Module {
 
   // The id of the Module.
   string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.tuuid = true
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).string.tuuid = true
   ];
   // The time the Module was created on the BSR.
-  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp create_time = 2 [(protovalidate.v1.field).required = true];
   // The last time the Module was updated on the BSR.
-  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp update_time = 3 [(protovalidate.v1.field).required = true];
   // The name of the Module.
   //
   // Unique within a given User or Organization.
-  string name = 4 [(buf.validate.field).string = {
+  string name = 4 [(protovalidate.v1.field).string = {
     min_len: 2
     max_len: 100
   }];
   // The id of the User or Organization that owns the Module.
   string owner_id = 5 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.tuuid = true
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).string.tuuid = true
   ];
   // The Module's visibility, either public or private.
   ModuleVisibility visibility = 6 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).enum.defined_only = true
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).enum.defined_only = true
   ];
   // The Module state, either active or deprecated.
   ModuleState state = 7 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).enum.defined_only = true
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).enum.defined_only = true
   ];
   // The configurable description of the Module.
-  string description = 8 [(buf.validate.field).string.max_len = 350];
+  string description = 8 [(protovalidate.v1.field).string.max_len = 350];
   // The configurable URL in the description of the Module,
   string url = 9 [
-    (buf.validate.field).string.uri = true,
-    (buf.validate.field).string.max_len = 255,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    (protovalidate.v1.field).string.uri = true,
+    (protovalidate.v1.field).string.max_len = 255,
+    (protovalidate.v1.field).ignore = IGNORE_IF_UNPOPULATED
   ];
   // The name of the default Label of the Module.
   //
@@ -73,8 +73,8 @@ message Module {
   //
   // This could also be the name of an archived Label.
   string default_label_name = 10 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 250
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).string.max_len = 250
   ];
 }
 
@@ -110,20 +110,20 @@ message ModuleRef {
   message Name {
     // The name of the owner of the Module, either a User or Organization.
     string owner = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 32
+      (protovalidate.v1.field).required = true,
+      (protovalidate.v1.field).string.max_len = 32
     ];
     // The name of the Module.
-    string module = 2 [(buf.validate.field).string = {
+    string module = 2 [(protovalidate.v1.field).string = {
       min_len: 2
       max_len: 100
     }];
   }
 
   oneof value {
-    option (buf.validate.oneof).required = true;
+    option (protovalidate.v1.oneof).required = true;
     // The id of the Module.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
+    string id = 1 [(protovalidate.v1.field).string.tuuid = true];
     // The fully-qualified name of the Module.
     Name name = 2;
   }

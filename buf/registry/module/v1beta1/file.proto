@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -30,8 +30,8 @@ message File {
   // The path must be relative, and cannot contain any "." or ".." components.
   // The separator "/" must be used.
   string path = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string = {
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).string = {
       max_len: 4096
       not_contains: "\\"
       pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"

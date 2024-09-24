@@ -18,8 +18,8 @@ package buf.registry.module.v1;
 
 import "buf/registry/module/v1/digest.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
@@ -36,43 +36,43 @@ message Commit {
 
   // The id of the Commit.
   string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.tuuid = true
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).string.tuuid = true
   ];
   // The time the Commit was pushed to the BSR.
   //
   // Commits are immutable, so there is no corresponding update_time.
-  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp create_time = 2 [(protovalidate.v1.field).required = true];
   // The id of the User or Organization that owns the Module that the Commit is associated with.
   string owner_id = 3 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.tuuid = true
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).string.tuuid = true
   ];
   // The id of the Module that the Commit is associated with.
   string module_id = 4 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.tuuid = true
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).string.tuuid = true
   ];
   // The Digest of the Commit's contents.
   //
   // Note that individual RPCs may request a specific DigestType, and a Digest of
   // this DigestType will be returned as part of this Commit. This may affect your
   // caching of returned Commit messages if you require different DigestTypes.
-  Digest digest = 5 [(buf.validate.field).required = true];
+  Digest digest = 5 [(protovalidate.v1.field).required = true];
   // The id of the User that created this Commit on the BSR.
   //
   // May be empty if the User is no longer available.
   string created_by_user_id = 6 [
-    (buf.validate.field).string.tuuid = true,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    (protovalidate.v1.field).string.tuuid = true,
+    (protovalidate.v1.field).ignore = IGNORE_IF_UNPOPULATED
   ];
   // The URL of the source control commit that is associated with the Commit.
   //
   // BSR users can navigate to this link to find source control information that is relevant to this Commit
   // (e.g. commit description, PR discussion, authors, approvers, etc.).
   string source_control_url = 7 [
-    (buf.validate.field).string.uri = true,
-    (buf.validate.field).string.max_len = 255,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    (protovalidate.v1.field).string.uri = true,
+    (protovalidate.v1.field).string.max_len = 255,
+    (protovalidate.v1.field).ignore = IGNORE_IF_UNPOPULATED
   ];
 }

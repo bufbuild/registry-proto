@@ -18,7 +18,7 @@ package buf.registry.owner.v1;
 
 import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/owner/v1/user.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
 
@@ -55,14 +55,14 @@ service OrganizationService {
 message GetOrganizationsRequest {
   // The Organizations to request.
   repeated OrganizationRef organization_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
 }
 
 message GetOrganizationsResponse {
   // The retrieved Organizations in the same order as requested.
-  repeated Organization organizations = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Organization organizations = 1 [(protovalidate.v1.field).repeated.min_items = 1];
 }
 
 message ListOrganizationsRequest {
@@ -77,11 +77,11 @@ message ListOrganizationsRequest {
   // The maximum number of items to return.
   //
   // The default value is 10.
-  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  uint32 page_size = 1 [(protovalidate.v1.field).uint32.lte = 250];
   // The page to start from.
   //
   // If empty, the first page is returned.
-  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  string page_token = 2 [(protovalidate.v1.field).string.max_len = 4096];
   // The ids of the specific Users to list Organizations for.
   //
   // If this is empty, all Organizations are listed, but this functionality
@@ -90,14 +90,14 @@ message ListOrganizationsRequest {
   // The order to return the Organizations.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
-  Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  Order order = 4 [(protovalidate.v1.field).enum.defined_only = true];
 }
 
 message ListOrganizationsResponse {
   // The next page token.
   //
   // If empty, there are no more pages.
-  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  string next_page_token = 1 [(protovalidate.v1.field).string.max_len = 4096];
   // The listed Organizations.
   repeated Organization organizations = 2;
 }
@@ -107,72 +107,72 @@ message CreateOrganizationsRequest {
   message Value {
     // The name of the Organization.
     string name = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.min_len = 2,
-      (buf.validate.field).string.max_len = 32,
-      (buf.validate.field).string.pattern = "^[a-z][a-z0-9-]*[a-z0-9]$"
+      (protovalidate.v1.field).required = true,
+      (protovalidate.v1.field).string.min_len = 2,
+      (protovalidate.v1.field).string.max_len = 32,
+      (protovalidate.v1.field).string.pattern = "^[a-z][a-z0-9-]*[a-z0-9]$"
     ];
     // The configurable description of the Organization.
-    string description = 2 [(buf.validate.field).string.max_len = 350];
+    string description = 2 [(protovalidate.v1.field).string.max_len = 350];
     // The configurable URL that represents the homepage for an Organization.
     string url = 3 [
-      (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+      (protovalidate.v1.field).string.uri = true,
+      (protovalidate.v1.field).string.max_len = 255,
+      (protovalidate.v1.field).ignore = IGNORE_IF_UNPOPULATED
     ];
     // The verification status of the Organization.
     //
     // If not set, the Organization will default to VERIFICATION_STATUS_UNVERIFIED.
-    OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
+    OrganizationVerificationStatus verification_status = 4 [(protovalidate.v1.field).enum.defined_only = true];
   }
   // The Organizations to create.
   repeated Value values = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
 }
 
 message CreateOrganizationsResponse {
   // The created Organizations in the same order as given on the request.
-  repeated Organization organizations = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Organization organizations = 1 [(protovalidate.v1.field).repeated.min_items = 1];
 }
 
 message UpdateOrganizationsRequest {
   // An individual request to update an Organization.
   message Value {
     // The organization to update.
-    OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
+    OrganizationRef organization_ref = 1 [(protovalidate.v1.field).required = true];
     // The configurable description of the Organization.
-    optional string description = 2 [(buf.validate.field).string.max_len = 350];
+    optional string description = 2 [(protovalidate.v1.field).string.max_len = 350];
     // The configurable URL that represents the homepage for an Organization.
     optional string url = 3 [
-      (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore = IGNORE_IF_DEFAULT_VALUE
+      (protovalidate.v1.field).string.uri = true,
+      (protovalidate.v1.field).string.max_len = 255,
+      (protovalidate.v1.field).ignore = IGNORE_IF_DEFAULT_VALUE
     ];
     // The verification status of the Organization.
     optional OrganizationVerificationStatus verification_status = 4 [
-      (buf.validate.field).enum.defined_only = true,
-      (buf.validate.field).enum.not_in = 0
+      (protovalidate.v1.field).enum.defined_only = true,
+      (protovalidate.v1.field).enum.not_in = 0
     ];
   }
   // The Organizations to update.
   repeated Value values = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
 }
 
 message UpdateOrganizationsResponse {
   // The updated Organizations in the same order as given on the request.
-  repeated Organization organizations = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Organization organizations = 1 [(protovalidate.v1.field).repeated.min_items = 1];
 }
 
 message DeleteOrganizationsRequest {
   // The Organizations to delete.
   repeated OrganizationRef organization_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
 }
 

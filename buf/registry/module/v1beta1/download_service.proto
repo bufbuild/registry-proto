@@ -20,7 +20,7 @@ import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/file.proto";
 import "buf/registry/module/v1beta1/resource.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -45,14 +45,14 @@ message DownloadRequest {
     //   - If a Module is referenced, the content of the Commit of the default Label is returned.
     //   - If a Label is referenced, the content of the Commit of this Label is returned.
     //   - If a Commit is referenced, the content for this Commit is returned.
-    ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
+    ResourceRef resource_ref = 1 [(protovalidate.v1.field).required = true];
     // Specific file types to request.
     //
     // If not set, all file types are returned.
     repeated FileType file_types = 2 [
-      (buf.validate.field).repeated.unique = true,
-      (buf.validate.field).repeated.items.enum.defined_only = true,
-      (buf.validate.field).repeated.items.enum.not_in = 0
+      (protovalidate.v1.field).repeated.unique = true,
+      (protovalidate.v1.field).repeated.items.enum.defined_only = true,
+      (protovalidate.v1.field).repeated.items.enum.not_in = 0
     ];
     // Specific file paths to retrieve.
     //
@@ -72,7 +72,7 @@ message DownloadRequest {
     //
     // The path must be relative, and cannot contain any "." or ".." components
     // The separator "/" must be used.
-    repeated string paths = 3 [(buf.validate.field).repeated.items = {
+    repeated string paths = 3 [(protovalidate.v1.field).repeated.items = {
       string: {
         max_len: 4096
         not_contains: "\\"
@@ -89,8 +89,8 @@ message DownloadRequest {
   }
   // The references to get contents for.
   repeated Value values = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
   // The DigestType to return for the Commits of the references.
   //
@@ -98,7 +98,7 @@ message DownloadRequest {
   // Note that certain DigestTypes may be deprecated over time.
   //
   // If not set, the latest DigestType is used, currently B5.
-  DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
+  DigestType digest_type = 2 [(protovalidate.v1.field).enum.defined_only = true];
 }
 
 message DownloadResponse {
@@ -109,7 +109,7 @@ message DownloadResponse {
     // The Commit associated with this ID will be present in the commits field.
     //
     // The Commit will use the DigestType specified in the request value.
-    Commit commit = 1 [(buf.validate.field).required = true];
+    Commit commit = 1 [(protovalidate.v1.field).required = true];
     // The Files of the content.
     //
     // This will consist of the .proto files, license files, and documentation files.
@@ -137,5 +137,5 @@ message DownloadResponse {
     File v1_buf_lock_file = 4;
   }
   // The Contents of the references in the same order as requested.
-  repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Content contents = 1 [(protovalidate.v1.field).repeated.min_items = 1];
 }

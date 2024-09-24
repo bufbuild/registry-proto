@@ -20,7 +20,7 @@ import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/file.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/module.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -40,20 +40,20 @@ message UploadRequest {
   message DepRef {
     // The commit_id of the dependency.
     string commit_id = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.tuuid = true
+      (protovalidate.v1.field).required = true,
+      (protovalidate.v1.field).string.tuuid = true
     ];
     // The registry hostname of the dependency.
-    string registry = 2 [(buf.validate.field).required = true];
+    string registry = 2 [(protovalidate.v1.field).required = true];
   }
   // Content to upload for a given reference.
   message Content {
     // The Module of the reference.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    ModuleRef module_ref = 1 [(protovalidate.v1.field).required = true];
     // The Files of the Content.
     //
     // This will consist of the .proto files, license files, and documentation files.
-    repeated File files = 2 [(buf.validate.field).repeated.min_items = 1];
+    repeated File files = 2 [(protovalidate.v1.field).repeated.min_items = 1];
     // The labels to associate with the Commit for the Content.
     //
     // If an id is set, this id must represent a Label that already exists and is
@@ -70,13 +70,13 @@ message UploadRequest {
     // BSR users can navigate to this link to find source control information that is relevant to this Commit
     // (e.g. commit description, PR discussion, authors, approvers, etc.).
     string source_control_url = 4 [
-      (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+      (protovalidate.v1.field).string.uri = true,
+      (protovalidate.v1.field).string.max_len = 255,
+      (protovalidate.v1.field).ignore = IGNORE_IF_UNPOPULATED
     ];
   }
   // The Contents of all references.
-  repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Content contents = 1 [(protovalidate.v1.field).repeated.min_items = 1];
   // The dependencies of the references specified by Contents.
   //
   // This will include all transitive dependencies.
@@ -96,5 +96,5 @@ message UploadResponse {
   //
   // A single Commit will be returned for each reference. These Commits may or may not be new.
   // If nothing changed for a given reference, the existing Commit will be returned.
-  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Commit commits = 1 [(protovalidate.v1.field).repeated.min_items = 1];
 }

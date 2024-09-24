@@ -18,7 +18,7 @@ package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -31,30 +31,30 @@ message Graph {
   // This wraps the top-level Commit.
   message Commit {
     // The top-level Commit.
-    buf.registry.module.v1beta1.Commit commit = 1 [(buf.validate.field).required = true];
+    buf.registry.module.v1beta1.Commit commit = 1 [(protovalidate.v1.field).required = true];
     // The registry hostname of the Commit.
-    string registry = 2 [(buf.validate.field).required = true];
+    string registry = 2 [(protovalidate.v1.field).required = true];
   }
   // A node in the dependency graph.
   message Node {
     // The commit of the node.
     string commit_id = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.tuuid = true
+      (protovalidate.v1.field).required = true,
+      (protovalidate.v1.field).string.tuuid = true
     ];
     // The registry hostname of the Node.
-    string registry = 2 [(buf.validate.field).required = true];
+    string registry = 2 [(protovalidate.v1.field).required = true];
   }
   // An edge in the dependency graph.
   message Edge {
     // The Node of the start of the edge.
-    Node from_node = 1 [(buf.validate.field).required = true];
+    Node from_node = 1 [(protovalidate.v1.field).required = true];
     // The Node of the end of the edge.
-    Node to_node = 2 [(buf.validate.field).required = true];
+    Node to_node = 2 [(protovalidate.v1.field).required = true];
   }
 
   // The nodes of the graph, each of which are Commits.
-  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Commit commits = 1 [(protovalidate.v1.field).repeated.min_items = 1];
   // The edges of the graph.
   repeated Edge edges = 2;
 }

@@ -20,14 +20,14 @@ import "buf/registry/module/v1/commit.proto";
 import "buf/registry/module/v1/label.proto";
 import "buf/registry/module/v1/module.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
 // A Module, Label, or Commit.
 message Resource {
   oneof value {
-    option (buf.validate.oneof).required = true;
+    option (protovalidate.v1.oneof).required = true;
 
     Module module = 1;
     Label label = 2;
@@ -70,11 +70,11 @@ message ResourceRef {
   message Name {
     // The name of the User or Organization that owns the resource.
     string owner = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 32
+      (protovalidate.v1.field).required = true,
+      (protovalidate.v1.field).string.max_len = 32
     ];
     // The name of the Module that contains or is the resource.
-    string module = 2 [(buf.validate.field).string = {
+    string module = 2 [(protovalidate.v1.field).string = {
       min_len: 2
       max_len: 100
     }];
@@ -84,7 +84,7 @@ message ResourceRef {
       //
       // If this value is present but empty, this should be treated as not present, that is
       // an empty value is the same as a null value.
-      string label_name = 3 [(buf.validate.field).string.max_len = 250];
+      string label_name = 3 [(protovalidate.v1.field).string.max_len = 250];
       // The untyped reference, applying the semantics as documented on the Name message.
       //
       // If this value is present but empty, this should be treated as not present, that is
@@ -94,9 +94,9 @@ message ResourceRef {
   }
 
   oneof value {
-    option (buf.validate.oneof).required = true;
+    option (protovalidate.v1.oneof).required = true;
     // The id of the resource.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
+    string id = 1 [(protovalidate.v1.field).string.tuuid = true];
     // The fully-qualified name of the resource.
     Name name = 2;
   }

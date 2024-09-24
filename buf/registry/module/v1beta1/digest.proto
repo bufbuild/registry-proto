@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -27,11 +27,11 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 message Digest {
   // The type of the Digest.
   DigestType type = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).enum.defined_only = true
+    (protovalidate.v1.field).required = true,
+    (protovalidate.v1.field).enum.defined_only = true
   ];
   // The value of the Digest.
-  bytes value = 2 [(buf.validate.field).required = true];
+  bytes value = 2 [(protovalidate.v1.field).required = true];
 }
 
 // The type of Digest.

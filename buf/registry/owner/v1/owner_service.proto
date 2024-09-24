@@ -17,7 +17,7 @@ syntax = "proto3";
 package buf.registry.owner.v1;
 
 import "buf/registry/owner/v1/owner.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
 
@@ -34,12 +34,12 @@ service OwnerService {
 message GetOwnersRequest {
   // The Users or Organizations to request.
   repeated OwnerRef owner_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
 }
 
 message GetOwnersResponse {
   // The retrieved Users or Organizations in the same order as requested.
-  repeated Owner owners = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Owner owners = 1 [(protovalidate.v1.field).repeated.min_items = 1];
 }

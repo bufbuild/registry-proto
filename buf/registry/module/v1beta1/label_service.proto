@@ -20,7 +20,7 @@ import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/resource.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -68,14 +68,14 @@ message GetLabelsRequest {
   //
   // This may reference archived Labels.
   repeated LabelRef label_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
 }
 
 message GetLabelsResponse {
   // The retrieved Labels in the same order as requested.
-  repeated Label labels = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Label labels = 1 [(protovalidate.v1.field).repeated.min_items = 1];
 }
 
 message ListLabelsRequest {
@@ -104,11 +104,11 @@ message ListLabelsRequest {
   // The maximum number of items to return.
   //
   // The default value is 10.
-  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  uint32 page_size = 1 [(protovalidate.v1.field).uint32.lte = 250];
   // The page to start from.
   //
   // If empty, the first page is returned.
-  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  string page_token = 2 [(protovalidate.v1.field).string.max_len = 4096];
   // The reference to list Labels for.
   //
   // See the documentation on Ref for resource resolution details.
@@ -118,18 +118,18 @@ message ListLabelsRequest {
   //   - If a Label is referenced, this Label is returned.
   //   - If a Commit is referenced, all Labels that currently point to the Commit are returned. Note that
   //     Labels only point to passed or approved Commits, or Commits where policy checks were disabled.
-  ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
+  ResourceRef resource_ref = 3 [(protovalidate.v1.field).required = true];
   // The order to return the Labels.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
-  Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  Order order = 4 [(protovalidate.v1.field).enum.defined_only = true];
   // Only return Labels that point to a Commit with one of these CommitCheckStatus values.
   //
   // If not set, Labels that point to a Commit with any CommitCheckStatus value are returned.
   //
   // It is an error to filter on CommitCheckStatuses of pending or rejected, as Labels will only
   // point to Commits that are passed or approved, or that have policy checks disabled.
-  repeated CommitCheckStatus commit_check_statuses = 5 [(buf.validate.field).repeated.items.enum = {
+  repeated CommitCheckStatus commit_check_statuses = 5 [(protovalidate.v1.field).repeated.items.enum = {
     defined_only: true
     in: [
       1,
@@ -138,18 +138,18 @@ message ListLabelsRequest {
     ]
   }];
   // Only return Labels with a name that contains this string using a case-insensitive comparison.
-  string name_query = 6 [(buf.validate.field).string.max_len = 250];
+  string name_query = 6 [(protovalidate.v1.field).string.max_len = 250];
   // The archive filter on the returned Labels.
   //
   // If not specified, defaults to ARCHIVE_FILTER_UNARCHIVED_ONLY.
-  ArchiveFilter archive_filter = 7 [(buf.validate.field).enum.defined_only = true];
+  ArchiveFilter archive_filter = 7 [(protovalidate.v1.field).enum.defined_only = true];
 }
 
 message ListLabelsResponse {
   // The next page token.
   //
   // If empty, there are no more pages.
-  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  string next_page_token = 1 [(protovalidate.v1.field).string.max_len = 4096];
   // The listed Labels.
   repeated Label labels = 2;
 }
@@ -168,36 +168,36 @@ message ListLabelHistoryRequest {
   // The maximum number of items to return.
   //
   // The default value is 10.
-  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  uint32 page_size = 1 [(protovalidate.v1.field).uint32.lte = 250];
   // The page to start from.
   //
   // If empty, the first page is returned.
-  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  string page_token = 2 [(protovalidate.v1.field).string.max_len = 4096];
   // The Label to list history for.
   //
   // This may reference archived Labels.
-  LabelRef label_ref = 3 [(buf.validate.field).required = true];
+  LabelRef label_ref = 3 [(protovalidate.v1.field).required = true];
   // The order to list the Labels.
   //
   // If not specified, defaults to ORDER_DESC.
-  Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  Order order = 4 [(protovalidate.v1.field).enum.defined_only = true];
   // The DigestType to use for Digests returned on Commits.
   //
   // If this DigestType is not available, an error is returned.
   // Note that certain DigestTypes may be deprecated over time.
   //
   // If not set, the latest DigestType is used, currently B5.
-  DigestType digest_type = 5 [(buf.validate.field).enum.defined_only = true];
+  DigestType digest_type = 5 [(protovalidate.v1.field).enum.defined_only = true];
   // Only return Commits that have one of these CommitCheckStatus values for this label.
   //
   // If not set, Commits with any CommitCheckStatus value are returned.
-  repeated CommitCheckStatus commit_check_statuses = 6 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  repeated CommitCheckStatus commit_check_statuses = 6 [(protovalidate.v1.field).repeated.items.enum.defined_only = true];
   // The Commit id to start from.
   //
   // It is an error to provide a Commit id that doesn't exist on the Label.
   string start_commit_id = 7 [
-    (buf.validate.field).string.tuuid = true,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    (protovalidate.v1.field).string.tuuid = true,
+    (protovalidate.v1.field).ignore = IGNORE_IF_UNPOPULATED
   ];
   // Only list Commits where the Digest has changed from the previous Commit in the
   // history of this Label.
@@ -207,14 +207,14 @@ message ListLabelHistoryRequest {
 message ListLabelHistoryResponse {
   message Value {
     // The Commit.
-    Commit commit = 1 [(buf.validate.field).required = true];
+    Commit commit = 1 [(protovalidate.v1.field).required = true];
     // The CommitCheckState for this Commit on this Label.
-    CommitCheckState commit_check_state = 2 [(buf.validate.field).required = true];
+    CommitCheckState commit_check_state = 2 [(protovalidate.v1.field).required = true];
   }
   // The next page token.
   //
   // If empty, there are no more pages.
-  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  string next_page_token = 1 [(protovalidate.v1.field).string.max_len = 4096];
   // The ordered history of the Label.
   repeated Value values = 2;
 }
@@ -223,7 +223,7 @@ message CreateOrUpdateLabelsRequest {
   // An individual request to create or update a Label.
   message Value {
     // The Labels to create or update.
-    LabelRef label_ref = 1 [(buf.validate.field).required = true];
+    LabelRef label_ref = 1 [(protovalidate.v1.field).required = true];
     // The id of the Commit to associate with the Label.
     //
     // If the Label already existed, the Label will now point to this Commit, as long as this Commit
@@ -231,27 +231,27 @@ message CreateOrUpdateLabelsRequest {
     // returned.
     // If the Label was archived, it will be unarchived.
     string commit_id = 2 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.tuuid = true
+      (protovalidate.v1.field).required = true,
+      (protovalidate.v1.field).string.tuuid = true
     ];
   }
   // The Labels to create.
   repeated Value values = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
 }
 
 message CreateOrUpdateLabelsResponse {
   // The created or updated Labels in the same order as given on the request.
-  repeated Label labels = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Label labels = 1 [(protovalidate.v1.field).repeated.min_items = 1];
 }
 
 message ArchiveLabelsRequest {
   // The Labels to archive.
   repeated LabelRef label_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
 }
 
@@ -260,8 +260,8 @@ message ArchiveLabelsResponse {}
 message UnarchiveLabelsRequest {
   // The Labels to unarchive.
   repeated LabelRef label_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
 }
 

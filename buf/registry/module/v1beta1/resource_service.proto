@@ -18,7 +18,7 @@ package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/resource.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
 
@@ -35,8 +35,8 @@ message GetResourcesRequest {
   //
   // See the documentation on ResourceRef for resource resolution details.
   repeated ResourceRef resource_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
   // The DigestType to use for Digests returned on Commits.
   //
@@ -44,10 +44,10 @@ message GetResourcesRequest {
   // Note that certain DigestTypes may be deprecated over time.
   //
   // If not set, the latest DigestType is used, currently B5.
-  DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
+  DigestType digest_type = 2 [(protovalidate.v1.field).enum.defined_only = true];
 }
 
 message GetResourcesResponse {
   // The found Resources in the same order as requested.
-  repeated Resource resources = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Resource resources = 1 [(protovalidate.v1.field).repeated.min_items = 1];
 }

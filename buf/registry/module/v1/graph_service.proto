@@ -18,7 +18,7 @@ package buf.registry.module.v1;
 
 import "buf/registry/module/v1/graph.proto";
 import "buf/registry/module/v1/resource.proto";
-import "buf/validate/validate.proto";
+import "protovalidate/v1/protovalidate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
@@ -48,12 +48,12 @@ message GetGraphRequest {
   // The specified ResourceRefs must reference unique Modules, that is no two ResourceRefs
   // may resolve to the same Module.
   repeated ResourceRef resource_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (protovalidate.v1.field).repeated.min_items = 1,
+    (protovalidate.v1.field).repeated.max_items = 250
   ];
 }
 
 message GetGraphResponse {
   // The Graph calculated for the Commits.
-  Graph graph = 1 [(buf.validate.field).required = true];
+  Graph graph = 1 [(protovalidate.v1.field).required = true];
 }
