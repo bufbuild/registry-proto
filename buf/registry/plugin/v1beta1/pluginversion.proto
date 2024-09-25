@@ -74,20 +74,22 @@ message PluginVersion {
   ];
   // The SPDX identifier of the license of the Plugin.
   string license_spdx_identifier = 8;
-  // TODO(mf): should this and operation be a repeated field? I.e., a single plugin could satisfy
-  // multiple operations?
+  // The plugin types the PluginVersion supports. Must have at least one element.
   repeated PluginType plugin_type = 9 [
+    (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.unique = true,
     (buf.validate.field).repeated.items.enum.defined_only = true,
     (buf.validate.field).repeated.items.enum.not_in = 0
   ];
-  // TODO(mf): couldn't think of a better name for a generic field that could be used for any plugin
-  // type
-
+  // Optional configuration for plugins that support code generation. Can only be set if the
+  // PluginType is a code generation plugin.
   CodeGenerationConfig code_generation = 10;
+  // Optional configuration for plugins that support the pluginrpc checks. Can only be set if the
+  // PluginType is a check plugin.
   CheckConfig check = 11;
-
-  Reference reference = 12; // TBD
+  // The reference to a resource that uniquely identifies the packaged content. For example, the
+  // digest of a Docker image or WASM module.
+  Reference reference = 12 [(buf.validate.field).required = true];
 }
 
 // The type of the Plugin.
@@ -98,6 +100,12 @@ enum PluginType {
   PLUGIN_TYPE_CHECK = 3;
 }
 
+// The configuration for a check plugin.
+//
+// TODO(mf): we might want to remove this entirely, as it's not clear what this would be used for.
+// The Rules and Categories are a property of the plugin itself, and not what a user would define.
+// At most we'll want to keep this around for Responses to surface Rules and/or Categories, but this
+// is not clear yet.
 message CheckConfig {}
 
 // The runtime type of the PluginVersion.
