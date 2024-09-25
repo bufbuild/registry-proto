@@ -1,0 +1,206 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.plugin.v1beta1;
+
+import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/plugin/v1beta1/plugin.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
+
+// Operate on Plugins.
+service PluginService {
+  // Get Plugins by id or name.
+  rpc GetPlugins(GetPluginsRequest) returns (GetPluginsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List Plugins, usually for a specific User or Organization.
+  rpc ListPlugins(ListPluginsRequest) returns (ListPluginsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create new Plugins.
+  //
+  // This operation is atomic. Either all Plugins are created or an error is returned.
+  rpc CreatePlugins(CreatePluginsRequest) returns (CreatePluginsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Update existing Plugins.
+  //
+  // This operation is atomic. Either all Plugins are updated or an error is returned.
+  rpc UpdatePlugins(UpdatePluginsRequest) returns (UpdatePluginsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Delete existing Plugins.
+  //
+  // This operation is atomic. Either all Plugins are deleted or an error is returned.
+  rpc DeletePlugins(DeletePluginsRequest) returns (DeletePluginsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message GetPluginsRequest {
+  // The Plugins to request.
+  repeated PluginRef plugin_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetPluginsResponse {
+  // The retrieved Plugins in the same order as requested.
+  repeated Plugin plugins = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message ListPluginsRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // Filter for the list request, if any. When multiple filters are specified, they are combined.
+  message Filter {
+    // The specific Organizations to list Plugins for.
+    //
+    // If empty, all Plugins for all Organizations are listed, but this functionality is limited to
+    // Users with the necessary permissions.
+    repeated buf.registry.owner.v1.OwnerRef owner_refs = 1;
+    // The collections to list Plugins for.
+    //
+    // If empty, all Plugins are listed regardless of collection.
+    repeated PluginCollection collections = 2 [
+      (buf.validate.field).repeated.unique = true,
+      (buf.validate.field).repeated.items.enum.defined_only = true,
+      (buf.validate.field).repeated.items.enum.not_in = 0
+    ];
+  }
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // An optional filter to filter the list of Plugins.
+  Filter filter = 3;
+  // The order to return the Plugins.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 4 [(buf.validate.field).enum.defined_only = true];
+}
+
+message ListPluginsResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed Plugins.
+  repeated Plugin plugins = 2;
+}
+
+message CreatePluginsRequest {
+  // An individual request to create a Plugin.
+  message Value {
+    // The Organization to create the Plugin under. The OwnerRef must be a reference to an
+    // Organization and cannot be a User reference.
+    buf.registry.owner.v1.OwnerRef owner_ref = 1 [(buf.validate.field).required = true];
+    // The name of the Plugin.
+    string name = 2 [(buf.validate.field).string = {
+      min_len: 2
+      max_len: 100
+    }];
+    // The plugin's visibility.
+    PluginVisibility visibility = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true
+    ];
+    // The configurable description of the Plugin.
+    string description = 4 [(buf.validate.field).string.max_len = 350];
+    // The configurable source URL of the Plugin.
+    string source_url = 5 [
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).string.max_len = 255,
+      (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    ];
+    // The configurable readme of the Plugin.
+    //
+    // TODO(mf): worth a discussion. You could argue this belongs on the (immutable) PluginVersion
+    // object and should be versioned along with revision bumps. I personally don't necessarily agree
+    // with this because I always felt there was a way to write a readme that was version agnostic.
+    string readme = 6;
+  }
+  // The Plugins to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreatePluginsResponse {
+  repeated Plugin plugins = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdatePluginsRequest {
+  // An individual request to update a Plugin.
+  message Value {
+    // The Plugin to update.
+    PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+    // The plugins's visibility.
+    optional PluginVisibility visibility = 3 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+    // The deprecation status of the Plugin.
+    optional PluginState state = 4 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+    // The configurable description of the Plugin.
+    optional string description = 5 [(buf.validate.field).string.max_len = 350];
+    // The configurable source URL in the description of the Plugin.
+    optional string source_url = 6 [
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).string.max_len = 255,
+      (buf.validate.field).ignore = IGNORE_IF_DEFAULT_VALUE
+    ];
+    // The configurable readme of the Plugin.
+    optional string readme = 7;
+  }
+  // The Plugins to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdatePluginsResponse {
+  // The updated Plugins in the same order as given on the request.
+  repeated Plugin plugins = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeletePluginsRequest {
+  // The Plugins to delete.
+  repeated PluginRef plugin_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeletePluginsResponse {}
