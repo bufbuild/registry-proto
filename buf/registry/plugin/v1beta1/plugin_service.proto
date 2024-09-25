@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.plugin.v1beta1;
 
 import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/plugin/v1beta1/code_generation_config.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
 import "buf/validate/validate.proto";
 
@@ -85,6 +86,14 @@ message ListPluginsRequest {
     //
     // If empty, all Plugins are listed regardless of collection.
     repeated PluginCollection collections = 2 [
+      (buf.validate.field).repeated.unique = true,
+      (buf.validate.field).repeated.items.enum.defined_only = true,
+      (buf.validate.field).repeated.items.enum.not_in = 0
+    ];
+    // The languages to list Plugins for.
+    //
+    // If empty, all Plugins are listed regardless of language.
+    repeated PluginLanguage languages = 3 [
       (buf.validate.field).repeated.unique = true,
       (buf.validate.field).repeated.items.enum.defined_only = true,
       (buf.validate.field).repeated.items.enum.not_in = 0
