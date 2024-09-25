@@ -56,7 +56,7 @@ message DownloadResponse {
       (buf.validate.field).enum.defined_only = true
     ];
     // The content.
-    bytes content = 2;
+    bytes content = 2 [(buf.validate.field).bytes.min_len = 1];
 
     // TODO(mf): do we want to include the original PluginRef and Reference here? There might be an
     // opportunity to encapsulate the content in a container type similar to Commit.
