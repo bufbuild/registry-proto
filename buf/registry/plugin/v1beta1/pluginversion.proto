@@ -64,7 +64,7 @@ message PluginVersion {
   // - License changes
   // - Registry type changes
   // - Output language changes
-  // - Build changes, such as a new docker image or wasm module digest
+  // - Build changes, such as a new Docker image or WASM module digest
   int32 revision = 6 [(buf.validate.field).required = true];
   // The URL to the license of the Plugin.
   string license_url = 7 [
