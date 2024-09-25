@@ -16,15 +16,17 @@ syntax = "proto3";
 
 package buf.registry.plugin.v1beta1;
 
-import "buf/registry/plugin/v1beta1/generated_sdk.proto";
+import "buf/registry/plugin/v1beta1/code_generation_config.proto";
+import "buf/registry/plugin/v1beta1/reference.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
-// An immutable snapshot of a specific version of a Plugin that was pushed to the BSR. It captures
-// the Plugin's state at the time of the push and cannot be modified since some contents are used in
-// code generation and we want to ensure that the code generated from a specific version of a Plugin
-// does not change.
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
+
+// An immutable snapshot of a specific version of a Plugin. It captures the Plugin's state at the
+// time of the push and cannot be modified since some items are used at runtime and must be
+// consistent.
 message PluginVersion {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
@@ -72,12 +74,15 @@ message PluginVersion {
   ];
   // The SPDX identifier of the license of the Plugin.
   string license_spdx_identifier = 8;
-  // TODO(mf): should this and operation be a repeated field? I.e., a single plugin could satisfy multiple operations?
+  // TODO(mf): should this and operation be a repeated field? I.e., a single plugin could satisfy
+  // multiple operations?
   repeated PluginType plugin_type = 9 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).enum.defined_only = true
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
   ];
-  // TODO(mf): couldn't think of a better name for a generic field that could be used for any plugin type
+  // TODO(mf): couldn't think of a better name for a generic field that could be used for any plugin
+  // type
 
   CodeGenerationConfig code_generation = 10;
   CheckConfig check = 11;
@@ -93,36 +98,7 @@ enum PluginType {
   PLUGIN_TYPE_CHECK = 3;
 }
 
-message CodeGenerationConfig {
-  // The language that the plugin outputs.
-  PluginLanguage language = 1 [
-    (buf.validate.field).enum.defined_only = true,
-    (buf.validate.field).enum.not_in = 0
-  ];
-}
-
 message CheckConfig {}
-
-// The language that the plugin outputs.
-enum PluginLanguage {
-  PLUGIN_LANGUAGE_UNSPECIFIED = 0;
-  PLUGIN_LANGUAGE_GO = 1;
-  PLUGIN_LANGUAGE_JAVASCRIPT = 2;
-  PLUGIN_LANGUAGE_TYPESCRIPT = 3;
-  PLUGIN_LANGUAGE_SWIFT = 4;
-  PLUGIN_LANGUAGE_CPP = 5;
-  PLUGIN_LANGUAGE_JAVA = 6;
-  PLUGIN_LANGUAGE_DART = 7;
-  PLUGIN_LANGUAGE_RUST = 8;
-  PLUGIN_LANGUAGE_PYTHON = 9;
-  PLUGIN_LANGUAGE_RUBY = 10;
-  PLUGIN_LANGUAGE_KOTLIN = 11;
-  PLUGIN_LANGUAGE_OBJECTIVE_C = 12;
-  PLUGIN_LANGUAGE_PHP = 13;
-  PLUGIN_LANGUAGE_CSHARP = 14;
-  PLUGIN_LANGUAGE_SCALA = 15;
-  PLUGIN_LANGUAGE_C = 16;
-}
 
 // The runtime type of the PluginVersion.
 enum RuntimeType {

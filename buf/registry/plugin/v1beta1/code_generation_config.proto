@@ -1,0 +1,303 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.plugin.v1beta1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
+
+// TODO(mf): add validation for registry-related fields.
+
+// The configuration for code generation.
+message CodeGenerationConfig {
+  // The language that the plugin outputs.
+  repeated PluginLanguage languages = 1 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
+  // An optional configuration for plugins that support remote registries.
+  RegistryConfig registry_config = 2;
+}
+
+// The language that the plugin outputs.
+enum PluginLanguage {
+  PLUGIN_LANGUAGE_UNSPECIFIED = 0;
+  PLUGIN_LANGUAGE_GO = 1;
+  PLUGIN_LANGUAGE_JAVASCRIPT = 2;
+  PLUGIN_LANGUAGE_TYPESCRIPT = 3;
+  PLUGIN_LANGUAGE_SWIFT = 4;
+  PLUGIN_LANGUAGE_CPP = 5;
+  PLUGIN_LANGUAGE_JAVA = 6;
+  PLUGIN_LANGUAGE_DART = 7;
+  PLUGIN_LANGUAGE_RUST = 8;
+  PLUGIN_LANGUAGE_PYTHON = 9;
+  PLUGIN_LANGUAGE_RUBY = 10;
+  PLUGIN_LANGUAGE_KOTLIN = 11;
+  PLUGIN_LANGUAGE_OBJECTIVE_C = 12;
+  PLUGIN_LANGUAGE_PHP = 13;
+  PLUGIN_LANGUAGE_CSHARP = 14;
+  PLUGIN_LANGUAGE_SCALA = 15;
+  PLUGIN_LANGUAGE_C = 16;
+}
+
+// RegistryConfig is the configuration for the remote registries of a plugin.
+message RegistryConfig {
+  GoConfig go_config = 1;
+  NPMConfig npm_config = 2;
+  MavenConfig maven_config = 3;
+  SwiftConfig swift_config = 4;
+  PythonConfig python_config = 5;
+  CargoConfig cargo_config = 6;
+  NugetConfig nuget_config = 7;
+  CmakeConfig cmake_config = 8;
+  // The options to pass to the plugin. These will be merged into a single, comma-separated
+  // string.
+  repeated string options = 10;
+}
+
+// NPMImportStyle is used to specify the import style the plugin supports.
+enum NPMImportStyle {
+  NPM_IMPORT_STYLE_UNSPECIFIED = 0;
+  NPM_IMPORT_STYLE_MODULE = 1;
+  NPM_IMPORT_STYLE_COMMONJS = 2;
+}
+
+// SwiftPlatformType is used to specify the platform type for a Swift plugins minimum compatible version.
+enum SwiftPlatformType {
+  SWIFT_PLATFORM_TYPE_UNSPECIFIED = 0;
+  SWIFT_PLATFORM_TYPE_MACOS = 1;
+  SWIFT_PLATFORM_TYPE_IOS = 2;
+  SWIFT_PLATFORM_TYPE_WATCHOS = 3;
+  SWIFT_PLATFORM_TYPE_TVOS = 4;
+}
+
+// PythonPackageType is used to specify the package type for a Python Generated SDK.
+enum PythonPackageType {
+  PYTHON_PACKAGE_TYPE_UNSPECIFIED = 0;
+  // Regular Python package, containing Python runtime code (`.py` files).
+  PYTHON_PACKAGE_TYPE_RUNTIME = 1;
+  // Stub-only package, containing only `.pyi` files.
+  // Ref: https://peps.python.org/pep-0561/#stub-only-packages
+  PYTHON_PACKAGE_TYPE_STUB_ONLY = 2;
+}
+
+// DotnetTargetFramework specifies the target framework for dotnet plugins.
+// This is not meant to be an exhaustive list - most plugins should target a
+// netstandard version.
+// Reference: https://learn.microsoft.com/en-us/dotnet/standard/frameworks
+enum DotnetTargetFramework {
+  DOTNET_TARGET_FRAMEWORK_UNSPECIFIED = 0;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_0 = 1;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_1 = 2;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_2 = 3;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_3 = 4;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_4 = 5;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_5 = 6;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_6 = 7;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_2_0 = 8;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_2_1 = 9;
+  DOTNET_TARGET_FRAMEWORK_NET_5_0 = 10;
+  DOTNET_TARGET_FRAMEWORK_NET_6_0 = 11;
+  DOTNET_TARGET_FRAMEWORK_NET_7_0 = 12;
+  DOTNET_TARGET_FRAMEWORK_NET_8_0 = 13;
+}
+
+// GoConfig is the configuration for a Go plugin.
+message GoConfig {
+  // RuntimeLibrary describes the runtime library dependency of the generated code.
+  message RuntimeLibrary {
+    // The name of the runtime library module, i.e. "google.golang.org/protobuf".
+    string module = 1;
+    // The version of the runtime library, i.e. "v1.27.1".
+    string version = 2;
+  }
+  // Optionally define the runtime libraries for the plugin.
+  repeated RuntimeLibrary runtime_libraries = 1;
+  // The minimum Go version required by the plugin.
+  string minimum_version = 2;
+}
+
+// NPMConfig is the configuration for a JavaScript NPM plugin.
+message NPMConfig {
+  // RuntimeLibrary describes the runtime library dependency of the generated code.
+  message RuntimeLibrary {
+    // The name of the runtime library package, i.e. "@grpc/grpc-js".
+    string package = 1;
+    // The version of the runtime library, i.e. "^1.27.1".
+    string version = 2;
+  }
+  // Optionally define the runtime libraries for the plugin.
+  repeated RuntimeLibrary runtime_libraries = 1;
+  // Optionally define a configuration for rewriting import paths, a feature mainly
+  // used for remote code generation in the BSR npm registry, which makes it possible
+  // to serve the output of a BSR module and a plugin in an individual package.
+  //
+  // All plugins based on @bufbuild/protoplugin support the option "rewrite_imports".
+  // Setting this value, i.e. "connectweb.js" or "pb.js", informs the BSR npm registry
+  // that the plugin supports import rewrites with the given import suffix.
+  string rewrite_import_path_suffix = 2;
+  // The import style used for the "type" field in the package.json file.
+  // This exists to support legacy plugins that require "commonjs" support.
+  NPMImportStyle import_style = 3;
+}
+
+// MavenConfig is the configuration for a Maven plugin.
+message MavenConfig {
+  // RuntimeLibrary describes a runtime dependency of the generated code.
+  message RuntimeLibrary {
+    string group_id = 1;
+    string artifact_id = 2;
+    string version = 3;
+    string classifier = 4;
+    string extension = 5;
+  }
+  // CompilerConfig contains configuration for the Java and/or Kotlin compiler used when compiling the generated code.
+  message CompilerConfig {
+    CompilerJavaConfig java = 1;
+    CompilerKotlinConfig kotlin = 2;
+  }
+  // CompilerJavaConfig contains settings for the Java compiler.
+  message CompilerJavaConfig {
+    // File encoding (default: UTF-8).
+    string encoding = 1;
+    // Release version (default: 8).
+    int32 release = 2;
+    // Source version (default: 8).
+    int32 source = 3;
+    // Target version (default: 8).
+    int32 target = 4;
+  }
+  // CompilerKotlinConfig contains settings for the Kotlin compiler.
+  message CompilerKotlinConfig {
+    // Version of the Kotlin compiler used to compile the generated code.
+    string version = 1;
+    // Version of the Kotlin API to target.
+    string api_version = 2;
+    // Target version of the JVM bytecode (default: 1.8).
+    string jvm_target = 3;
+    // Kotlin language version used for source compatibility.
+    string language_version = 4;
+  }
+  // RuntimeConfig allows configuring additional runtimes (like the 'lite' runtime).
+  // They can use different runtime dependencies and plugin options.
+  message RuntimeConfig {
+    string name = 1;
+    repeated RuntimeLibrary runtime_libraries = 2;
+    // The options to pass to the plugin. These will
+    // be merged into a single, comma-separated string.
+    repeated string options = 3;
+  }
+
+  // Optionally define the runtime libraries for the plugin.
+  repeated RuntimeLibrary runtime_libraries = 1;
+  // Settings for the Java/Kotlin compiler used to compile the generated code.
+  CompilerConfig compiler = 2;
+  // Optional additional runtimes supported by the plugin.
+  repeated RuntimeConfig additional_runtimes = 3;
+}
+
+// NugetConfig is the configuration for a NuGet C# plugin.
+message NugetConfig {
+  // RuntimeLibrary describes a NuGet package dependency of the generated code.
+  // Ref: https://learn.microsoft.com/en-us/dotnet/core/tools/dependencies#the-packagereference-element
+  message RuntimeLibrary {
+    // The name of the NuGet package (also known as the package ID).
+    string name = 1;
+    // The version of the NuGet package (supports ranges).
+    // Ref: https://learn.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges
+    string version = 2;
+    // Optional target frameworks. If specified, these dependencies will be
+    // conditionally added when building for the specified target framework.
+    repeated DotnetTargetFramework target_frameworks = 3;
+  }
+  // Target frameworks to build. At least one target framework is required.
+  repeated DotnetTargetFramework target_frameworks = 1;
+  // Optional runtime libraries required by the plugin's generated code.
+  repeated RuntimeLibrary runtime_libraries = 2;
+}
+
+// CmakeConfig is the configuration for a Cmake C++ plugin.
+message CmakeConfig {}
+
+message SwiftConfig {
+  // RuntimeLibrary describes a runtime library dependency of the generated code.
+  message RuntimeLibrary {
+    // The source of the runtime library package, e.g. https://github.com/apple/swift-protobuf.git.
+    string source = 1;
+    // The name of the runtime library package, e.g. "swift-protobuf".
+    string package = 2;
+    // The version of the runtime library, e.g. "1.21.0".
+    string version = 3;
+    // The products exported by the runtime library, e.g. "SwiftProtobuf".
+    repeated string products = 4;
+    // The minimum compatible platform versions of the runtime library.
+    message Platform {
+      // The name of the platform.
+      SwiftPlatformType name = 1;
+      // The minimum compatible version of the platform.
+      string version = 2;
+    }
+    // The minimum compatible platform versions of the runtime library.
+    repeated Platform platforms = 5;
+    // The supported Swift language versions of the runtime library, e.g. ".v5".
+    repeated string swift_versions = 6;
+  }
+  // Optionally define the runtime libraries for the plugin.
+  repeated RuntimeLibrary runtime_libraries = 1;
+}
+
+message PythonConfig {
+  message RuntimeLibrary {
+    // dependency_specification is a PEP 508 Dependency Specification.
+    // Ref: https://peps.python.org/pep-0508/
+    string dependency_specification = 1;
+  }
+  repeated RuntimeLibrary runtime_libraries = 1;
+  // requires_python is a PEP 440 Version Specifier that specifies the value of
+  // the `Requires-Python` field in a metadata file.
+  //
+  // Ref:
+  // - https://packaging.python.org/en/latest/specifications/core-metadata/#requires-python
+  // - https://peps.python.org/pep-0440/
+  string requires_python = 2;
+  // package_type is the PythonPackageType that this plugin generates.
+  PythonPackageType package_type = 3;
+}
+
+// CargoConfig specifies the Cargo Registry configuration for a Rust plugin.
+message CargoConfig {
+  // RuntimeLibrary specifies a runtime dependency for a generated crate.
+  // It is the subset of a full Cargo dependency specification, which contains
+  // fields that are irrelevant for Generated SDKs.
+  // Ref: https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html
+  message RuntimeLibrary {
+    // name specifies the name of the dependency.
+    string name = 1;
+    // version_requirement specifies the version requirement of the dependency.
+    string version_requirement = 2;
+    // default_features specifies whether or not default features will be enabled for the dependency.
+    bool default_features = 3;
+    // features specifies the features enabled for the dependency.
+    repeated string features = 4;
+  }
+  // rust_version specifies the minimum supported Rust version (MSRV) for the generated crate.
+  // Ref: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
+  string rust_version = 1;
+  // runtime_libraries specifies the runtime dependencies for the generated crate. Optional.
+  repeated RuntimeLibrary runtime_libraries = 2;
+}
