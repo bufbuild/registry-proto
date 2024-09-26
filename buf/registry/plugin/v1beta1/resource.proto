@@ -36,7 +36,7 @@ message Resource {
 }
 
 // A reference to any of:
-//   - Module
+//   - Plugin
 //   - Label
 //   - Commit
 //
@@ -53,11 +53,11 @@ message ResourceRef {
   // The fully-qualified name component of a ResourceRef.
   //
   // The following semantics are applied:
-  //   - If the child oneof is not specified, the name is interpreted to reference a Module.
+  //   - If the child oneof is not specified, the name is interpreted to reference a Plugin.
   //   - If label_name is specified, the name is interpreted to reference a Label.
   //   - If ref is specified, it is interpreted to be either an id or name.
   //     - If an id, this is equivalent to setting the id field on ResourceRef. However,
-  //       backends can choose to validate that the owner and module fields match the resource
+  //       backends can choose to validate that the owner and plugin fields match the resource
   //       referenced, as additional validation.
   //     - If a name, this is interpreted to be a Label name.
   //     - If there is a conflict between names across resources (for example, there is a Commit id

@@ -18,6 +18,7 @@ package buf.registry.plugin.v1beta1;
 
 import "buf/registry/plugin/v1beta1/plugin.proto";
 import "buf/registry/plugin/v1beta1/commit.proto";
+import "buf/registry/plugin/v1beta1/resource.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
@@ -38,6 +39,11 @@ message UploadRequest {
   message Content {
     // The Plugin of the reference.
     PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+    // Compression type of the content.
+    CompressionType compression_type = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true
+    ];
     // The content to upload.
     bytes content = 3;
   }

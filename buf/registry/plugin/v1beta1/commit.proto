@@ -61,4 +61,45 @@ message Commit {
     (buf.validate.field).string.tuuid = true,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
+  // The URL to the license of the Plugin.
+  string license_url = 7 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+  ];
+  // The SPDX identifier of the license of the Plugin.
+  string license_spdx_identifier = 8;
+  // The plugin types the PluginVersion supports. Must have at least one element.
+  repeated PluginType plugin_type = 9 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
+  //
+}
+
+// The type of the Plugin.
+enum PluginType {
+  PLUGIN_TYPE_UNSPECIFIED = 0;
+  PLUGIN_TYPE_PROTOC_CODE_GENERATION = 1;
+  PLUGIN_TYPE_CODE_GENERATION = 2;
+  PLUGIN_TYPE_CHECK = 3;
+}
+
+// The configuration for a check plugin.
+//
+// TODO(mf): we might want to remove this entirely, as it's not clear what this would be used for.
+// The Rules and Categories are a property of the plugin itself, and not what a user would define.
+// At most we'll want to keep this around for Responses to surface Rules and/or Categories, but this
+// is not clear yet.
+message CheckConfig {}
+
+// The runtime type of the PluginVersion.
+enum RuntimeType {
+  RUNTIME_TYPE_UNSPECIFIED = 0;
+  // The PluginVersion is a Docker image.
+  RUNTIME_TYPE_DOCKER = 1;
+  // The PluginVersion is a WASI module.
+  RUNTIME_TYPE_WASIP1 = 2;
 }
