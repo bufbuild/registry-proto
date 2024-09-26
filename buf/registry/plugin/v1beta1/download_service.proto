@@ -17,7 +17,7 @@ syntax = "proto3";
 package buf.registry.plugin.v1beta1;
 
 import "buf/registry/plugin/v1beta1/plugin.proto";
-import "buf/registry/plugin/v1beta1/reference.proto";
+import "buf/registry/plugin/v1beta1/commit.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
@@ -35,10 +35,17 @@ service DownloadService {
 message DownloadRequest {
   // A request for content for a single version of a Plugin.
   message Value {
-    // The plugin reference to get content for.
-    PluginRef plugin_ref = 2 [(buf.validate.field).required = true];
     // The reference to get content for.
-    Reference reference = 1 [(buf.validate.field).required = true];
+    //
+    // See the documentation on Reference for reference resolution details.
+    //
+    // Once the resource is resolved, the following content is returned:
+    //   - If a Plugin is referenced, the content of the latest commit of the
+    //     default label is returned.
+    //   - If a Label is referenced, the content of the Commit of this Label is
+    //     returned.
+    //   - If a Commit is referenced, the content for this Commit is returned.
+    ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
   }
   // The references to get contents for.
   repeated Value values = 1 [
@@ -50,11 +57,14 @@ message DownloadRequest {
 message DownloadResponse {
   // Content for a single version of a Plugin.
   message Content {
-    // Compression type of the content.
-    CompressionType compression_type = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).enum.defined_only = true
-    ];
+    // The Commit associated with the Content.
+    Commit commit = 1 [(buf.validate.field).required = true];
+    // TODO: compression?
+    //// Compression type of the content.
+    //CompressionType compression_type = 1 [
+    //  (buf.validate.field).required = true,
+    //  (buf.validate.field).enum.defined_only = true
+    //];
     // The content.
     bytes content = 2 [(buf.validate.field).required = true];
 

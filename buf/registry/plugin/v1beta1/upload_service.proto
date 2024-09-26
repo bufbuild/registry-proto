@@ -17,7 +17,7 @@ syntax = "proto3";
 package buf.registry.plugin.v1beta1;
 
 import "buf/registry/plugin/v1beta1/plugin.proto";
-import "buf/registry/plugin/v1beta1/reference.proto";
+import "buf/registry/plugin/v1beta1/commit.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
@@ -32,17 +32,12 @@ service UploadService {
 }
 
 message UploadRequest {
-  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   // Content to upload.
   message Content {
     // The Plugin of the reference.
     PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
-    // Compression type of the content.
-    CompressionType compression_type = 2 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).enum.defined_only = true
-    ];
     // The content to upload.
     bytes content = 3;
   }
@@ -51,7 +46,7 @@ message UploadRequest {
 }
 
 message UploadResponse {
-  // TODO(mf): consider adding a container type to hold references similar to Commit, but not
-  // include the content itself.
-  repeated Reference references = 1 [(buf.validate.field).repeated.min_items = 1];
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }

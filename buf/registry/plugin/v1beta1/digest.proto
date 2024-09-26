@@ -20,34 +20,23 @@ import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
 
-// Reference to a piece of content.
+// A digest of a Commit's content.
 //
-// TODO(mf): not overly happy with the name as the term "Reference" is overloaded. maybe:
-// ContentReference, ArtifactDigest, ContentIdentifier, Identifier, ??
-message Reference {
-  // The type of the Reference.
-  ReferenceType type = 1 [
+// A digest represents all content for a single Commit, including its .proto files, documentation
+// files, license files, and the digests of its dependencies.
+message Digest {
+  // The type of the Digest.
+  DigestType type = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
-  // The value of the Reference.
+  // The value of the Digest.
   bytes value = 2 [(buf.validate.field).required = true];
 }
 
-// The type of a Reference.
-enum ReferenceType {
-  REFERENCE_TYPE_UNSPECIFIED = 0;
-  // The SHA256 digest of the content.
-  REFERENCE_TYPE_SHA256 = 1;
-}
-
-// The compression type of the content.
-//
-// TODO(mf): is there a better place for this?
-enum CompressionType {
-  COMPRESSION_TYPE_UNSPECIFIED = 0;
-  // No compression.
-  COMPRESSION_TYPE_NONE = 1;
-  // Zstandard compression.
-  COMPRESSION_TYPE_ZSTD = 2;
+// The type of Digest.
+enum DigestType {
+  DIGEST_TYPE_UNSPECIFIED = 0;
+  // The b5 digest function.
+  DIGEST_TYPE_B5 = 2;
 }
