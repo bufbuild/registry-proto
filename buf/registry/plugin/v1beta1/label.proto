@@ -60,8 +60,9 @@ message Label {
   ];
   // The id of the Commit currently associated with the Label.
   //
-  // If policy checks are enabled, this will point to the most recent Commit that passed or was approved.
-  // To get the history of the Commits that have been associated with a Label, use ListLabelHistory.
+  // If policy checks are enabled, this will point to the most recent Commit that passed or was
+  // approved. To get the history of the Commits that have been associated with a Label, use
+  // ListLabelHistory.
   string commit_id = 8 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
@@ -83,8 +84,8 @@ message LabelRef {
 
   // The fully-qualified name of a Label within a BSR instance.
   //
-  // A Name uniquely identifies a Label.
-  // This is used for requests when a caller only has the label name and not the ID.
+  // A Name uniquely identifies a Label. This is used for requests when a caller only has the label
+  // name and not the ID.
   message Name {
     // The name of the owner of the Plugin that contains the Label, either a User or Organization.
     string owner = 1 [

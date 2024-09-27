@@ -40,10 +40,9 @@ message DownloadRequest {
     // See the documentation on Reference for reference resolution details.
     //
     // Once the resource is resolved, the following content is returned:
-    //   - If a Plugin is referenced, the content of the latest commit of the
-    //     default label is returned.
-    //   - If a Label is referenced, the content of the Commit of this Label is
+    //   - If a Plugin is referenced, the content of the latest commit of the default label is
     //     returned.
+    //   - If a Label is referenced, the content of the Commit of this Label is returned.
     //   - If a Commit is referenced, the content for this Commit is returned.
     ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
   }
@@ -59,13 +58,9 @@ message DownloadResponse {
   message Content {
     // The Commit associated with the Content.
     Commit commit = 1 [(buf.validate.field).required = true];
-    // TODO: compression?
-    //// Compression type of the content.
-    //CompressionType compression_type = 1 [
-    //  (buf.validate.field).required = true,
-    //  (buf.validate.field).enum.defined_only = true
-    //];
-    // The content.
+    // TODO: compression? // Compression type of the content. CompressionType compression_type = 1 [
+    //(buf.validate.field).required = true, (buf.validate.field).enum.defined_only = true ]; The
+    //content.
     bytes content = 2 [(buf.validate.field).required = true];
 
     // TODO(mf): do we want to include the original PluginRef and Reference here? There might be an

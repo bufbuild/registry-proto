@@ -40,10 +40,9 @@ service LabelService {
   }
   // Create or update Labels on a Plugin.
   //
-  // If the Label does not exist, it will be created.
-  // If the Label was archived, it will be unarchived.
-  // If the Label already existed, the Commit in the request has to be newer than the Commit that
-  // the Label is currently pointing to, otherwise an error is returned.
+  // If the Label does not exist, it will be created. If the Label was archived, it will be
+  // unarchived. If the Label already existed, the Commit in the request has to be newer than the
+  // Commit that the Label is currently pointing to, otherwise an error is returned.
   //
   // This operation is atomic. Either all Labels are created/updated or an error is returned.
   rpc CreateOrUpdateLabels(CreateOrUpdateLabelsRequest) returns (CreateOrUpdateLabelsResponse) {
@@ -113,11 +112,13 @@ message ListLabelsRequest {
   //
   // See the documentation on Ref for resource resolution details.
   //
-  // Once the resource is resolved, the following Labels are listed (subject to any additional filters in the request):
+  // Once the resource is resolved, the following Labels are listed (subject to any additional
+  // filters in the request):
   //   - If a Plugin is referenced, all Labels for the Plugin are returned.
   //   - If a Label is referenced, this Label is returned.
-  //   - If a Commit is referenced, all Labels that currently point to the Commit are returned. Note that
-  //     Labels only point to passed or approved Commits, or Commits where policy checks were disabled.
+  //   - If a Commit is referenced, all Labels that currently point to the Commit are returned. Note
+  //     that Labels only point to passed or approved Commits, or Commits where policy checks were
+  //     disabled.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //
@@ -169,8 +170,8 @@ message ListLabelHistoryRequest {
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
   // The DigestType to use for Digests returned on Commits.
   //
-  // If this DigestType is not available, an error is returned.
-  // Note that certain DigestTypes may be deprecated over time.
+  // If this DigestType is not available, an error is returned. Note that certain DigestTypes may be
+  // deprecated over time.
   //
   // If not set, the latest DigestType is used, currently B5.
   DigestType digest_type = 5 [(buf.validate.field).enum.defined_only = true];
@@ -181,8 +182,8 @@ message ListLabelHistoryRequest {
     (buf.validate.field).string.tuuid = true,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
-  // Only list Commits where the Digest has changed from the previous Commit in the
-  // history of this Label.
+  // Only list Commits where the Digest has changed from the previous Commit in the history of this
+  // Label.
   bool only_commits_with_changed_digests = 8;
 }
 
@@ -208,8 +209,7 @@ message CreateOrUpdateLabelsRequest {
     //
     // If the Label already existed, the Label will now point to this Commit, as long as this Commit
     // is newer than the Commit that the Label is currently pointing to, otherwise an error is
-    // returned.
-    // If the Label was archived, it will be unarchived.
+    // returned. If the Label was archived, it will be unarchived.
     string commit_id = 2 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.tuuid = true

@@ -158,10 +158,9 @@ message CreatePluginsRequest {
     ];
     // The configurable readme of the Plugin.
     //
-    // TODO(mf): worth a discussion. You could argue this belongs on the (immutable) PluginVersion
-    // object and should be versioned along with revision bumps. I personally don't necessarily
-    // agree with this because I always felt there was a way to write a readme that was version
-    // agnostic.
+    // TODO(mf): worth a discussion. You could argue this belongs on the (immutable) Commit object
+    // and should be versioned along with revision bumps. I personally don't necessarily agree with
+    // this because I always felt there was a way to write a readme that was version agnostic.
     string readme = 6;
   }
   // The Plugins to create.
