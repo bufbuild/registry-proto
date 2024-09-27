@@ -69,7 +69,7 @@ message Commit {
   ];
   // The SPDX identifier of the license of the Plugin.
   string license_spdx_identifier = 8;
-  // The plugin types the PluginVersion supports. Must have at least one element.
+  // The plugin types the Commit supports. Must have at least one element.
   repeated PluginType plugin_type = 9 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.unique = true,
@@ -95,11 +95,11 @@ enum PluginType {
 // is not clear yet.
 message CheckConfig {}
 
-// The runtime type of the PluginVersion.
+// The runtime type of the Commit.
 enum RuntimeType {
   RUNTIME_TYPE_UNSPECIFIED = 0;
-  // The PluginVersion is a Docker image.
+  // The Commit is a Docker image.
   RUNTIME_TYPE_DOCKER = 1;
-  // The PluginVersion is a WASI module.
+  // The Commit is a WASI module.
   RUNTIME_TYPE_WASIP1 = 2;
 }
