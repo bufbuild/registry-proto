@@ -40,12 +40,12 @@ message Resource {
 //   - Label
 //   - Commit
 //
-// The id or name is resolved to a specific resource.
-// If an id is passed, this is interpreted as being the id of the resource.
-// If a name is passed, the semantics according to ResourceRef.Name are applied.
+// The id or name is resolved to a specific resource. If an id is passed, this is interpreted as
+// being the id of the resource. If a name is passed, the semantics according to ResourceRef.Name
+// are applied.
 //
-// ResourceRefs can only be used in requests, and only for read-only RPCs, that is
-// you should not use an arbitrary reference when modifying a specific resource.
+// ResourceRefs can only be used in requests, and only for read-only RPCs, that is you should not
+// use an arbitrary reference when modifying a specific resource.
 message ResourceRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
   option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
@@ -56,17 +56,17 @@ message ResourceRef {
   //   - If the child oneof is not specified, the name is interpreted to reference a Plugin.
   //   - If label_name is specified, the name is interpreted to reference a Label.
   //   - If ref is specified, it is interpreted to be either an id or name.
-  //     - If an id, this is equivalent to setting the id field on ResourceRef. However,
-  //       backends can choose to validate that the owner and plugin fields match the resource
-  //       referenced, as additional validation.
+  //     - If an id, this is equivalent to setting the id field on ResourceRef. However, backends
+  //       can choose to validate that the owner and plugin fields match the resource referenced, as
+  //       additional validation.
   //     - If a name, this is interpreted to be a Label name.
   //     - If there is a conflict between names across resources (for example, there is a Commit id
   //       and Label name of the same value), the following order of precedence is applied:
   //       - Commit
   //       - Label
   //
-  // Names can only be used in requests, and only for read-only RPCs, that is
-  // you should not use an arbitrary reference when modifying a specific resource.
+  // Names can only be used in requests, and only for read-only RPCs, that is you should not use an
+  // arbitrary reference when modifying a specific resource.
   message Name {
     // The name of the User or Organization that owns the resource.
     string owner = 1 [
@@ -82,13 +82,13 @@ message ResourceRef {
     oneof child {
       // The name of the Label.
       //
-      // If this value is present but empty, this should be treated as not present, that is
-      // an empty value is the same as a null value.
+      // If this value is present but empty, this should be treated as not present, that is an empty
+      // value is the same as a null value.
       string label_name = 3 [(buf.validate.field).string.max_len = 250];
       // The untyped reference, applying the semantics as documented on the Name message.
       //
-      // If this value is present but empty, this should be treated as not present, that is
-      // an empty value is the same as a null value.
+      // If this value is present but empty, this should be treated as not present, that is an empty
+      // value is the same as a null value.
       string ref = 4;
     }
   }

@@ -14,13 +14,13 @@
 
 syntax = "proto3";
 
+package buf.registry.plugin.v1beta1;
+
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
-
-package buf.registry.plugin.v1beta1;
 
 // A label on a specific Plugin.
 //
@@ -48,7 +48,7 @@ message Label {
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 250
   ];
-  // The id of the User or Organization that owns the Plugin that the Label is associated with.
+  // The id of the Organization that owns the Plugin that the Label is associated with.
   string owner_id = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
@@ -109,20 +109,5 @@ message LabelRef {
     string id = 1 [(buf.validate.field).string.tuuid = true];
     // The fully-qualified name of the Label.
     Name name = 2;
-  }
-}
-
-// A reference to a Label scoped to a Plugin, either an id or a name.
-//
-// This is used in requests.
-message ScopedLabelRef {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // The id of the Label.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
-    // The name of the Label.
-    string name = 2;
   }
 }

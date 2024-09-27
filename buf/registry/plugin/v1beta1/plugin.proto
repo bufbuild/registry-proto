@@ -65,6 +65,8 @@ message Plugin {
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
   // The configurable readme of the Plugin.
+  //
+  // TODO(mf): this will probably need to be pushed down a level to the commit.
   string readme = 10;
   // Managed indicates whether a Plugin is managed by the BSR.
   //

@@ -29,10 +29,10 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 //
 // Many Commits may be associated with one Digest.
 //
-// The only supported DigestType for 
+// The only supported DigestType for
 message Commit {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
-  
+
   // The id of the Commit.
   string id = 1 [
     (buf.validate.field).required = true,
