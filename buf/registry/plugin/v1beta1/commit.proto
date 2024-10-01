@@ -29,7 +29,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 //
 // Many Commits may be associated with one Digest.
 //
-// The only supported DigestType for
+// Not that the Digest returned on a Commit depends on the requested DigestType in the
+// RPC that returned the Commit.
 message Commit {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
