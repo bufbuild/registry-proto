@@ -29,8 +29,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 //
 // Many Commits may be associated with one Digest.
 //
-// Not that the Digest returned on a Commit depends on the requested DigestType in the
-// RPC that returned the Commit.
+// Not that the Digest returned on a Commit depends on the requested DigestType in the RPC that
+// returned the Commit.
 message Commit {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
@@ -43,7 +43,7 @@ message Commit {
   //
   // Commits are immutable, so there is no corresponding update_time.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
-  // The id of the User or Organization that owns the Plugin that the Commit is associated with.
+  // The id of the Organization that owns the Plugin that the Commit is associated with.
   string owner_id = 3 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
@@ -69,7 +69,7 @@ message Commit {
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
   // The SPDX identifier of the license of the Plugin.
-  string license_spdx_identifier = 8;
+  string spdx_license_id = 8;
   // The plugin types the Commit supports. Must have at least one element.
   repeated PluginType plugin_type = 9 [
     (buf.validate.field).repeated.min_items = 1,
@@ -77,7 +77,6 @@ message Commit {
     (buf.validate.field).repeated.items.enum.defined_only = true,
     (buf.validate.field).repeated.items.enum.not_in = 0
   ];
-  //
 }
 
 // The type of the Plugin.
@@ -87,14 +86,6 @@ enum PluginType {
   PLUGIN_TYPE_CODE_GENERATION = 2;
   PLUGIN_TYPE_CHECK = 3;
 }
-
-// The configuration for a check plugin.
-//
-// TODO(mf): we might want to remove this entirely, as it's not clear what this would be used for.
-// The Rules and Categories are a property of the plugin itself, and not what a user would define.
-// At most we'll want to keep this around for Responses to surface Rules and/or Categories, but this
-// is not clear yet.
-message CheckConfig {}
 
 // The runtime type of the Commit.
 enum RuntimeType {

@@ -58,13 +58,13 @@ message DownloadResponse {
   message Content {
     // The Commit associated with the Content.
     Commit commit = 1 [(buf.validate.field).required = true];
-    // TODO: compression? // Compression type of the content. CompressionType compression_type = 1 [
-    //(buf.validate.field).required = true, (buf.validate.field).enum.defined_only = true ]; The
-    //content.
-    bytes content = 2 [(buf.validate.field).required = true];
-
-    // TODO(mf): do we want to include the original PluginRef and Reference here? There might be an
-    // opportunity to encapsulate the content in a container type similar to Commit.
+    // Compression type of the content.
+    CompressionType compression_type = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true
+    ];
+    // The content.
+    bytes content = 3 [(buf.validate.field).required = true];
   }
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
 }

@@ -68,7 +68,7 @@ message ResourceRef {
   // Names can only be used in requests, and only for read-only RPCs, that is you should not use an
   // arbitrary reference when modifying a specific resource.
   message Name {
-    // The name of the User or Organization that owns the resource.
+    // The name of the Organization that owns the resource.
     string owner = 1 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 32
