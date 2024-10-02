@@ -84,11 +84,7 @@ message ListPluginsRequest {
     // The collections to list Plugins for.
     //
     // If empty, all Plugins are listed regardless of collection.
-    repeated PluginCollection collections = 2 [
-      (buf.validate.field).repeated.unique = true,
-      (buf.validate.field).repeated.items.enum.defined_only = true,
-      (buf.validate.field).repeated.items.enum.not_in = 0
-    ];
+    repeated string collection_names = 2;
     // The languages to list Plugins for.
     //
     // If empty, all Plugins are listed regardless of language.
@@ -151,17 +147,21 @@ message CreatePluginsRequest {
     // The configurable description of the Plugin.
     string description = 4 [(buf.validate.field).string.max_len = 350];
     // The configurable source URL of the Plugin.
+    //
+    // TODO(mf): do we want this at the Plugin or the PluginCommit.
+    //
+    // I'm inclined to leave this on the Plugin. I think the most common use case is a plugin
+    // repository moving from github.com/foo/bar to github.com/new/repo and that event should apply
+    // to all commits since the project as a whole is moving, and not a subset of commits.
+    //
+    // For example, connect used to be under bufbuild but moved to a new organization, when looking
+    // at the Go docs there is a single source of truth for the project despite having a different
+    // home.
     string source_url = 5 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
     ];
-    // The configurable readme of the Plugin.
-    //
-    // TODO(mf): worth a discussion. You could argue this belongs on the (immutable) Commit object
-    // and should be versioned along with revision bumps. I personally don't necessarily agree with
-    // this because I always felt there was a way to write a readme that was version agnostic.
-    string readme = 6;
   }
   // The Plugins to create.
   repeated Value values = 1 [

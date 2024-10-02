@@ -35,13 +35,15 @@ message Collection {
   ];
   // The time the Collection was created on the BSR.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The last time the Label was updated on the BSR.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The name of the Collection.
   //
   // Unique within a BSR instance.
-  string name = 5 [
+  string name = 4 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 250
   ];
   // The configurable description of the Collection.
-  string description = 8 [(buf.validate.field).string.max_len = 350];
+  string description = 5 [(buf.validate.field).string.max_len = 350];
 }
