@@ -54,6 +54,10 @@ message Commit {
     (buf.validate.field).string.tuuid = true
   ];
   // The Digest of the Commit's contents.
+  //
+  // TODO(mf): if we have both docker and wasm modules, is this only returning the p1 digest, or
+  // also the sha256 docker image digest? Do we need a digest_type, or more explicitly a
+  // runtime_type like wasip1 or docker?
   Digest digest = 5 [(buf.validate.field).required = true];
   // The id of the User that created this Commit on the BSR.
   //
@@ -77,6 +81,8 @@ message Commit {
     (buf.validate.field).repeated.items.enum.defined_only = true,
     (buf.validate.field).repeated.items.enum.not_in = 0
   ];
+  // The documentation of the Plugin.
+  string doc = 10;
 }
 
 // The type of the Plugin.
@@ -85,13 +91,4 @@ enum PluginType {
   PLUGIN_TYPE_PROTOC_CODE_GENERATION = 1;
   PLUGIN_TYPE_CODE_GENERATION = 2;
   PLUGIN_TYPE_CHECK = 3;
-}
-
-// The runtime type of the Commit.
-enum RuntimeType {
-  RUNTIME_TYPE_UNSPECIFIED = 0;
-  // The Commit is a Docker image.
-  RUNTIME_TYPE_DOCKER = 1;
-  // The Commit is a WASI module.
-  RUNTIME_TYPE_WASIP1 = 2;
 }
