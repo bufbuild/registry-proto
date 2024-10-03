@@ -54,7 +54,7 @@ message CollectionRef {
 
   oneof value {
     option (buf.validate.oneof).required = true;
-    // The id of the Label.
+    // The id of the Collection.
     string id = 1 [(buf.validate.field).string.tuuid = true];
     // The name of the Collection.
     string name = 2 [(buf.validate.field).string = {
