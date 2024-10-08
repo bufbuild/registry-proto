@@ -74,21 +74,6 @@ message Commit {
   ];
   // The SPDX identifier of the license of the Plugin.
   string spdx_license_id = 8;
-  // The plugin types the Commit supports. Must have at least one element.
-  repeated PluginType plugin_type = 9 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.unique = true,
-    (buf.validate.field).repeated.items.enum.defined_only = true,
-    (buf.validate.field).repeated.items.enum.not_in = 0
-  ];
   // The documentation of the Plugin.
   string doc = 10;
-}
-
-// The type of the Plugin.
-enum PluginType {
-  PLUGIN_TYPE_UNSPECIFIED = 0;
-  PLUGIN_TYPE_PROTOC_CODE_GENERATION = 1;
-  PLUGIN_TYPE_CODE_GENERATION = 2;
-  PLUGIN_TYPE_CHECK = 3;
 }

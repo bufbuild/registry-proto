@@ -57,10 +57,15 @@ message Plugin {
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
+  // The Plugin type.
+  PluginType type = 8 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
   // The configurable short description of the Plugin.
-  string description = 8 [(buf.validate.field).string.max_len = 350];
+  string description = 9 [(buf.validate.field).string.max_len = 350];
   // The configurable source URL of the Plugin.
-  string source_url = 9 [
+  string source_url = 10 [
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.max_len = 255,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
@@ -69,9 +74,9 @@ message Plugin {
   //
   // Managed Plugins are automatically updated and should not be updated by users because they will
   // be overwritten.
-  bool managed = 10;
+  bool managed = 11;
   // The collections the Plugin belongs to.
-  repeated Collection collections = 11;
+  repeated Collection collections = 12;
 }
 
 // The visibility of a Plugin, currently either public or private.
@@ -90,6 +95,14 @@ enum PluginState {
   PLUGIN_STATE_ACTIVE = 1;
   // PLUGIN_STATE_DEPRECATED says that the Plugin has been deprecated and should no longer be used.
   PLUGIN_STATE_DEPRECATED = 2;
+}
+
+// The type of the Plugin.
+enum PluginType {
+  PLUGIN_TYPE_UNSPECIFIED = 0;
+  PLUGIN_TYPE_PROTOC_CODE_GENERATION = 1;
+  PLUGIN_TYPE_CODE_GENERATION = 2;
+  PLUGIN_TYPE_CHECK = 3;
 }
 
 // PluginRef is a reference to a Plugin, either an id or a fully-qualified name.
