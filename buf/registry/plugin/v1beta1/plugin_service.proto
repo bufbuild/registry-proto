@@ -17,7 +17,7 @@ syntax = "proto3";
 package buf.registry.plugin.v1beta1;
 
 import "buf/registry/owner/v1/owner.proto";
-import "buf/registry/plugin/v1beta1/collection.proto";
+import "buf/registry/plugin/v1beta1/code_generation_config.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
 import "buf/validate/validate.proto";
 
@@ -85,7 +85,23 @@ message ListPluginsRequest {
     // The collections to list Plugins for.
     //
     // If empty, all Plugins are listed regardless of collection.
-    repeated CollectionRef collection_names = 2;
+    repeated string collection_names = 2;
+    // The languages to list Plugins for.
+    //
+    // If empty, all Plugins are listed regardless of language.
+    repeated PluginLanguage languages = 3 [
+      (buf.validate.field).repeated.unique = true,
+      (buf.validate.field).repeated.items.enum.defined_only = true,
+      (buf.validate.field).repeated.items.enum.not_in = 0
+    ];
+    // The registry types to list Plugins for.
+    //
+    // If empty, all Plugins are listed regardless of registry type.
+    repeated PluginRegistryType registry_types = 4 [
+      (buf.validate.field).repeated.unique = true,
+      (buf.validate.field).repeated.items.enum.defined_only = true,
+      (buf.validate.field).repeated.items.enum.not_in = 0
+    ];
   }
   // The maximum number of items to return.
   //
@@ -146,6 +162,11 @@ message CreatePluginsRequest {
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    ];
+    // The Plugin type.
+    PluginType type = 6 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true
     ];
   }
   // The Plugins to create.
