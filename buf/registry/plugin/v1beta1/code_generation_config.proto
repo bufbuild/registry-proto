@@ -1,0 +1,333 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.plugin.v1beta1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
+
+// The configuration for code generation.
+message CodeGenerationConfig {
+  // The languages that the plugin outputs.
+  repeated PluginLanguage languages = 1 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
+  // An optional configuration for plugins that support remote registries.
+  RegistryConfig registry_config = 2;
+}
+
+// The language that the plugin outputs.
+enum PluginLanguage {
+  PLUGIN_LANGUAGE_UNSPECIFIED = 0;
+  PLUGIN_LANGUAGE_GO = 1;
+  PLUGIN_LANGUAGE_JAVASCRIPT = 2;
+  PLUGIN_LANGUAGE_TYPESCRIPT = 3;
+  PLUGIN_LANGUAGE_SWIFT = 4;
+  PLUGIN_LANGUAGE_CPP = 5;
+  PLUGIN_LANGUAGE_JAVA = 6;
+  PLUGIN_LANGUAGE_DART = 7;
+  PLUGIN_LANGUAGE_RUST = 8;
+  PLUGIN_LANGUAGE_PYTHON = 9;
+  PLUGIN_LANGUAGE_RUBY = 10;
+  PLUGIN_LANGUAGE_KOTLIN = 11;
+  PLUGIN_LANGUAGE_OBJECTIVE_C = 12;
+  PLUGIN_LANGUAGE_PHP = 13;
+  PLUGIN_LANGUAGE_CSHARP = 14;
+  PLUGIN_LANGUAGE_SCALA = 15;
+  PLUGIN_LANGUAGE_C = 16;
+}
+
+// The type of registry the plugin supports.
+enum PluginRegistryType {
+  PLUGIN_REGISTRY_TYPE_UNSPECIFIED = 0;
+  PLUGIN_REGISTRY_TYPE_GO = 1;
+  PLUGIN_REGISTRY_TYPE_NPM = 2;
+  PLUGIN_REGISTRY_TYPE_MAVEN = 3;
+  PLUGIN_REGISTRY_TYPE_SWIFT = 4;
+  PLUGIN_REGISTRY_TYPE_PYTHON = 5;
+  PLUGIN_REGISTRY_TYPE_CARGO = 6;
+  PLUGIN_REGISTRY_TYPE_NUGET = 7;
+  PLUGIN_REGISTRY_TYPE_CMAKE = 8;
+}
+
+// A collection of configurations for different registries.
+//
+// A plugin may support multiple registry types, and each registry type may have a different
+// configuration.
+message RegistryConfig {
+  GoConfig go_config = 1;
+  NPMConfig npm_config = 2;
+  MavenConfig maven_config = 3;
+  SwiftConfig swift_config = 4;
+  PythonConfig python_config = 5;
+  CargoConfig cargo_config = 6;
+  NugetConfig nuget_config = 7;
+  CmakeConfig cmake_config = 8;
+  // The options to pass to the plugin.
+  repeated string options = 10;
+}
+
+// The configuration for a Go plugin.
+message GoConfig {
+  // The runtime library dependency of the generated code.
+  message RuntimeLibrary {
+    // The name of a Go module. Exmaple: "google.golang.org/protobuf".
+    string module = 1 [(buf.validate.field).required = true];
+    // The version of the Go module. Example: "v1.34.2".
+    string version = 2 [(buf.validate.field).required = true];
+  }
+  // The optional runtime libraries for the plugin.
+  repeated RuntimeLibrary runtime_libraries = 1;
+  // The minimum Go version required by the plugin.
+  string minimum_version = 2 [(buf.validate.field).required = true];
+}
+
+// The configuration for an NPM plugin.
+message NPMConfig {
+  // The runtime library dependency of the generated code.
+  message RuntimeLibrary {
+    // The name of the package. Example: "@connectrpc/connect".
+    string package = 1 [(buf.validate.field).required = true];
+    // The version of the package. Example: "^0.13.1".
+    string version = 2 [(buf.validate.field).required = true];
+  }
+  // The optional runtime libraries for the plugin.
+  repeated RuntimeLibrary runtime_libraries = 1;
+  // The import path suffix to rewrite. This is the suffix of the import path that will be
+  // rewritten. Example: "connect.js" or "pb.js".
+  string rewrite_import_path_suffix = 2;
+  // The import style used for the "type" field in the package.json file. This exists to support
+  // legacy plugins that require "commonjs" support.
+  NPMImportStyle import_style = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+}
+
+// The configuration for a Maven plugin.
+message MavenConfig {
+  // The runtime library dependency of the generated code.
+  message RuntimeLibrary {
+    string group_id = 1;
+    string artifact_id = 2;
+    string version = 3;
+    string classifier = 4;
+    string extension = 5;
+  }
+  // The configuration for the Java and/or Kotlin compiler used when compiling the generated code.
+  message CompilerConfig {
+    CompilerJavaConfig java = 1;
+    CompilerKotlinConfig kotlin = 2;
+  }
+  // CompilerJavaConfig contains settings for the Java compiler.
+  message CompilerJavaConfig {
+    // File encoding. The default is UTF-8.
+    string encoding = 1;
+    // Release version. The default is 8.
+    int32 release = 2;
+    // Source version. The default is 8.
+    int32 source = 3;
+    // Target version. The default is 8.
+    int32 target = 4;
+  }
+  // CompilerKotlinConfig contains settings for the Kotlin compiler.
+  message CompilerKotlinConfig {
+    // Version of the Kotlin compiler used to compile the generated code.
+    string version = 1;
+    // Version of the Kotlin API to target.
+    string api_version = 2;
+    // Target version of the JVM bytecode. The default is 1.8.
+    string jvm_target = 3;
+    // Kotlin language version used for source compatibility.
+    string language_version = 4;
+  }
+  // RuntimeConfig allows configuring additional runtimes (like the 'lite' runtime). They can use
+  // different runtime dependencies and plugin options.
+  message RuntimeConfig {
+    // The name of the runtime.
+    string name = 1;
+    // The runtime libraries for the plugin.
+    repeated RuntimeLibrary runtime_libraries = 2;
+    // The options to pass to the plugin. These will be merged into a single, comma-separated
+    // string.
+    repeated string options = 3;
+  }
+  // The optional runtime libraries for the plugin.
+  repeated RuntimeLibrary runtime_libraries = 1;
+  // Settings for the Java/Kotlin compiler used to compile the generated code.
+  CompilerConfig compiler = 2;
+  // The optional runtimes for the plugin.
+  repeated RuntimeConfig additional_runtimes = 3;
+}
+
+// The configuration for a NuGet C# plugin.
+message NugetConfig {
+  // RuntimeLibrary describes a NuGet package dependency of the generated code.
+  //
+  // Ref:
+  // https://learn.microsoft.com/en-us/dotnet/core/tools/dependencies#the-packagereference-element
+  message RuntimeLibrary {
+    // The name of the NuGet package (also known as the package ID).
+    string name = 1;
+    // The version of the NuGet package (supports ranges).
+    //
+    // Ref: https://learn.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges
+    string version = 2;
+    // Optional target frameworks. If specified, these dependencies will be conditionally added when
+    // building for the specified target framework.
+    repeated DotnetTargetFramework target_frameworks = 3;
+  }
+  // Target frameworks to build.
+  repeated DotnetTargetFramework target_frameworks = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
+  // The optional runtime libraries for the plugin.
+  repeated RuntimeLibrary runtime_libraries = 2;
+}
+
+// The configuration for a CMake C++ plugin.
+message CmakeConfig {}
+
+// The configuration for a Swift plugin.
+message SwiftConfig {
+  // The runtime library dependency of the generated code.
+  message RuntimeLibrary {
+    // The source of the runtime library package. Example:
+    // https://github.com/apple/swift-protobuf.git.
+    string source = 1;
+    // The name of the runtime library package. Example "swift-protobuf".
+    string package = 2;
+    // The version of the runtime library. Example "1.21.0".
+    string version = 3;
+    // The products exported by the runtime library. Example "SwiftProtobuf".
+    repeated string products = 4;
+    // The minimum compatible platform versions of the runtime library.
+    message Platform {
+      // The name of the platform.
+      SwiftPlatformType name = 1;
+      // The minimum compatible version of the platform.
+      string version = 2;
+    }
+    // The minimum compatible platforms of the runtime library.
+    repeated Platform platforms = 5;
+    // The supported Swift language versions of the runtime library. Example: ".v5".
+    repeated string swift_versions = 6;
+  }
+  // The optional runtime libraries for the plugin.
+  repeated RuntimeLibrary runtime_libraries = 1;
+}
+
+// The configuration for a Python plugin.
+message PythonConfig {
+  // The runtime library dependency of the generated code.
+  message RuntimeLibrary {
+    // The value of this field is a PEP 508 dependency specifier that specifies the dependency
+    // required by the generated Python package.
+    //
+    // Ref: https://peps.python.org/pep-0508/
+    string dependency_specification = 1;
+  }
+  repeated RuntimeLibrary runtime_libraries = 1;
+  // The value of this field is a PEP 440 Version Specifier that specifies the value of the
+  // `Requires-Python` field in a metadata file.
+  //
+  // Ref:
+  //  - https://packaging.python.org/en/latest/specifications/core-metadata/#requires-python
+  //  - https://peps.python.org/pep-0440/
+  string requires_python = 2;
+  // The package type is the type of Python package that the plugin generates.
+  PythonPackageType package_type = 3;
+}
+
+// The configuration for a Rust plugin.
+message CargoConfig {
+  // The runtime library dependency of the generated code. It is the subset of a full Cargo
+  // dependency specification, which contains fields that are not needed for Generated SDKs.
+  //
+  // Ref: https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html
+  message RuntimeLibrary {
+    // The name must be a valid Cargo package name.
+    string name = 1;
+    // The version requirement is a version requirement.
+    string version_requirement = 2;
+    // Specifies whether or not default features will be enabled for the dependency. If not
+    // specified, default features are not enabled.
+    bool default_features = 3;
+    // The value of this field is a list of feature names. If not specified, no features are
+    // enabled.
+    repeated string features = 4;
+  }
+  // The minimum supported Rust version (MSRV) for the generated crate.
+  //
+  // Ref: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
+  string rust_version = 1;
+  // The optional runtime libraries for the plugin.
+  repeated RuntimeLibrary runtime_libraries = 2;
+}
+
+// This is used to specify the import style for the "type" field in the package.json file.
+enum NPMImportStyle {
+  NPM_IMPORT_STYLE_UNSPECIFIED = 0;
+  NPM_IMPORT_STYLE_MODULE = 1;
+  NPM_IMPORT_STYLE_COMMONJS = 2;
+}
+
+// The supported Swift platform types.
+enum SwiftPlatformType {
+  SWIFT_PLATFORM_TYPE_UNSPECIFIED = 0;
+  SWIFT_PLATFORM_TYPE_MACOS = 1;
+  SWIFT_PLATFORM_TYPE_IOS = 2;
+  SWIFT_PLATFORM_TYPE_WATCHOS = 3;
+  SWIFT_PLATFORM_TYPE_TVOS = 4;
+}
+
+// The type of Python package that the plugin generates.
+enum PythonPackageType {
+  PYTHON_PACKAGE_TYPE_UNSPECIFIED = 0;
+  // Regular Python package, containing Python runtime code (`.py` files).
+  PYTHON_PACKAGE_TYPE_RUNTIME = 1;
+  // Stub-only package, containing only `.pyi` files.
+  //
+  // Ref: https://peps.python.org/pep-0561/#stub-only-packages
+  PYTHON_PACKAGE_TYPE_STUB_ONLY = 2;
+}
+
+// The target framework for dotnet plugins. This is not meant to be an exhaustive list - most
+// plugins should target a netstandard version.
+//
+// Ref: https://learn.microsoft.com/en-us/dotnet/standard/frameworks
+enum DotnetTargetFramework {
+  DOTNET_TARGET_FRAMEWORK_UNSPECIFIED = 0;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_0 = 1;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_1 = 2;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_2 = 3;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_3 = 4;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_4 = 5;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_5 = 6;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_1_6 = 7;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_2_0 = 8;
+  DOTNET_TARGET_FRAMEWORK_NETSTANDARD_2_1 = 9;
+  DOTNET_TARGET_FRAMEWORK_NET_5_0 = 10;
+  DOTNET_TARGET_FRAMEWORK_NET_6_0 = 11;
+  DOTNET_TARGET_FRAMEWORK_NET_7_0 = 12;
+  DOTNET_TARGET_FRAMEWORK_NET_8_0 = 13;
+}
