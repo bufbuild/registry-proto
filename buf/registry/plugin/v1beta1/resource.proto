@@ -73,8 +73,8 @@ message ResourceRef {
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 32
     ];
-    // The name of the Module that contains or is the resource.
-    string module = 2 [(buf.validate.field).string = {
+    // The name of the Plugin that contains or is the resource.
+    string plugin = 2 [(buf.validate.field).string = {
       min_len: 2
       max_len: 100
     }];
