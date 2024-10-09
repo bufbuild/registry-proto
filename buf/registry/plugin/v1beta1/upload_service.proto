@@ -51,11 +51,6 @@ message UploadRequest {
     ];
     // The content to upload.
     bytes content = 3;
-    // The plugin type.
-    PluginType plugin_type = 4 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).enum.defined_only = true
-    ];
   }
   // The Contents of all references.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
@@ -74,12 +69,9 @@ message UploadImageRequest {
   message Content {
     // The Plugin of the reference.
     PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
-
-    // The version of the Plugin. Must be a semantic version without a prelease
-    // or build metadata, and must be prefixed with a "v". For example,
-    // "v1.32.4".
+    // The version of the Plugin. Must be a semantic version without a prelease or build metadata,
+    // and must be prefixed with a "v". For example, "v1.32.4".
     string version = 2 [(buf.validate.field).required = true];
-
     // A number that is acquired prior to pushing a new version of a Plugin.
     int32 revision = 3 [(buf.validate.field).required = true];
     // The URL to the license of the Plugin.
@@ -90,8 +82,10 @@ message UploadImageRequest {
     ];
     // The SPDX identifier of the license of the Plugin.
     string license_spdx_identifier = 5;
+    // The documentation of the Plugin.
+    string doc = 6;
     // The configuration for code generation supported by the plugin.
-    CodeGenerationConfig code_generation = 10;
+    CodeGenerationConfig code_generation = 7;
   }
   // The Contents of all references.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
