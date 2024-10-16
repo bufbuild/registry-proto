@@ -148,16 +148,6 @@ message CreatePluginsRequest {
     // The configurable description of the Plugin.
     string description = 4 [(buf.validate.field).string.max_len = 350];
     // The configurable source URL of the Plugin.
-    //
-    // TODO(mf): do we want this at the Plugin or the PluginCommit.
-    //
-    // I'm inclined to leave this on the Plugin. I think the most common use case is a plugin
-    // repository moving from github.com/foo/bar to github.com/new/repo and that event should apply
-    // to all commits since the project as a whole is moving, and not a subset of commits.
-    //
-    // For example, connect used to be under bufbuild but moved to a new organization, when looking
-    // at the Go docs there is a single source of truth for the project despite having a different
-    // home.
     string source_url = 5 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
