@@ -19,7 +19,6 @@ package buf.registry.plugin.v1beta1;
 import "buf/registry/plugin/v1beta1/code_generation_config.proto";
 import "buf/registry/plugin/v1beta1/commit.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
-import "buf/registry/plugin/v1beta1/resource.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 

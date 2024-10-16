@@ -101,14 +101,3 @@ message ResourceRef {
     Name name = 2;
   }
 }
-
-// The compression type of the content.
-//
-// TODO(mf): is there a better place for this?
-enum CompressionType {
-  COMPRESSION_TYPE_UNSPECIFIED = 0;
-  // No compression.
-  COMPRESSION_TYPE_NONE = 1;
-  // Zstandard compression.
-  COMPRESSION_TYPE_ZSTD = 2;
-}
