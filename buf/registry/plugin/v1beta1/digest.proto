@@ -22,8 +22,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // A digest of a Commit's content.
 //
-// A digest represents all content for a single Commit, including its .proto files, documentation
-// files, license files, and the digests of its dependencies.
+// A digest represents all content for a single Commit.
 message Digest {
   // The type of the Digest.
   DigestType type = 1 [
