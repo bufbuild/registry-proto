@@ -54,10 +54,6 @@ message Commit {
     (buf.validate.field).string.tuuid = true
   ];
   // The Digest of the Commit's contents.
-  //
-  // TODO(mf): if we have both docker and wasm modules, is this only returning the p1 digest, or
-  // also the sha256 docker image digest? Do we need a digest_type, or more explicitly a
-  // runtime_type like wasip1 or docker?
   Digest digest = 5 [(buf.validate.field).required = true];
   // The id of the User that created this Commit on the BSR.
   //
