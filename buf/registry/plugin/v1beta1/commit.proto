@@ -68,12 +68,3 @@ message Commit {
   // The documentation of the Plugin.
   Doc doc = 8;
 }
-
-// The compression type of the content a commit provides.
-enum CompressionType {
-  COMPRESSION_TYPE_UNSPECIFIED = 0;
-  // No compression.
-  COMPRESSION_TYPE_NONE = 1;
-  // Zstandard compression.
-  COMPRESSION_TYPE_ZSTD = 2;
-}

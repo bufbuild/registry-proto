@@ -38,13 +38,8 @@ message UploadRequest {
   message Content {
     // The Plugin of the reference.
     PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
-    // Compression type of the content.
-    CompressionType compression_type = 2 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).enum.defined_only = true
-    ];
     // The content to upload.
-    bytes content = 3;
+    bytes content = 2 [(buf.validate.field).required = true];
   }
   // The Contents of all references.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
