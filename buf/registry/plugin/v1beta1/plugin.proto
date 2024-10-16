@@ -100,13 +100,8 @@ enum PluginState {
 // The type of the Plugin.
 enum PluginType {
   PLUGIN_TYPE_UNSPECIFIED = 0;
-  // PLUGIN_TYPE_PROTOC_CODE_GENERATION says that the Plugin is a protoc code generation plugin. It
-  // is intentionally a separate type because it does not use the pluginrpc protocol.
-  PLUGIN_TYPE_PROTOC_CODE_GENERATION = 1;
   // PLUGIN_TYPE_CODE_GENERATION says that the Plugin is a code generation plugin.
-  PLUGIN_TYPE_CODE_GENERATION = 2;
-  // PLUGIN_TYPE_CHECK says that the Plugin is a check plugin.
-  PLUGIN_TYPE_CHECK = 3;
+  PLUGIN_TYPE_CHECK = 1;
 }
 
 // PluginRef is a reference to a Plugin, either an id or a fully-qualified name.

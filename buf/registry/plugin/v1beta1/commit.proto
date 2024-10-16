@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.plugin.v1beta1;
 
 import "buf/registry/plugin/v1beta1/digest.proto";
+import "buf/registry/plugin/v1beta1/plugin_info.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
@@ -62,16 +63,10 @@ message Commit {
     (buf.validate.field).string.tuuid = true,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
-  // The URL to the license of the Plugin.
-  string license_url = 7 [
-    (buf.validate.field).string.uri = true,
-    (buf.validate.field).string.max_len = 255,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
-  ];
-  // The SPDX identifier of the license of the Plugin.
-  string spdx_license_id = 8;
+  // The license of the plugin.
+  License license = 7;
   // The documentation of the Plugin.
-  string doc = 10;
+  Doc doc = 8;
 }
 
 // The compression type of the content a commit provides.

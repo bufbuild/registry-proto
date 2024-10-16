@@ -20,22 +20,27 @@ import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
 
-// A digest of a Commit's content.
-//
-// A digest represents all content for a single Commit.
-message Digest {
-  // The type of the Digest.
-  DigestType type = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).enum.defined_only = true
-  ];
-  // The value of the Digest.
-  bytes value = 2 [(buf.validate.field).required = true];
+message License {
+  // The SPDX license ID.
+  //
+  // See https://spdx.org/licenses.
+  string spdx_license_id = 1;
+  oneof source {
+    // The raw text of the license.
+    string text = 2;
+    // The url that contains the license
+    string url = 3 [(buf.validate.field).string.uri = true];
+  }
 }
 
-// The type of Digest.
-enum DigestType {
-  DIGEST_TYPE_UNSPECIFIED = 0;
-  // The p1 digest function.
-  DIGEST_TYPE_P1 = 1;
+message Doc {
+  // A short string describing the plugin.
+  //
+  // This is required.
+  string short = 1 [(buf.validate.field).required = true];
+  // A long string providing more details on using the plugin.
+  //
+  // When producing documentation for the plugin, this will be concatenated with
+  // the value from short with a newline separating short and long.
+  string long = 2;
 }
