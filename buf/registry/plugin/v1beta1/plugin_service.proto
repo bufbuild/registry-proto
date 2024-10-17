@@ -74,18 +74,6 @@ message ListPluginsRequest {
     // Order by create_time oldest to newest.
     ORDER_CREATE_TIME_ASC = 2;
   }
-  // Filter for the list request, if any. When multiple filters are specified, they are combined.
-  message Filter {
-    // The specific Organizations to list Plugins for.
-    //
-    // If empty, all Plugins for all Organizations are listed, but this functionality is limited to
-    // Users with the necessary permissions.
-    repeated buf.registry.owner.v1.OwnerRef owner_refs = 1;
-    // The collections to list Plugins for.
-    //
-    // If empty, all Plugins are listed regardless of collection.
-    repeated string collection_names = 2;
-  }
   // The maximum number of items to return.
   //
   // The default value is 10.
@@ -94,13 +82,19 @@ message ListPluginsRequest {
   //
   // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
-  // An optional filter to filter the list of Plugins. If unset, all Plugins for all organizations
-  // are listed, but this functionality is limited to Users with the necessary permissions.
-  Filter filter = 3;
+  // The specific Organizations to list Plugins for.
+  //
+  // If empty, all Plugins for all Organizations are listed, but this functionality is limited to
+  // Users with the necessary permissions.
+  repeated buf.registry.owner.v1.OwnerRef owner_refs = 3;
+  // The collections to list Plugins for.
+  //
+  // If empty, all Plugins are listed regardless of collection.
+  repeated string collection_names = 4;
   // The order to return the Plugins.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
-  Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  Order order = 5 [(buf.validate.field).enum.defined_only = true];
 }
 
 message ListPluginsResponse {
