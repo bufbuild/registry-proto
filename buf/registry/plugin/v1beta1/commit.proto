@@ -63,8 +63,8 @@ message Commit {
     (buf.validate.field).string.tuuid = true,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
-  // The license of the plugin.
+  // The license of the Plugin Commit.
   License license = 7;
-  // The documentation of the Plugin.
+  // The documentation of the Plugin Commit.
   Doc doc = 8;
 }
