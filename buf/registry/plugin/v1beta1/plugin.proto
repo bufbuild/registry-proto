@@ -100,7 +100,7 @@ enum PluginState {
 // The type of the Plugin.
 enum PluginType {
   PLUGIN_TYPE_UNSPECIFIED = 0;
-  // PLUGIN_TYPE_CODE_GENERATION says that the Plugin is a code generation plugin.
+  // PLUGIN_TYPE_CHECK says that the Plugin is a check plugin.
   PLUGIN_TYPE_CHECK = 1;
 }
 
