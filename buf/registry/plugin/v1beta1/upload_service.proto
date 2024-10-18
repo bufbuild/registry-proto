@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.plugin.v1beta1;
 
 import "buf/registry/plugin/v1beta1/commit.proto";
+import "buf/registry/plugin/v1beta1/label.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
@@ -40,6 +41,17 @@ message UploadRequest {
     PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
     // The content to upload.
     bytes content = 2 [(buf.validate.field).required = true];
+    // The labels to associate with the Commit for the Content.
+    //
+    // If an id is set, this id must represent a Label that already exists and is
+    // owned by the Plugin. The Label will point to the newly-created Commits for the References,
+    // or will be updated to point to the pre-existing Commit for the Reference.
+    //
+    // If no labels are referenced, the default Label for the Plugin is used.
+    //
+    // If the Labels do not exist, they will be created.
+    // If the Labels were archived, they will be unarchived.
+    repeated ScopedLabelRef scoped_label_refs = 3;
   }
   // The Contents of all references.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
