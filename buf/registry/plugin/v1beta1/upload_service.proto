@@ -39,8 +39,13 @@ message UploadRequest {
   message Content {
     // The Plugin of the reference.
     PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+    // Compression type of the content.
+    CompressionType compression_type = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true
+    ];
     // The content to upload.
-    bytes content = 2 [(buf.validate.field).required = true];
+    bytes content = 3 [(buf.validate.field).required = true];
     // The labels to associate with the Commit for the Content.
     //
     // If an id is set, this id must represent a Label that already exists and is
@@ -49,14 +54,14 @@ message UploadRequest {
     //
     // If no labels are referenced, the default Label for the Plugin is used.
     //
-    // If the Labels do not exist, they will be created.
-    // If the Labels were archived, they will be unarchived.
-    repeated ScopedLabelRef scoped_label_refs = 3;
+    // If the Labels do not exist, they will be created. If the Labels were archived, they will be
+    // unarchived.
+    repeated ScopedLabelRef scoped_label_refs = 4;
     // The URL of the source control commit to associate with the Commit for this Content.
     //
-    // BSR users can navigate to this link to find source control information that is relevant to this Commit
-    // (e.g. commit description, PR discussion, authors, approvers, etc.).
-    string source_control_url = 4 [
+    // BSR users can navigate to this link to find source control information that is relevant to
+    // this Commit (e.g. commit description, PR discussion, authors, approvers, etc.).
+    string source_control_url = 5 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
@@ -70,4 +75,13 @@ message UploadResponse {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// The type of compression.
+enum CompressionType {
+  COMPRESSION_TYPE_UNSPECIFIED = 0;
+  // No compression.
+  COMPRESSION_TYPE_NONE = 1;
+  // Zstandard compression.
+  COMPRESSION_TYPE_ZSTD = 2;
 }

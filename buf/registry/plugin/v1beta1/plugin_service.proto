@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.plugin.v1beta1;
 
 import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/plugin/v1beta1/collection.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
 import "buf/validate/validate.proto";
 
@@ -87,10 +88,10 @@ message ListPluginsRequest {
   // If empty, all Plugins for all Organizations are listed, but this functionality is limited to
   // Users with the necessary permissions.
   repeated buf.registry.owner.v1.OwnerRef owner_refs = 3;
-  // The collections to list Plugins for.
+  // The specific Collections to list Plugins for.
   //
   // If empty, all Plugins are listed regardless of collection.
-  repeated string collection_names = 4;
+  repeated CollectionRef collection_refs = 4;
   // The order to return the Plugins.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.

@@ -72,6 +72,7 @@ message Commit {
     (buf.validate.field).string.max_len = 255,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
-  // The plugin info of the Commit.
-  buf.plugin.info.v1.PluginInfo info = 8;
+  // The plugin information as stored directly within the plugin. This is part of the Bufplugin API,
+  // and can be returned from a plugin's GetPluginInfo implementation.
+  buf.plugin.info.v1.PluginInfo plugin_info = 8;
 }
