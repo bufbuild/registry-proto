@@ -98,6 +98,6 @@ message GetCollectionsPluginsResponse {
     // The id of the Collection.
     string collection_id = 2;
   }
-  // A list of Plugin and Collection id pairs.
+  // The list of Plugin and Collection id pairs.
   repeated Value values = 1;
 }
