@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package buf.registry.plugin.v1beta1;
 
-import "buf/registry/plugin/v1beta1/collection.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
@@ -70,13 +69,8 @@ message Plugin {
     (buf.validate.field).string.max_len = 255,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
-  // Managed indicates whether a Plugin is managed by the BSR.
-  //
-  // Managed Plugins are automatically updated and should not be updated by users because they will
-  // be overwritten.
-  bool managed = 11;
-  // The collections the Plugin belongs to.
-  repeated Collection collections = 12;
+  // The collection ids the Plugin is a member of, this may be empty.
+  repeated string collection_ids = 11 [(buf.validate.field).repeated.items.string.tuuid = true];
 }
 
 // The visibility of a Plugin, currently either public or private.
