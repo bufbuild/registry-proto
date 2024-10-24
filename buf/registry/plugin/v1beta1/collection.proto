@@ -35,7 +35,7 @@ message Collection {
   ];
   // The time the Collection was created on the BSR.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
-  // The last time the Label was updated on the BSR.
+  // The last time the Collection was updated on the BSR.
   google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The name of the Collection.
   //
