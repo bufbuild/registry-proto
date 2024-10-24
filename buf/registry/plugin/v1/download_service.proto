@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.plugin.v1;
 
 import "buf/registry/plugin/v1/commit.proto";
+import "buf/registry/plugin/v1/compression.proto";
 import "buf/registry/plugin/v1/resource.proto";
 import "buf/validate/validate.proto";
 
@@ -58,8 +59,13 @@ message DownloadResponse {
   message Content {
     // The Commit associated with the Content.
     Commit commit = 1 [(buf.validate.field).required = true];
+    // The compression type.
+    CompressionType compression_type = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true
+    ];
     // The content.
-    bytes content = 2 [(buf.validate.field).required = true];
+    bytes content = 3 [(buf.validate.field).required = true];
   }
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
 }

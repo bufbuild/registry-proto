@@ -94,9 +94,9 @@ message GetPluginCollectionAssociationsRequest {
 message GetPluginCollectionAssociationsResponse {
   // The Associations for the requested Plugins.
   message Association {
-    // The Plugin ID.
+    // The id of the Plugin.
     string plugin_id = 1;
-    // The Collection IDs associated with the Plugin.
+    // The collection ids associated with the Plugin.
     repeated string collection_ids = 2;
   }
   // The Associations for the requested Plugins in the same order as requested.

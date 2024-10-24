@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.plugin.v1;
 
 import "buf/registry/plugin/v1/commit.proto";
+import "buf/registry/plugin/v1/compression.proto";
 import "buf/registry/plugin/v1/label.proto";
 import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
@@ -78,13 +79,4 @@ message UploadResponse {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
-}
-
-// The type of compression.
-enum CompressionType {
-  COMPRESSION_TYPE_UNSPECIFIED = 0;
-  // No compression.
-  COMPRESSION_TYPE_NONE = 1;
-  // Zstandard compression.
-  COMPRESSION_TYPE_ZSTD = 2;
 }
