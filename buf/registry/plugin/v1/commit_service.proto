@@ -14,14 +14,14 @@
 
 syntax = "proto3";
 
-package buf.registry.plugin.v1beta1;
+package buf.registry.plugin.v1;
 
-import "buf/registry/plugin/v1beta1/commit.proto";
-import "buf/registry/plugin/v1beta1/digest.proto";
-import "buf/registry/plugin/v1beta1/resource.proto";
+import "buf/registry/plugin/v1/commit.proto";
+import "buf/registry/plugin/v1/digest.proto";
+import "buf/registry/plugin/v1/resource.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1";
 
 // Operate on Commits.
 service CommitService {
