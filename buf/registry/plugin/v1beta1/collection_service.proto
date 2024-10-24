@@ -33,7 +33,7 @@ service CollectionService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
   // Get the Collections for the given Plugins.
-  rpc GetCollectionsPlugins(GetCollectionsPluginsRequest) returns (GetCollectionsPluginsResponse) {
+  rpc GetPluginCollectionAssociations(GetPluginCollectionAssociationsRequest) returns (GetPluginCollectionAssociationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
@@ -83,21 +83,22 @@ message ListCollectionsResponse {
   repeated Collection collections = 2;
 }
 
-message GetCollectionsPluginsRequest {
-  // The Plugins to request.
+message GetPluginCollectionAssociationsRequest {
+  // The Plugins to request Collections for.
   repeated PluginRef plugin_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
 }
 
-message GetCollectionsPluginsResponse {
-  message Value {
-    // The id of the Plugin.
+message GetPluginCollectionAssociationsResponse {
+  // The Associations for the requested Plugins.
+  message Association {
+    // The Plugin ID.
     string plugin_id = 1;
-    // The id of the Collection.
-    string collection_id = 2;
+    // The Collection IDs associated with the Plugin.
+    repeated string collection_ids = 2;
   }
-  // The list of Plugin and Collection id pairs.
-  repeated Value values = 1;
+  // The Associations for the requested Plugins in the same order as requested.
+  repeated Association associations = 1;
 }
