@@ -68,7 +68,10 @@ message UploadRequest {
     ];
   }
   // The Contents of all references.
-  repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated Content contents = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 10
+  ];
 }
 
 message UploadResponse {
