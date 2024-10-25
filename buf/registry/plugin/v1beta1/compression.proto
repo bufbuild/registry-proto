@@ -14,9 +14,9 @@
 
 syntax = "proto3";
 
-package buf.registry.plugin.v1;
+package buf.registry.plugin.v1beta1;
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
 
 // The type of compression.
 enum CompressionType {
