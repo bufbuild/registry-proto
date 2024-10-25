@@ -1,6 +1,7 @@
 version: v2
 name: buf.build/bufbuild/registry
 deps:
+  - buf.build/bufbuild/bufplugin
   - buf.build/bufbuild/protovalidate
 lint:
   use:
