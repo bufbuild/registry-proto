@@ -82,7 +82,7 @@ message Commit {
   // from the license file.
   string spdx_license_id = 8 [
     (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.pattern = "^[a-zA-Z0-9-.]+$",
+    (buf.validate.field).string.pattern = "^[a-zA-Z0-9-.+]+$",
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
 }

@@ -78,7 +78,7 @@ message UploadRequest {
     // detected from the license file, if present.
     string spdx_license_id = 5 [
       (buf.validate.field).string.min_len = 1,
-      (buf.validate.field).string.pattern = "^[a-zA-Z0-9-.]+$",
+      (buf.validate.field).string.pattern = "^[a-zA-Z0-9-.+]+$",
       (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
     ];
   }
