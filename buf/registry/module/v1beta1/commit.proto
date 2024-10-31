@@ -75,4 +75,14 @@ message Commit {
     (buf.validate.field).string.max_len = 255,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];
+  // The SPDX License Identifier of the Commit.
+  //
+  // May be empty if the SPDX License Identifier was not explicitly set during upload, if the
+  // license file was not present, or if it was not possible to detect the SPDX License Identifier
+  // from the license file.
+  string spdx_license_id = 8 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.pattern = "^[a-zA-Z0-9-.]+$",
+    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+  ];
 }

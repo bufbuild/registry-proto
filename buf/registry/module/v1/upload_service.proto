@@ -63,7 +63,11 @@ message UploadRequest {
     ];
     // The SPDX License Identifier. If this field is not set, the SPDX License Identifier will be
     // detected from the license file, if present.
-    string spdx_license_id = 5;
+    string spdx_license_id = 5 [
+      (buf.validate.field).string.min_len = 1,
+      (buf.validate.field).string.pattern = "^[a-zA-Z0-9-.]+$",
+      (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    ];
   }
   // The Contents of all references.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
