@@ -1,0 +1,71 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.plugin.v1beta1;
+
+import "buf/registry/plugin/v1beta1/commit.proto";
+import "buf/registry/plugin/v1beta1/compression.proto";
+import "buf/registry/plugin/v1beta1/resource.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
+
+// Download contents.
+service DownloadService {
+  // Download contents for given set of Plugins.
+  //
+  // Contents are WASM modules that are compiled and executed within a suitable runtime.
+  rpc Download(DownloadRequest) returns (DownloadResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message DownloadRequest {
+  // A request for content for a single version of a Plugin.
+  message Value {
+    // The reference to get content for.
+    //
+    // See the documentation on Reference for reference resolution details.
+    //
+    // Once the resource is resolved, the following content is returned:
+    //   - If a Plugin is referenced, the content of the latest commit of the default label is
+    //     returned.
+    //   - If a Label is referenced, the content of the Commit of this Label is returned.
+    //   - If a Commit is referenced, the content for this Commit is returned.
+    ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
+  }
+  // The references to get contents for.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DownloadResponse {
+  // Content for a single version of a Plugin.
+  message Content {
+    // The Commit associated with the Content.
+    Commit commit = 1 [(buf.validate.field).required = true];
+    // The compression type.
+    CompressionType compression_type = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true
+    ];
+    // The content.
+    bytes content = 3 [(buf.validate.field).required = true];
+  }
+  repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
+}
