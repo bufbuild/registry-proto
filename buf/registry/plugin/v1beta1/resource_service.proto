@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package buf.registry.plugin.v1beta1;
 
-import "buf/registry/plugin/v1beta1/digest.proto";
 import "buf/registry/plugin/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
 
@@ -38,13 +37,6 @@ message GetResourcesRequest {
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
-  // The DigestType to use for Digests returned on Commits.
-  //
-  // If this DigestType is not available, an error is returned.
-  // Note that certain DigestTypes may be deprecated over time.
-  //
-  // If not set, the latest DigestType is used, currently P1.
-  DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
 message GetResourcesResponse {
