@@ -25,11 +25,11 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Operate on Check plugins.
 service CheckService {
-  // List rules for a given plugin commit.
+  // List Rules for a given Plugin, Label, or Commit.
   rpc ListRules(ListRulesRequest) returns (ListRulesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // List categories for a given plugin commit.
+  // List Categories for a given Plugin, Label, or Commit.
   rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -44,25 +44,24 @@ message ListRulesRequest {
   //
   // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
-  // The reference to get rules for.
+  // The reference to get Rules for.
   //
   // See the documentation on ResourceRef for resource resolution details.
   //
-  // Once the resource is resolved, the following rules are returned:
-  //   - If a Plugin is referenced, the rules of the the default Label are returned.
-  //   - If a Label is referenced, the rules of the Commit of this Label are returned.
-  //   - If a Commit is referenced, the rules for this commit are returned.
+  // Once the resource is resolved, the following Rules are returned:
+  //   - If a Plugin is referenced, the Rules of the the default Label are returned.
+  //   - If a Label is referenced, the Rules of the Commit of this Label are returned.
+  //   - If a Commit is referenced, the Rules for this Commit are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
 }
 
-// A response containing the rules that the plugin commit implements.
 message ListRulesResponse {
   // The next page token.
   //
   // If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
-  // The rules that the plugin implements. This is part of the Bufplugin API,
-  // and can be returned from a plugin's ListRules implementation.
+  // The listed Rules. This is part of the Bufplugin API, and can be returned from
+  // a plugin's ListRules implementation.
   repeated buf.plugin.check.v1.Rule rules = 2;
 }
 
@@ -75,24 +74,23 @@ message ListCategoriesRequest {
   //
   // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
-  // The reference to get categories for.
+  // The reference to get Categories for.
   //
   // See the documentation on ResourceRef for resource resolution details.
   //
-  // Once the resource is resolved, the following categories are returned:
-  //   - If a Plugin is referenced, the categories of the the default Label are returned.
-  //   - If a Label is referenced, the categories of the Commit of this Label are returned.
-  //   - If a Commit is referenced, the categories for this commit are returned.
+  // Once the resource is resolved, the following Categories are returned:
+  //   - If a Plugin is referenced, the Categories of the the default Label are returned.
+  //   - If a Label is referenced, the Categories of the Commit of this Label are returned.
+  //   - If a Commit is referenced, the Categories for this Commit are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
 }
 
-// A response containing the categories that the Plugin implements.
 message ListCategoriesResponse {
   // The next page token.
   //
   // If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
-  // The categories that the plugin implements. This is part of the Bufplugin API,
-  // and can be returned from a plugin's ListCategories implementation.
+  // The listed Categories. This is part of the Bufplugin API, and can be returned from
+  // a plugin's ListCategories implementation.
   repeated buf.plugin.check.v1.Category categories = 2;
 }
