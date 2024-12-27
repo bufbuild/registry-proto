@@ -34,8 +34,7 @@ service ModuleService {
   }
   // Create new Modules.
   //
-  // When a Module is created, a Branch representing the release Branch
-  // is created as well.
+  // New modules are created with a default Label named "main".
   //
   // This operation is atomic. Either all Modules are created or an error is returned.
   rpc CreateModules(CreateModulesRequest) returns (CreateModulesResponse) {
