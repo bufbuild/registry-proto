@@ -1,0 +1,144 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.policy.v1beta1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/policy/v1beta1";
+
+// The Configuration of a specific Policy at a specific Version. This consists of the built-in
+// rules version and lint, breaking, and plugin configurations required to run the Policy.
+message Configuration {
+  // The built-in rules version. This specifies which version of built-in rules to use for the Policy.
+  enum BuiltInVersion {
+    BUILT_IN_VERSION_UNSPECIFIED = 0;
+    BUILT_IN_VERSION_V1BETA1 = 1;
+    BUILT_IN_VERSION_V1 = 2;
+    BUILT_IN_VERSION_V2 = 3;
+  }
+  // A check config represents the shared configurations for checks (e.g. lint and breaking).
+  message CheckConfig {
+    // The list of check rules and/or categories used for the Policy.
+    repeated string use = 1 [
+      (buf.validate.field).repeated.items = {
+        string: {
+          min_len: 2
+          max_len: 250
+        }
+      },
+      (buf.validate.field).repeated.max_items = 250
+    ];
+    // The list of check rules and/or categories to exclude for the Policy.
+    repeated string except = 2 [
+      (buf.validate.field).repeated.items = {
+        string: {
+          min_len: 2
+          max_len: 250
+        }
+      },
+      (buf.validate.field).repeated.max_items = 250
+    ];
+  }
+  // A lint config consists of the generic check config and additional lint-specifc configs
+  // required for running lint.
+  message LintConfig {
+    // The check config.
+    CheckConfig check_config = 1;
+    // The suffix that controls the behavior of the ENUM_ZERO_VALUE_SUFFIX lint rule. By default,
+    // this rule verifies that the zero value of all enums ends in `_UNSPECIFIED`, however, this
+    // allows organizations to choose a different suffix.
+    string enum_zero_value_suffix = 2 [(buf.validate.field).string.max_len = 250];
+    // This bool allows the same message type to be used for a single RPC's request and response type.
+    bool rpc_allow_same_request_response = 3;
+    // This bool allows RPC requests to be google.protobuf.Empty messages.
+    bool rpc_allow_google_protobuf_empty_requests = 4;
+    // This bool allows RPC responses to be google.protobuf.Empty messages.
+    bool rpc_allow_google_protobuf_empty_responses = 5;
+    // This suffix controls the behavior of the SERVICE_SUFFIX lint rule. By default, this rule
+    // verifies that all service names are suffixed with `Service`, however this allows organizations
+    // to choose a different suffix.
+    string service_suffix = 6 [(buf.validate.field).string.max_len = 250];
+  }
+  // A breaking config consists of the generic check config and additional breaking-specifc configs
+  // required for running breaking change detection.
+  message BreakingConfig {
+    // The check config.
+    CheckConfig check_cofnig = 1;
+    // This bool determines whether to ignore unstable packages for breaking change detection:
+    //   - v\d+test.*
+    //   - v\d+(alpha|beta)\d*
+    //   - v\d+p\d+(alpha|beta)\d*
+    bool ignore_unstable_packages = 2;
+  }
+  // A plugin config consists of the configs for invoking a check plugin.
+  message CheckPluginConfig {
+    // The fully-qualified name of a check Plugin within a BSR instance.
+    //
+    // A Name uniquely identifies a Plugin.
+    message Name {
+      // The name of the Organization owner.
+      string owner = 1 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).string.max_len = 32
+      ];
+      // The name of the Plugin.
+      string plugin = 2 [(buf.validate.field).string = {
+        min_len: 2
+        max_len: 100
+      }];
+    }
+    // A Plugin option. This consists of a key and value.
+    message Option {
+      string key = 1 [(buf.validate.field).string = {
+        min_len: 2
+        max_len: 100
+      }];
+      string value = 2 [(buf.validate.field).string = {
+        min_len: 2
+        max_len: 100
+      }];
+    }
+    // The Plugin name.
+    Name name = 1 [(buf.validate.field).required = true];
+    // The ref to a specific Plugin commit. This could be a label name or a commit ID.
+    // If no reference is set, then at the time of running the Policy, the latest commit on
+    // the default label of the Plugin is used.
+    //
+    // If this value is present but empty, this should be treated as not present.
+    string ref = 2 [(buf.validate.field).string.max_len = 250];
+    // The options to invoke with the Plugin.
+    repeated Option options = 3 [(buf.validate.field).repeated.max_items = 250];
+    // The arguments to invoke with the Plugin.
+    repeated string args = 4 [
+      (buf.validate.field).repeated.items = {
+        string: {
+          min_len: 2
+          max_len: 250
+        }
+      },
+      (buf.validate.field).repeated.max_items = 250
+    ];
+  }
+  // The builtin lint and breaking rules version to use.
+  BuiltInVersion built_in_version = 1;
+  // The lint config.
+  LintConfig lint_config = 2;
+  // The breaking config.
+  BreakingConfig breaking_config = 3;
+  // The plugin configs.
+  repeated CheckPluginConfig check_plugin_configs = 4;
+}

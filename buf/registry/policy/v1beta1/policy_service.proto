@@ -1,0 +1,194 @@
+// Copyright 2023-2024 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.policy.v1beta1;
+
+import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/policy/v1beta1/policy.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/policy/v1beta1";
+
+// Operate on Policies.
+service PolicyService {
+  // Get Policies by id or name.
+  rpc GetPolicies(GetPoliciesRequest) returns (GetPoliciesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List Policies, usually for a specific User or Organization.
+  rpc ListPolicies(ListPoliciesRequest) returns (ListPoliciesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create new Policies.
+  //
+  // This operation is atomic. Either all Policies are created or an error is returned.
+  rpc CreatePolicies(CreatePoliciesRequest) returns (CreatePoliciesResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Update exiting Policies.
+  //
+  // This operation is atomic. Either all Policies are updated or an error is returned.
+  rpc UpdatePolicies(UpdatePoliciesRequest) returns (UpdatePoliciesResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Delete existing Policies.
+  //
+  // This operation is atomic. Either all Policies are deleted or an error is returned.
+  rpc DeletePolicies(DeletePoliciesRequest) returns (DeletePoliciesResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message GetPoliciesRequest {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The Policies to request.
+  repeated PolicyRef policy_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetPoliciesResponse {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The retrieved Policies in the same order as requested.
+  repeated Policy policies = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message ListPoliciesRequest {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The specific Users or Organizations to list Policies for.
+  //
+  // If empty, all Policies for all owners are listed, but this functionality
+  // is limited to Users with the necessary permissions.
+  repeated buf.registry.owner.v1.OwnerRef owner_refs = 3;
+  // The order to return the Policies.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 4 [(buf.validate.field).enum.defined_only = true];
+}
+
+message ListPoliciesResponse {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed Policies.
+  repeated Policy policies = 2;
+}
+
+message CreatePoliciesRequest {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // An individual request to create a Policy.
+  message Value {
+    // The User or Organization to create the Policy under.
+    buf.registry.owner.v1.OwnerRef owner_ref = 1 [(buf.validate.field).required = true];
+    // The name of the Policy.
+    string name = 2 [(buf.validate.field).string = {
+      min_len: 2
+      max_len: 100
+    }];
+    // The Policy's visibility.
+    PolicyVisibility visibility = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true
+    ];
+    // The configurable description of the Policy.
+    string description = 4 [(buf.validate.field).string.max_len = 350];
+  }
+  // The Policies to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreatePoliciesResponse {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The created Policies in the same order as given on the request.
+  repeated Policy policies = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdatePoliciesRequest {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // An individual request to update a Policy.
+  message Value {
+    // The Policy to update.
+    PolicyRef policy_ref = 1 [(buf.validate.field).required = true];
+    // The Policy's visibility.
+    optional PolicyVisibility visibility = 2 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+    // The deprecation status of the Policy.
+    optional PolicyState state = 4 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+    // The configurable description of the Policy.
+    optional string description = 5 [(buf.validate.field).string.max_len = 350];
+  }
+  // The Policies to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdatePoliciesResponse {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The updated Policies in the same order as given in the request.
+  repeated Policy policies = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeletePoliciesRequest {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The Policies to delete.
+  repeated PolicyRef policy_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeletePoliciesResponse {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+}
