@@ -22,37 +22,35 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/policy/v1beta1";
 
-// A version on a specific Policy.
+// A Commit on a specific Policy.
 //
-// Versions are immutable.
-message Version {
+// Commits are immutable.
+message Commit {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The id of the Version.
+  // The id of the Commit.
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
-  // The autoincremented Version number.
-  uint32 number = 2 [(buf.validate.field).required = true];
-  // The time the Version was pushed to the BSR.
+  // The time the Commit was pushed to the BSR.
   //
-  // Versions are immutable, so there is no corresponding update_time.
-  google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
-  // The id of the Organization that owns the Policy that the Version is associated with.
-  string owner_id = 4 [
+  // Commits are immutable, so there is no corresponding update_time.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The id of the Organization that owns the Policy that the Commit is associated with.
+  string owner_id = 3 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
-  // The id of the Policy that the Version is associated with.
-  string policy_id = 5 [
+  // The id of the Policy that the Commit is associated with.
+  string policy_id = 4 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
-  // The id of the User that created this Version on the BSR.
+  // The id of the User that created this Commit on the BSR.
   //
   // May be empty if the User is no longer available.
-  string created_by_user_id = 6 [
+  string created_by_user_id = 5 [
     (buf.validate.field).string.tuuid = true,
     (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
   ];

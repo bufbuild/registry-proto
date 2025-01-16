@@ -16,49 +16,49 @@ syntax = "proto3";
 
 package buf.registry.policy.v1beta1;
 
+import "buf/registry/policy/v1beta1/commit.proto";
 import "buf/registry/policy/v1beta1/resource.proto";
-import "buf/registry/policy/v1beta1/version.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/policy/v1beta1";
 
-// Operate on Versions.
-service VersionService {
-  // Get Versions.
-  rpc GetVersions(GetVersionsRequest) returns (GetVersionsResponse) {
+service CommitService {
+  // Get Commits.
+  rpc GetCommits(GetCommitsRequest) returns (GetCommitsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // List Versions for a given Policy.
-  rpc ListVersions(ListVersionsRequest) returns (ListVersionsResponse) {
+  // List Commits for a given Policy.
+  rpc ListCommits(ListCommitsRequest) returns (ListCommitsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
-message GetVersionsRequest {
+message GetCommitsRequest {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
-  // References to request a Version for.
+  // References to request a Commit for.
   //
   // See the documentation on ResourceRef for resource resolution details.
   //
   // Resolution is as follows:
-  //   - If a Policy is referenced, the latest Version of the Policy is returned.
-  //   - If a Version is referenced, then the Version is returned.
+  //   - If a Policy is referenced, the Commit of the default Label is returned.
+  //   - If a Label is referenced, the Commit of this Label is returned.
+  //   - If a Commit is referenced, this Commit is returned.
   repeated ResourceRef resource_refs = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
 }
 
-message GetVersionsResponse {
+message GetCommitsResponse {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The found Versions in the same order as requested.
-  repeated Version versions = 1 [(buf.validate.field).repeated.min_items = 1];
+  // The found Commits in the same order as requested.
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message ListVersionsRequest {
+message ListCommitsRequest {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   // The list order.
@@ -77,27 +77,31 @@ message ListVersionsRequest {
   //
   // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
-  // The reference to list Versions for.
+  // The reference to list Commits for.
   //
   // See the documentation on Ref for resource resolution details.
   //
-  // Once the resource is resolved, the following Versions are listed (subject to any additional filters in the request):
-  //   - If a Policy is referenced, all Versions for the Policy are returned.
-  //   - If a Version is referenced, the Version is returned.
+  // Once the resource is resolved, the following Commits are listed (subject to any additional filters in the request):
+  //   - If a Policy is referenced, all Commits for the Policy are returned.
+  //   - If a Label is referenced, the Commit the Label points to is returned.
+  //     Use ListLabelHistory to get the history of Commits for a Label.
+  //   - If a Commit is referenced, this Commit is returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
-  // The order to return the Versions.
+  // The order to return the Commits.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  // Only return Commits with an id that contains this string using a case-insensitive comparison.
+  string id_query = 5 [(buf.validate.field).string.max_len = 36];
 }
 
-message ListVersionsResponse {
+message ListCommitsResponse {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
   // The next page token.
   //
   // If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
-  // The listed Versions.
-  repeated Version versions = 2;
+  // The listed Commits.
+  repeated Commit commits = 2;
 }

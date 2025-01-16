@@ -16,9 +16,8 @@ syntax = "proto3";
 
 package buf.registry.policy.v1beta1;
 
-import "buf/registry/policy/v1beta1/configuration.proto";
+import "buf/registry/policy/v1beta1/commit.proto";
 import "buf/registry/policy/v1beta1/policy.proto";
-import "buf/registry/policy/v1beta1/version.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
@@ -28,7 +27,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 service UploadService {
   // Upload contents for given set of Policies.
   //
-  // Contents are expected to be a Configuration.
+  // Contents are expected to be a single YAML file.
   rpc Upload(UploadRequest) returns (UploadResponse) {}
 }
 
@@ -39,8 +38,8 @@ message UploadRequest {
   message Content {
     // The Policy of the reference.
     PolicyRef policy_ref = 1 [(buf.validate.field).required = true];
-    // The Configuration of the Content.
-    Configuration configuration = 2 [(buf.validate.field).required = true];
+    // The content to upload.
+    bytes content = 2 [(buf.validate.field).required = true];
   }
   // The Contents of all references.
   repeated Content contents = 1 [(buf.validate.field).repeated.min_items = 1];
@@ -49,10 +48,10 @@ message UploadRequest {
 message UploadResponse {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The Versions for each reference in the same order as given on the request.
+  // The Commits for each reference in the same order as given on the request.
   //
-  // A single Version will be returned for each reference. These Versions may or may not be new.
-  // If nothing changed for a given reference (e.g. the same Configuration as the latest), the
-  // existing Version will be returned.
-  repeated Version versions = 1 [(buf.validate.field).repeated.min_items = 1];
+  // A single Commit will be returned for each reference. These Commits may or may not be new.
+  // If nothing changed for a given reference (e.g. the same file contents as the latest), the
+  // existing Commit will be returned.
+  repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }

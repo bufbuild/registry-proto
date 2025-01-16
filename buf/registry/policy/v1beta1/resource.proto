@@ -16,26 +16,29 @@ syntax = "proto3";
 
 package buf.registry.policy.v1beta1;
 
+import "buf/registry/policy/v1beta1/commit.proto";
+import "buf/registry/policy/v1beta1/label.proto";
 import "buf/registry/policy/v1beta1/policy.proto";
-import "buf/registry/policy/v1beta1/version.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/policy/v1beta1";
 
-// A Policy or Version.
+// A Policy, Label, or Commit.
 message Resource {
   oneof value {
     option (buf.validate.oneof).required = true;
 
     Policy policy = 1;
-    Version version = 2;
+    Label label = 2;
+    Commit commit = 3;
   }
 }
 
 // A reference to any of:
 //   - Policy
-//   - Version
+//   - Label
+//   - Commit
 //
 // The id or name is resolved to a specific resource.
 // If an id is passed, this is interpreted as being the id of the resource.
@@ -51,10 +54,16 @@ message ResourceRef {
   //
   // The following semantics are applied:
   //   - If the child oneof is not specified, the name is interpreted to reference a Policy.
-  //   - If version_id is specified, the name is interpreted to reference a Version with the
-  //     specified name.
-  //   - If version_number is specified, the name is interpreted to reference a Version with
-  //     the specified number.
+  //   - If label_name is specified, the name is interpreted to reference a Label.
+  //   - If ref is specified, it is interpreted to be either an id or name.
+  //     - If an id, this is equivalent to setting the id field on ResourceRef. However, backends
+  //       can choose to validate that the owner and policy fields match the resource referenced, as
+  //       additional validation.
+  //     - If a name, this is interpreted to be a Label name.
+  //     - If there is a conflict between names across resources (for example, there is a Commit id
+  //       and Label name of the same value), the following order of precedence is applied:
+  //       - Commit
+  //       - Label
   //
   // Names can only be used in requests, and only for read-only RPCs, that is
   // you should not use an arbitrary reference when modifying a specific resource.
@@ -71,16 +80,16 @@ message ResourceRef {
     }];
     // If the oneof is present but empty, this should be treated as not present.
     oneof child {
-      // The id of the Version.
+      // The name of the Label.
       //
-      // If this value is present but empty, this should be treated as not present, that is
-      // an empty value is the same as a null value.
-      string version_id = 3;
-      // The number of the Version.
+      // If this value is present but empty, this should be treated as not present, that is an empty
+      // value is the same as a null value.
+      string label_name = 3 [(buf.validate.field).string.max_len = 250];
+      // The untyped reference, applying the semantics as documented on the Name message.
       //
-      // If this value is present but empty, this should be treated as not present, that is
-      // an empty value is the same as a null value.
-      uint32 version_number = 4;
+      // If this value is present but empty, this should be treated as not present, that is an empty
+      // value is the same as a null value.
+      string ref = 4;
     }
   }
 
