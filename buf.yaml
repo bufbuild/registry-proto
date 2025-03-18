@@ -1,10 +1,11 @@
 version: v2
 name: buf.build/bufbuild/registry
 deps:
+  - buf.build/bufbuild/bufplugin
   - buf.build/bufbuild/protovalidate
 lint:
   use:
-    - DEFAULT
+    - STANDARD
     - UNARY_RPC
   disallow_comment_ignores: true
 breaking:

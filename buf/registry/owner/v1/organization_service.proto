@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Buf Technologies, Inc.
+// Copyright 2023-2025 Buf Technologies, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ message ListOrganizationsRequest {
   uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
   // The page to start from.
   //
-  // If empty, the first page is returned,
+  // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The ids of the specific Users to list Organizations for.
   //
@@ -148,13 +148,15 @@ message UpdateOrganizationsRequest {
     optional string url = 3 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore_empty = true
+      (buf.validate.field).ignore = IGNORE_IF_DEFAULT_VALUE
     ];
     // The verification status of the Organization.
-    optional OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
-
+    optional OrganizationVerificationStatus verification_status = 4 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
     // The base role that Organization members have for repositories in the Organization.
-    optional ModuleRole module_base_role = 8 [
+    optional ModuleRole module_base_role = 5 [
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0,
       (buf.validate.field).enum.not_in = 5

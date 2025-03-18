@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Buf Technologies, Inc.
+// Copyright 2023-2025 Buf Technologies, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -105,9 +105,9 @@ message OrganizationRef {
     string id = 1 [(buf.validate.field).string.tuuid = true];
     // The name of the Organization.
     string name = 2 [(buf.validate.field).string = {
-      min_len: 2;
-      max_len: 32;
-      pattern: "^[a-z][a-z0-9-]*[a-z0-9]$";
+      min_len: 2
+      max_len: 32
+      pattern: "^[a-z][a-z0-9-]*[a-z0-9]$"
     }];
   }
 }

@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Buf Technologies, Inc.
+// Copyright 2023-2025 Buf Technologies, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ message Module {
   //
   // Unique within a given User or Organization.
   string name = 4 [(buf.validate.field).string = {
-    min_len: 2,
+    min_len: 2
     max_len: 100
   }];
   // The id of the User or Organization that owns the Module.
@@ -115,7 +115,7 @@ message ModuleRef {
     ];
     // The name of the Module.
     string module = 2 [(buf.validate.field).string = {
-      min_len: 2,
+      min_len: 2
       max_len: 100
     }];
   }
