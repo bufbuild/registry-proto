@@ -58,7 +58,7 @@ message Policy {
     (buf.validate.field).enum.defined_only = true
   ];
   // The configurable description of the Policy.
-  string desription = 8 [(buf.validate.field).string.max_len = 350];
+  string description = 8 [(buf.validate.field).string.max_len = 350];
 }
 
 // The visibility of a Policy, currently either public or private.
