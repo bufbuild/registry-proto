@@ -29,7 +29,7 @@ service LabelService {
   rpc GetLabels(GetLabelsRequest) returns (GetLabelsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // List Labels for a given Module, Commit, or CommitDigest.
+  // List Labels for a given Module, Commit or Label.
   rpc ListLabels(ListLabelsRequest) returns (ListLabelsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
