@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.policy.v1beta1;
 
+import "buf/registry/policy/v1beta1/digest.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
@@ -25,6 +26,11 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // A Commit on a specific Policy.
 //
 // Commits are immutable.
+//
+// Many Commits may be associated with one Digest.
+//
+// Note that the Digest returned on a Commit depends on the requested DigestType in the RPC that
+// returned the Commit.
 message Commit {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
@@ -47,6 +53,8 @@ message Commit {
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
+  // The Digest of the Commit's contents.
+  Digest digest = 6 [(buf.validate.field).required = true];
   // The id of the User that created this Commit on the BSR.
   //
   // May be empty if the User is no longer available.

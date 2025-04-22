@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.policy.v1beta1;
 
 import "buf/registry/policy/v1beta1/commit.proto";
+import "buf/registry/policy/v1beta1/digest.proto";
 import "buf/registry/policy/v1beta1/label.proto";
 import "buf/registry/policy/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
@@ -29,7 +30,7 @@ service LabelService {
   rpc GetLabels(GetLabelsRequest) returns (GetLabelsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // List Labels for a given Policy or Commit.
+  // List Labels for a given Policy, Commit or Label.
   rpc ListLabels(ListLabelsRequest) returns (ListLabelsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -167,6 +168,10 @@ message ListLabelHistoryRequest {
   //
   // If not specified, defaults to ORDER_DESC.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  // The DigestType to use for Digests returned on Commits.
+  // If this DigestType is not available, an error is returned. Note that certain DigestTypes may be
+  // If not set, the latest DigestType is used, currently P1.
+  DigestType digest_type = 6 [(buf.validate.field).enum.defined_only = true];
   // The Commit id to start from.
   //
   // It is an error to provide a Commit id that doesn't exist on the Label.

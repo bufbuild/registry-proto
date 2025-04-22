@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.policy.v1beta1;
 
 import "buf/registry/policy/v1beta1/commit.proto";
+import "buf/registry/policy/v1beta1/digest.proto";
 import "buf/registry/policy/v1beta1/resource.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
@@ -49,6 +50,13 @@ message GetCommitsRequest {
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
+  // The DigestType to use for Digests returned on Commits.
+  //
+  // If this DigestType is not available, an error is returned.
+  // Note that certain DigestTypes may be deprecated over time.
+  //
+  // If not set, the latest DigestType is used, currently P1.
+  DigestType digest_type = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
 message GetCommitsResponse {
@@ -91,6 +99,13 @@ message ListCommitsRequest {
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  // The DigestType to use for Digests returned on Commits.
+  //
+  // If this DigestType is not available, an error is returned.
+  // Note that certain DigestTypes may be deprecated over time.
+  //
+  // If not set, the latest DigestType is used, currently p1.
+  DigestType digest_type = 6 [(buf.validate.field).enum.defined_only = true];
   // Only return Commits with an id that contains this string using a case-insensitive comparison.
   string id_query = 5 [(buf.validate.field).string.max_len = 36];
 }
