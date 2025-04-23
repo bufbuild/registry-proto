@@ -36,6 +36,6 @@ message Digest {
 // The type of Digest.
 enum DigestType {
   DIGEST_TYPE_UNSPECIFIED = 0;
-  // The p1 digest function.
-  DIGEST_TYPE_P1 = 1;
+  // The O1 digest function.
+  DIGEST_TYPE_O1 = 1;
 }
