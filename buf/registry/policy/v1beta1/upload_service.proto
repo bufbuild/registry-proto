@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.policy.v1beta1;
 
 import "buf/registry/policy/v1beta1/commit.proto";
+import "buf/registry/policy/v1beta1/label.proto";
 import "buf/registry/policy/v1beta1/policy.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
