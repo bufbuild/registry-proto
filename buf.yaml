@@ -11,4 +11,3 @@ lint:
 breaking:
   use:
     - WIRE_JSON
-  ignore_unstable_packages: true
