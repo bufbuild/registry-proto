@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.policy.v1beta1;
 
 import "buf/registry/policy/v1beta1/commit.proto";
+import "buf/registry/policy/v1beta1/configuration.proto";
 import "buf/registry/policy/v1beta1/label.proto";
 import "buf/registry/policy/v1beta1/policy.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
@@ -39,8 +40,8 @@ message UploadRequest {
   message Content {
     // The Policy of the reference.
     PolicyRef policy_ref = 1 [(buf.validate.field).required = true];
-    // The content to upload.
-    bytes content = 2 [(buf.validate.field).required = true];
+    // The Policy config to upload.
+    PolicyConfig config = 2 [(buf.validate.field).required = true];
     // The labels to associate with the Commit for the Content.
     //
     // If an id is set, this id must represent a Label that already exists and is owned by the
