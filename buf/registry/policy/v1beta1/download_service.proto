@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.policy.v1beta1;
 
 import "buf/registry/policy/v1beta1/commit.proto";
+import "buf/registry/policy/v1beta1/configuration.proto";
 import "buf/registry/policy/v1beta1/resource.proto";
 import "buf/validate/validate.proto";
 
@@ -58,8 +59,8 @@ message DownloadResponse {
   message Content {
     // The Commit associated with the Content.
     Commit commit = 1 [(buf.validate.field).required = true];
-    // The content.
-    bytes content = 2 [(buf.validate.field).required = true];
+    // The Policy config.
+    PolicyConfig config = 2 [(buf.validate.field).required = true];
   }
 
   // The contents for each reference in the same order as given on the request.
