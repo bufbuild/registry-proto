@@ -21,8 +21,8 @@ import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/policy/v1beta1";
 
-// PolicyConfig is the Policy's configuration. This consists of the built-in rules version and lint,
-// breaking, and plugin configurations required to run the Policy.
+// PolicyConfig is the Policy's configuration. This consists of the lint, breaking, and plugin
+// configurations required to run the Policy.
 message PolicyConfig {
   // A lint config consists of the generic check config and additional lint-specifc configs
   // required for running lint.
