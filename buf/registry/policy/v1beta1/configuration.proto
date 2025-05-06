@@ -24,61 +24,76 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // PolicyConfig is the Policy's configuration. This consists of the built-in rules version and lint,
 // breaking, and plugin configurations required to run the Policy.
 message PolicyConfig {
-  // A check config represents the shared configurations for checks (e.g. lint and breaking).
-  message CheckConfig {
-    // The list of check rules and/or categories used for the Policy.
-    repeated string use = 1 [
-      (buf.validate.field).repeated.items = {
-        string: {
-          min_len: 3
-          max_len: 64
-          pattern: "^[A-Z0-9][A-Z0-9_]*[A-Z0-9]$"
-        }
-      },
-      (buf.validate.field).repeated.max_items = 250
-    ];
-    // The list of check rules and/or categories to exclude for the Policy.
-    repeated string except = 2 [
-      (buf.validate.field).repeated.items = {
-        string: {
-          min_len: 3
-          max_len: 64
-          pattern: "^[A-Z0-9][A-Z0-9_]*[A-Z0-9]$"
-        }
-      },
-      (buf.validate.field).repeated.max_items = 250
-    ];
-  }
   // A lint config consists of the generic check config and additional lint-specifc configs
   // required for running lint.
   message LintConfig {
-    // The check config.
-    CheckConfig check_config = 1;
+    // The list of check rules and/or categories used for the Policy.
+    repeated string use = 1 [
+      (buf.validate.field).repeated.max_items = 250,
+      (buf.validate.field).repeated.items = {
+        string: {
+          min_len: 3
+          max_len: 64
+          pattern: "^[A-Z0-9][A-Z0-9_]*[A-Z0-9]$"
+        }
+      }
+    ];
+    // The list of check rules and/or categories to exclude for the Policy.
+    repeated string except = 2 [
+      (buf.validate.field).repeated.max_items = 250,
+      (buf.validate.field).repeated.items = {
+        string: {
+          min_len: 3
+          max_len: 64
+          pattern: "^[A-Z0-9][A-Z0-9_]*[A-Z0-9]$"
+        }
+      }
+    ];
     // The suffix that controls the behavior of the ENUM_ZERO_VALUE_SUFFIX lint rule. By default,
     // this rule verifies that the zero value of all enums ends in `_UNSPECIFIED`, however, this
     // allows organizations to choose a different suffix.
-    string enum_zero_value_suffix = 2 [(buf.validate.field).string.max_len = 250];
+    string enum_zero_value_suffix = 3 [(buf.validate.field).string.max_len = 250];
     // The bool allows the same message type to be used for a single RPC's request and response type.
-    bool rpc_allow_same_request_response = 3;
+    bool rpc_allow_same_request_response = 4;
     // The bool allows RPC requests to be google.protobuf.Empty messages.
-    bool rpc_allow_google_protobuf_empty_requests = 4;
+    bool rpc_allow_google_protobuf_empty_requests = 5;
     // The bool allows RPC responses to be google.protobuf.Empty messages.
-    bool rpc_allow_google_protobuf_empty_responses = 5;
+    bool rpc_allow_google_protobuf_empty_responses = 6;
     // The suffix controls the behavior of the SERVICE_SUFFIX lint rule. By default, this rule
     // verifies that all service names are suffixed with `Service`, however this allows organizations
     // to choose a different suffix.
-    string service_suffix = 6 [(buf.validate.field).string.max_len = 250];
+    string service_suffix = 7 [(buf.validate.field).string.max_len = 250];
   }
   // A breaking config consists of the generic check config and additional breaking-specifc configs
   // required for running breaking change detection.
   message BreakingConfig {
-    // The check config.
-    CheckConfig check_config = 1;
+    // The list of check rules and/or categories used for the Policy.
+    repeated string use = 1 [
+      (buf.validate.field).repeated.max_items = 250,
+      (buf.validate.field).repeated.items = {
+        string: {
+          min_len: 3
+          max_len: 64
+          pattern: "^[A-Z0-9][A-Z0-9_]*[A-Z0-9]$"
+        }
+      }
+    ];
+    // The list of check rules and/or categories to exclude for the Policy.
+    repeated string except = 2 [
+      (buf.validate.field).repeated.max_items = 250,
+      (buf.validate.field).repeated.items = {
+        string: {
+          min_len: 3
+          max_len: 64
+          pattern: "^[A-Z0-9][A-Z0-9_]*[A-Z0-9]$"
+        }
+      }
+    ];
     // This bool determines whether to ignore unstable packages for breaking change detection:
     //   - v\d+test.*
     //   - v\d+(alpha|beta)\d*
     //   - v\d+p\d+(alpha|beta)\d*
-    bool ignore_unstable_packages = 2;
+    bool ignore_unstable_packages = 3;
   }
   // A plugin config consists of the configs for invoking a check plugin.
   message CheckPluginConfig {
