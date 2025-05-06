@@ -99,12 +99,9 @@ message PolicyConfig {
   message CheckPluginConfig {
     // The fully-qualified name of a check Plugin within a BSR instance.
     //
-    // If an untyped reference is specified it is interpreted to either be an id or Label name. If
-    // an id, backends can choose to validate that the owner and plugin fields match this Name. If
-    // no reference is set, then at the time of running the Policy, the latest commit on the default
-    // label of the Plugin is used.
-    //
-    // A Name uniquely identifies a Plugin.
+    // If an untyped reference is specified it is interpreted to either be an Commit id or Label
+    // name. If no reference is set, then at the time of running the Policy, the latest commit on
+    // the default label of the Plugin is used.
     message Name {
       // The name of the Organization owner.
       string owner = 1 [
