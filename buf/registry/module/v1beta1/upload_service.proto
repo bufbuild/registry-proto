@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.module.v1beta1;
 
+import "buf/plugin/check/v1/annotation.proto";
 import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/file.proto";
 import "buf/registry/module/v1beta1/label.proto";
@@ -87,6 +88,11 @@ message UploadRequest {
   // Commits should be unique by Module, that is no two dep_refs should have the same Module but
   // different Commit IDs.
   repeated DepRef dep_refs = 2;
+  // Whether to dry run the upload.
+  //
+  // If set, the BSR will not create any Commits or Labels. This is useful for testing
+  // the upload process without actually uploading any content.
+  bool dry_run = 3 [(buf.validate.field).required = false];
 }
 
 // See the package documentation for more details. You should likely use buf.registry.module.v1beta1
@@ -97,4 +103,8 @@ message UploadResponse {
   // A single Commit will be returned for each reference. These Commits may or may not be new.
   // If nothing changed for a given reference, the existing Commit will be returned.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
+  // The annotations produced from Rule failures.
+  //
+  // These annotations are produced by the BSR and are not user-defined.
+  repeated buf.plugin.check.v1.Annotation annotations = 2;
 }
