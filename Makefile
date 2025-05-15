@@ -10,7 +10,7 @@ BIN := .tmp/bin
 export PATH := $(BIN):$(PATH)
 export GOBIN := $(abspath $(BIN))
 
-COPYRIGHT_YEARS := 2023-2024
+COPYRIGHT_YEARS := 2023-2025
 
 .PHONY: help
 help: ## Describe useful make targets

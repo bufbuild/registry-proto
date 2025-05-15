@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Buf Technologies, Inc.
+// Copyright 2023-2025 Buf Technologies, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,8 +34,7 @@ service ModuleService {
   }
   // Create new Modules.
   //
-  // When a Module is created, a Branch representing the release Branch
-  // is created as well.
+  // New modules are created with a default Label named "main".
   //
   // This operation is atomic. Either all Modules are created or an error is returned.
   rpc CreateModules(CreateModulesRequest) returns (CreateModulesResponse) {

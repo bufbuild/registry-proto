@@ -1,0 +1,113 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.policy.v1beta1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/policy/v1beta1";
+
+// A policy within the BSR.
+message Policy {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Policy.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the Policy was created in the BSR.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The last time the Policy was updated on the BSR.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  // The name of the Policy.
+  //
+  // Unique within a given Organization.
+  string name = 4 [(buf.validate.field).string = {
+    min_len: 2
+    max_len: 100
+  }];
+  // The id of the Organization that owns the Policy.
+  string owner_id = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The Policy's visibility, either public or private.
+  PolicyVisibility visibility = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The Policy state, either active or deprecated.
+  PolicyState state = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The configurable description of the Policy.
+  string description = 8 [(buf.validate.field).string.max_len = 350];
+}
+
+// The visibility of a Policy, currently either public or private.
+enum PolicyVisibility {
+  POLICY_VISIBILITY_UNSPECIFIED = 0;
+  // POLICY_VISIBILITY_PUBLIC says that the Policy is publicly available.
+  POLICY_VISIBILITY_PUBLIC = 1;
+  // POLICY_VISIBILITY_PRIVATE says that the Policy is private.
+  POLICY_VISIBILITY_PRIVATE = 2;
+}
+
+// The state of a Policy, currently either active or deprecated.
+enum PolicyState {
+  POLICY_STATE_UNSPECIFIED = 0;
+  // POLICY_STATE_ACTIVE says that the Policy is currently active.
+  POLICY_STATE_ACTIVE = 1;
+  // POLICY_STATE_DEPRECATED says that the Policy has been deprecated and should not longer be
+  // used.
+  POLICY_STATE_DEPRECATED = 2;
+}
+
+// PolicyRef is a reference to a Policy, either an id or a fully-qualified name.
+//
+// This is used in requests.
+message PolicyRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The fully-qualified name of a Policy within a BSR intance.
+  //
+  // A Name uniquely identifies a Policy.
+  // This is used for requests when a caller only has the policy name and not the ID.
+  message Name {
+    // The name of the owner of the Policy. The owner is always an Organization.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 32
+    ];
+    // The name of the Policy.
+    string policy = 2 [(buf.validate.field).string = {
+      min_len: 2
+      max_len: 100
+    }];
+  }
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Policy.
+    string id = 1 [(buf.validate.field).string.tuuid = true];
+    // The full-qualified name of the Policy.
+    Name name = 2;
+  }
+}
