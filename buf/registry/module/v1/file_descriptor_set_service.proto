@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Buf Technologies, Inc.
+// Copyright 2023-2025 Buf Technologies, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 
 syntax = "proto3";
 
-package buf.registry.descriptor.v1;
+package buf.registry.module.v1;
 
 import "buf/registry/module/v1/resource.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/descriptor.proto";
 import "google/protobuf/field_mask.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/descriptor/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
 // Provide compiled FileDescriptorSets for Modules, Labels, or Commits.
 service FileDescriptorSetService {
@@ -40,7 +40,7 @@ message GetFileDescriptorSetRequest {
   //   - If a Module is referenced, the FileDescriptorSet for the Commit of the default Label is returned.
   //   - If a Label is referenced, the FileDescriptorSet for the Commit of this Label is returned.
   //   - If a Commit is referenced, the FileDescriptorSet for this Commit is returned.
-  buf.registry.module.v1.ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
+  ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
   // Exclude imports from the returned FileDescriptorSet.
   //
   // A file is an import if:
@@ -61,20 +61,16 @@ message GetFileDescriptorSetRequest {
   // be self-contained. If imports are included, all types referenced within the FileDescriptorSet
   // are contained within the returned FileDescriptorSet.
   bool exclude_imports = 2;
-  // Exclude SourceCodeInfo from the returned FileDescriptorProtos.
+  // Include SourceCodeInfo in the returned FileDescriptorProtos.
   //
   // SourceCodeInfo is optional additional information that is not required to describe a set
   // of Protobuf APIs.
-  bool exclude_source_code_info = 3;
-  // Exclude source-retention options from the returned FileDescriptorProtos.
+  bool include_source_code_info = 3;
+  // Include source-retention options in the returned FileDescriptorProtos.
   //
   // With the new Editions work, options are either runtime-retention or source-retention.
-  // Setting this option will exclude the latter.
-  bool exclude_source_retention_options = 4;
-  // Exclude FileDescriptorProtoExtensions from the response.
-  //
-  // FileDescriptorProtoExtensions contain additional information about FileDescriptorProtos.
-  bool exclude_file_descriptor_proto_extensions = 5;
+  // Setting this option will include the latter.
+  bool include_source_retention_options = 4;
   // Only include specific types (and types that they reference, if exclude_imports is not set).
   //
   // A symbol is a package, message, enum, service, method, or extension.
@@ -84,7 +80,7 @@ message GetFileDescriptorSetRequest {
   // not start with a period, that is specify "foo.v1.Foo", not ".foo.v1.Foo".
   //
   // If no types are provided, all types are returned.
-  repeated string types = 6;
+  repeated string types = 5;
   // An explicit, opt-in field mask for the fields populated on the returned FileDescriptorProtos.
   //
   // For example, if you would only like to return the names of messages, use the mask:
@@ -99,7 +95,7 @@ message GetFileDescriptorSetRequest {
   // The filters exclude_imports, exclude_source_code_info, exclude_source_retention_options and
   // types continue to be respected even if this field is set. Specifically, if exclude_source_code_info
   // is set, but this mask includes source_code_info, SourceCodeInfo will continue to be excluded.
-  google.protobuf.FieldMask field_mask = 7;
+  google.protobuf.FieldMask field_mask = 6;
 }
 
 message GetFileDescriptorSetResponse {
