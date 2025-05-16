@@ -71,7 +71,7 @@ message GetFileDescriptorSetRequest {
   // With the new Editions work, options are either runtime-retention or source-retention.
   // Setting this option will include the latter.
   bool include_source_retention_options = 4;
-  // Only include specific types (and types that they reference, if exclude_imports is not set).
+  // Only include the specified types (and types that they reference, if exclude_imports is not set).
   //
   // A symbol is a package, message, enum, service, method, or extension.
   //
@@ -80,22 +80,24 @@ message GetFileDescriptorSetRequest {
   // not start with a period, that is specify "foo.v1.Foo", not ".foo.v1.Foo".
   //
   // If no types are provided, all types are returned.
-  repeated string types = 5;
-  // An explicit, opt-in field mask for the fields populated on the returned FileDescriptorProtos.
+  repeated string types = 5 [(buf.validate.field).repeated.items.cel = {
+    id: "fqn_no_period_prefix"
+    message: "fully-qualified names should not start with a '.'"
+    expression: "!this.startsWith('.')"
+  }];
+  // Exclude the specified types (and types that they reference if they are the only the
+  // only references to those types, if exclude_imports is not set).
   //
-  // For example, if you would only like to return the names of messages, use the mask:
+  // A symbol is a package, message, enum, service, method, or extension.
   //
-  //   {
-  //     paths: [
-  //       "message_type.name",
-  //       "message_type.nested_type.name"
-  //     ]
-  //   }
-  //
-  // The filters exclude_imports, exclude_source_code_info, exclude_source_retention_options and
-  // types continue to be respected even if this field is set. Specifically, if exclude_source_code_info
-  // is set, but this mask includes source_code_info, SourceCodeInfo will continue to be excluded.
-  google.protobuf.FieldMask field_mask = 6;
+  // Types are referenced by their fully-qualified name. For example, if "Foo" is a message within
+  // the package "foo.v1", the fully-qualified name is "foo.v1.Foo". Fully-qualfied names should
+  // not start with a period, that is specify "foo.v1.Foo", not ".foo.v1.Foo".
+  repeated string excluded_types = 6 [(buf.validate.field).repeated.items.cel = {
+    id: "fqn_no_period_prefx"
+    message: "fully-qualified names should not start with a '.'"
+    expression: "!this.startsWith('.')"
+  }];
 }
 
 message GetFileDescriptorSetResponse {
