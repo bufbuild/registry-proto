@@ -79,7 +79,7 @@ message GetFileDescriptorSetRequest {
   // not start with a period, that is specify "foo.v1.Foo", not ".foo.v1.Foo".
   //
   // If no types are provided, all types are returned.
-  repeated string types = 5 [(buf.validate.field).repeated.items.cel = {
+  repeated string include_types = 5 [(buf.validate.field).repeated.items.cel = {
     id: "fqn_no_period_prefix"
     message: "fully-qualified names should not start with a '.'"
     expression: "!this.startsWith('.')"
@@ -92,7 +92,7 @@ message GetFileDescriptorSetRequest {
   // Types are referenced by their fully-qualified name. For example, if "Foo" is a message within
   // the package "foo.v1", the fully-qualified name is "foo.v1.Foo". Fully-qualfied names should
   // not start with a period, that is specify "foo.v1.Foo", not ".foo.v1.Foo".
-  repeated string excluded_types = 6 [(buf.validate.field).repeated.items.cel = {
+  repeated string exclude_types = 6 [(buf.validate.field).repeated.items.cel = {
     id: "fqn_no_period_prefx"
     message: "fully-qualified names should not start with a '.'"
     expression: "!this.startsWith('.')"
