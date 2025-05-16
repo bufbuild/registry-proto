@@ -19,7 +19,6 @@ package buf.registry.module.v1;
 import "buf/registry/module/v1/resource.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/descriptor.proto";
-import "google/protobuf/field_mask.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
