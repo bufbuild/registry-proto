@@ -53,7 +53,10 @@ message CollectionRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   option (buf.validate.message).oneof = {
-    fields: ["id", "name"]
+    fields: [
+      "id",
+      "name"
+    ]
     required: true
   };
   // The id of the Collection.

@@ -28,7 +28,10 @@ message Owner {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
   option (buf.validate.message).oneof = {
-    fields: ["user", "organization"]
+    fields: [
+      "user",
+      "organization"
+    ]
     required: true
   };
   // The User.
@@ -44,7 +47,10 @@ message OwnerRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   option (buf.validate.message).oneof = {
-    fields: ["id", "name"]
+    fields: [
+      "id",
+      "name"
+    ]
     required: true
   };
   // The id of the User or Organization.

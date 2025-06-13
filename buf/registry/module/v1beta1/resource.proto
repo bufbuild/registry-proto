@@ -27,7 +27,11 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // A Module, Label, or Commit.
 message Resource {
   option (buf.validate.message).oneof = {
-    fields: ["module", "label", "commit"]
+    fields: [
+      "module",
+      "label",
+      "commit"
+    ]
     required: true
   };
   Module module = 1;
@@ -94,7 +98,10 @@ message ResourceRef {
   }
 
   option (buf.validate.message).oneof = {
-    fields: ["id", "name"]
+    fields: [
+      "id",
+      "name"
+    ]
     required: true
   };
   // The id of the resource.

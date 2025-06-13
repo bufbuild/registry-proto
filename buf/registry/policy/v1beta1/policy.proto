@@ -104,7 +104,10 @@ message PolicyRef {
   }
 
   option (buf.validate.message).oneof = {
-    fields: ["id", "name"]
+    fields: [
+      "id",
+      "name"
+    ]
     required: true
   };
   // The id of the Policy.
