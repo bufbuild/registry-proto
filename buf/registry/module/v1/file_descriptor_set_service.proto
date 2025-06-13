@@ -87,7 +87,7 @@ message GetFileDescriptorSetRequest {
   // Exclude the specified types (and types that they reference if they are the only the
   // only references to those types, if exclude_imports is not set).
   //
-  // A symbol is a package, message, enum, service, method, or extension.
+  // A type is a package, message, enum, service, method, or extension.
   //
   // Types are referenced by their fully-qualified name. For example, if "Foo" is a message within
   // the package "foo.v1", the fully-qualified name is "foo.v1.Foo". Fully-qualfied names should
