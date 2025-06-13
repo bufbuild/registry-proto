@@ -120,11 +120,12 @@ message ModuleRef {
     }];
   }
 
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // The id of the Module.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
-    // The fully-qualified name of the Module.
-    Name name = 2;
-  }
+  option (buf.validate.message).oneof = {
+    fields: ["id", "name"]
+    required: true
+  };
+  // The id of the Module.
+  string id = 1 [(buf.validate.field).string.tuuid = true];
+  // The fully-qualified name of the Module.
+  Name name = 2;
 }

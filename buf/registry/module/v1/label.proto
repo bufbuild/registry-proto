@@ -147,13 +147,14 @@ message LabelRef {
     ];
   }
 
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // The id of the Label.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
-    // The fully-qualified name of the Label.
-    Name name = 2;
-  }
+  option (buf.validate.message).oneof = {
+    fields: ["id", "name"]
+    required: true
+  };
+  // The id of the Label.
+  string id = 1 [(buf.validate.field).string.tuuid = true];
+  // The fully-qualified name of the Label.
+  Name name = 2;
 }
 
 // A reference to a Label scoped to a Module, either an id or a name.
@@ -162,11 +163,12 @@ message LabelRef {
 message ScopedLabelRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // The id of the Label.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
-    // The name of the Label.
-    string name = 2;
-  }
+  option (buf.validate.message).oneof = {
+    fields: ["id", "name"]
+    required: true
+  };
+  // The id of the Label.
+  string id = 1 [(buf.validate.field).string.tuuid = true];
+  // The name of the Label.
+  string name = 2;
 }
