@@ -27,13 +27,17 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 message Owner {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // The User.
-    User user = 1;
-    // The Organization.
-    Organization organization = 2;
-  }
+  option (buf.validate.message).oneof = {
+    fields: [
+      "user",
+      "organization"
+    ]
+    required: true
+  };
+  // The User.
+  User user = 1;
+  // The Organization.
+  Organization organization = 2;
 }
 
 // OwnerRef is a reference to a User or Organization, either an id or a name.
@@ -42,15 +46,19 @@ message Owner {
 message OwnerRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // The id of the User or Organization.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
-    // The name of the User or Organization.
-    string name = 2 [(buf.validate.field).string = {
-      min_len: 2
-      max_len: 32
-      pattern: "^[a-z][a-z0-9-]*[a-z0-9]$"
-    }];
-  }
+  option (buf.validate.message).oneof = {
+    fields: [
+      "id",
+      "name"
+    ]
+    required: true
+  };
+  // The id of the User or Organization.
+  string id = 1 [(buf.validate.field).string.tuuid = true];
+  // The name of the User or Organization.
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 2
+    max_len: 32
+    pattern: "^[a-z][a-z0-9-]*[a-z0-9]$"
+  }];
 }

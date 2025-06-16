@@ -119,11 +119,15 @@ message PluginRef {
     }];
   }
 
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // The id of the Plugin.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
-    // The fully-qualified name of the Plugin.
-    Name name = 2;
-  }
+  option (buf.validate.message).oneof = {
+    fields: [
+      "id",
+      "name"
+    ]
+    required: true
+  };
+  // The id of the Plugin.
+  string id = 1 [(buf.validate.field).string.tuuid = true];
+  // The fully-qualified name of the Plugin.
+  Name name = 2;
 }

@@ -52,14 +52,18 @@ message Collection {
 message CollectionRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // The id of the Collection.
-    string id = 1 [(buf.validate.field).string.tuuid = true];
-    // The name of the Collection.
-    string name = 2 [(buf.validate.field).string = {
-      min_len: 2
-      max_len: 100
-    }];
-  }
+  option (buf.validate.message).oneof = {
+    fields: [
+      "id",
+      "name"
+    ]
+    required: true
+  };
+  // The id of the Collection.
+  string id = 1 [(buf.validate.field).string.tuuid = true];
+  // The name of the Collection.
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 2
+    max_len: 100
+  }];
 }
