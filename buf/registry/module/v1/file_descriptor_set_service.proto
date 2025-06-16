@@ -75,7 +75,7 @@ message GetFileDescriptorSetRequest {
   // A type is a package, message, enum, service, method, or extension.
   //
   // Types are referenced by their fully-qualified name. For example, if "Foo" is a message within
-  // the package "foo.v1", the fully-qualified name is "foo.v1.Foo". Fully-qualfied names should
+  // the package "foo.v1", the fully-qualified name is "foo.v1.Foo". Fully-qualified names should
   // not start with a period, that is specify "foo.v1.Foo", not ".foo.v1.Foo".
   //
   // If no types are provided, all types are returned.
