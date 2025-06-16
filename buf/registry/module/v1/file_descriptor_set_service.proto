@@ -1,0 +1,105 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1;
+
+import "buf/registry/module/v1/resource.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/descriptor.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
+
+// Provide compiled FileDescriptorSets for Modules, Labels, or Commits.
+service FileDescriptorSetService {
+  // Get the compiled FileDescriptorSet for the given Module, Label, or Commit.
+  rpc GetFileDescriptorSet(GetFileDescriptorSetRequest) returns (GetFileDescriptorSetResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message GetFileDescriptorSetRequest {
+  // The reference to get the FileDescriptorSet for.
+  //
+  // See the documentation on ResourceRef for resource resolution details.
+  //
+  // Once the resource is resolved, the following content is returned:
+  //   - If a Module is referenced, the FileDescriptorSet for the Commit of the default Label is returned.
+  //   - If a Label is referenced, the FileDescriptorSet for the Commit of this Label is returned.
+  //   - If a Commit is referenced, the FileDescriptorSet for this Commit is returned.
+  ResourceRef resource_ref = 1 [(buf.validate.field).required = true];
+  // Exclude imports from the returned FileDescriptorSet.
+  //
+  // A file is an import if:
+  //
+  //   - It comes from a dependency of the Module specified via the ResourceRef used in the request.
+  //     For example, if the ResourceRef specifies "buf.build/foo/bar", which depends on
+  //     "buf.build/foo/baz", all files from "buf.build/foo/baz" will be imports.
+  //   - It is a Well-Known Type, and the Well-Known Type was not part of the Module specified
+  //     via the ResourceRef used in the request. Well-Known Types are special in the Protobuf ecosystem,
+  //     and can be imported without being contained in a specified module.
+  //   - It contains types that are referenced by types specified in the request. For example,
+  //     if the request specified symbol "foo.v1.Foo" contained within "foo.proto", which has a message
+  //     field of type "baz.v1.Baz", which is contained within "baz.proto", then the file "baz.proto"
+  //     will be marked as an import, regardless of which Module it derived from. If the types field
+  //     is not specified on the request, this situation will never occur.
+  //
+  // Note that if imports are excluded, the returned FileDescriptorSet may not (and likely will not)
+  // be self-contained. If imports are included, all types referenced within the FileDescriptorSet
+  // are contained within the returned FileDescriptorSet.
+  bool exclude_imports = 2;
+  // Include SourceCodeInfo in the returned FileDescriptorProtos.
+  //
+  // SourceCodeInfo is optional additional information that is not required to describe a set
+  // of Protobuf APIs.
+  bool include_source_code_info = 3;
+  // Include source-retention options in the returned FileDescriptorProtos.
+  //
+  // With the new Editions work, options are either runtime-retention or source-retention.
+  // Setting this option will include the latter.
+  bool include_source_retention_options = 4;
+  // Only include the specified types (and types that they reference, if exclude_imports is not set).
+  //
+  // A type is a package, message, enum, service, method, or extension.
+  //
+  // Types are referenced by their fully-qualified name. For example, if "Foo" is a message within
+  // the package "foo.v1", the fully-qualified name is "foo.v1.Foo". Fully-qualified names should
+  // not start with a period, that is specify "foo.v1.Foo", not ".foo.v1.Foo".
+  //
+  // If no types are provided, all types are returned.
+  repeated string include_types = 5 [(buf.validate.field).repeated.items.cel = {
+    id: "fqn_no_period_prefix"
+    message: "fully-qualified names should not start with a '.'"
+    expression: "!this.startsWith('.')"
+  }];
+  // Exclude the specified types (and types that they reference if they are the only the
+  // only references to those types, if exclude_imports is not set).
+  //
+  // A type is a package, message, enum, service, method, or extension.
+  //
+  // Types are referenced by their fully-qualified name. For example, if "Foo" is a message within
+  // the package "foo.v1", the fully-qualified name is "foo.v1.Foo". Fully-qualfied names should
+  // not start with a period, that is specify "foo.v1.Foo", not ".foo.v1.Foo".
+  repeated string exclude_types = 6 [(buf.validate.field).repeated.items.cel = {
+    id: "fqn_no_period_prefix"
+    message: "fully-qualified names should not start with a '.'"
+    expression: "!this.startsWith('.')"
+  }];
+}
+
+message GetFileDescriptorSetResponse {
+  // The FileDescriptorSet representing the referenced Module, Label, or Commit.
+  google.protobuf.FileDescriptorSet file_descriptor_set = 1 [(buf.validate.field).required = true];
+}
