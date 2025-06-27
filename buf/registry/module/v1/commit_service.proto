@@ -54,6 +54,31 @@ message GetCommitsResponse {
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
+message GetCommitsErrorDetails {
+  message PreconditionViolation {
+    // The Resource id resolved from the ResourceRef that caused the error.
+    string resource_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.tuuid = true
+    ];
+    // The possible error types.
+    enum Type {
+      TYPE_UNSPECIFIED = 0;
+      // The resource was empty.
+      TYPE_EMPTY = 1;
+    }
+    // The type of precondition violation.
+    Type type = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true
+    ];
+    // The user-friendly message describing the error.
+    string message = 3;
+  }
+  // The precondition violations that occurred.
+  repeated PreconditionViolation precondition_violations = 1 [(buf.validate.field).repeated.max_items = 250];
+}
+
 message ListCommitsRequest {
   // The list order.
   enum Order {
