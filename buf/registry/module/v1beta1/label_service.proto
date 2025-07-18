@@ -197,7 +197,7 @@ message ListLabelHistoryRequest {
   // It is an error to provide a Commit id that doesn't exist on the Label.
   string start_commit_id = 7 [
     (buf.validate.field).string.tuuid = true,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
   // Only list Commits where the Digest has changed from the previous Commit in the
   // history of this Label.

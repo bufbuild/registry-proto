@@ -129,7 +129,7 @@ message CreatePluginsRequest {
     string source_url = 5 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
     ];
     // The Plugin type.
     PluginType type = 6 [
@@ -168,8 +168,7 @@ message UpdatePluginsRequest {
     // The configurable source URL in the description of the Plugin.
     optional string source_url = 5 [
       (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore = IGNORE_IF_DEFAULT_VALUE
+      (buf.validate.field).string.max_len = 255
     ];
   }
   // The Plugins to update.

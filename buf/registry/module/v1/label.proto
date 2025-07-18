@@ -71,7 +71,7 @@ message Label {
   // May be empty if the User is no longer available.
   string updated_by_user_id = 9 [
     (buf.validate.field).string.tuuid = true,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
   // The CommitCheckState for the Commit the Label points to.
   //

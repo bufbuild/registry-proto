@@ -60,6 +60,6 @@ message Commit {
   // May be empty if the User is no longer available.
   string created_by_user_id = 5 [
     (buf.validate.field).string.tuuid = true,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 }
