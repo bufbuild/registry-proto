@@ -38,7 +38,7 @@ lint: $(BIN)/buf ## Lint all APIs
 
 .PHONY: upgrade
 upgrade: $(BIN)/buf ## Upgrade dependencies
-	buf mod update
+	buf dep update
 
 .PHONY: generate
 generate: $(BIN)/buf $(BIN)/license-header ## Format and regenerate license headers

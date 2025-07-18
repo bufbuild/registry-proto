@@ -64,7 +64,7 @@ message Commit {
   // May be empty if the User is no longer available.
   string created_by_user_id = 6 [
     (buf.validate.field).string.tuuid = true,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
   // The URL of the source control commit that is associated with the Commit.
   //
@@ -73,6 +73,6 @@ message Commit {
   string source_control_url = 7 [
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.max_len = 255,
-    (buf.validate.field).ignore = IGNORE_IF_UNPOPULATED
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 }
