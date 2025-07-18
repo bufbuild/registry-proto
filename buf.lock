@@ -2,7 +2,7 @@
 version: v2
 deps:
   - name: buf.build/bufbuild/bufplugin
-    commit: 21681557a8f6425e85c04abf62381ac5
+    commit: e35f9b6674434a41aea0359ee056d083
     digest: b5:0d2579c1953b5b20bfa5c9d183f17af030bd3e594e2de5ba11d12a12091e64257cb2d82ca0f2234a01085b26d7b9905a472723e40db94b6c925b1360d1a7b44a
   - name: buf.build/bufbuild/protovalidate
     commit: 6c6e0d3c608e4549802254a2eee81bc8
