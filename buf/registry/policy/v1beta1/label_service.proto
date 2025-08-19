@@ -116,9 +116,7 @@ message ListLabelsRequest {
   // filters in the request):
   //   - If a Policy is referenced, all Labels for the Policy are returned.
   //   - If a Label is referenced, this Label is returned.
-  //   - If a Commit is referenced, all Labels that currently point to the Commit are returned. Note
-  //     that Labels only point to passed or approved Commits, or Commits where policy checks were
-  //     disabled.
+  //   - If a Commit is referenced, all Labels that currently point to the Commit are returned.
   ResourceRef resource_ref = 3 [(buf.validate.field).required = true];
   // The order to return the Labels.
   //
