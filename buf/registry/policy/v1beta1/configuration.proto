@@ -63,6 +63,8 @@ message PolicyConfig {
     // verifies that all service names are suffixed with `Service`, however this allows organizations
     // to choose a different suffix.
     string service_suffix = 7 [(buf.validate.field).string.max_len = 250];
+    // The bool disables the builtin rules and categories.
+    bool disable_builtin = 8;
   }
   // A breaking config consists of the generic check config and additional breaking-specifc configs
   // required for running breaking change detection.
@@ -94,6 +96,8 @@ message PolicyConfig {
     //   - v\d+(alpha|beta)\d*
     //   - v\d+p\d+(alpha|beta)\d*
     bool ignore_unstable_packages = 3;
+    // The bool disables the builtin rules and categories.
+    bool disable_builtin = 4;
   }
   // A plugin config consists of the configs for invoking a check plugin.
   message CheckPluginConfig {
