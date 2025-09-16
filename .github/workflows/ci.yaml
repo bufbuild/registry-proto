@@ -10,7 +10,7 @@ jobs:
         with:
           fetch-depth: 1
       - name: install
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
       - name: make
         run: make
       - name: make checkgenerate
