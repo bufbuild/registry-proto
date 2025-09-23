@@ -106,8 +106,6 @@ message DownloadResponse {
   message Content {
     // The Commit associated with the Content.
     //
-    // The Commit associated with this ID will be present in the commits field.
-    //
     // The Commit will use the DigestType specified in the request value.
     Commit commit = 1 [(buf.validate.field).required = true];
     // The Files of the content.
