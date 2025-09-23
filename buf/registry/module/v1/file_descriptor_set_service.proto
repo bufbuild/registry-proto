@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.module.v1;
 
+import "buf/registry/module/v1/commit.proto";
 import "buf/registry/module/v1/resource.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/descriptor.proto";
@@ -90,7 +91,7 @@ message GetFileDescriptorSetRequest {
   // A type is a package, message, enum, service, method, or extension.
   //
   // Types are referenced by their fully-qualified name. For example, if "Foo" is a message within
-  // the package "foo.v1", the fully-qualified name is "foo.v1.Foo". Fully-qualfied names should
+  // the package "foo.v1", the fully-qualified name is "foo.v1.Foo". Fully-qualified names should
   // not start with a period, that is specify "foo.v1.Foo", not ".foo.v1.Foo".
   repeated string exclude_types = 6 [(buf.validate.field).repeated.items.cel = {
     id: "fqn_no_period_prefix"
@@ -102,4 +103,6 @@ message GetFileDescriptorSetRequest {
 message GetFileDescriptorSetResponse {
   // The FileDescriptorSet representing the referenced Module, Label, or Commit.
   google.protobuf.FileDescriptorSet file_descriptor_set = 1 [(buf.validate.field).required = true];
+  // The Commit associated with the resolved resource.
+  Commit commit = 2 [(buf.validate.field).required = true];
 }
