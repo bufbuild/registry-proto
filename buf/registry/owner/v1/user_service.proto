@@ -28,6 +28,10 @@ service UserService {
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+  // Get the currently authenticated User.
+  rpc GetCurrentUser(GetCurrentUserRequest) returns (GetCurrentUserResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   // List Users, usually by Organization.
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
@@ -66,6 +70,13 @@ message GetUsersRequest {
 message GetUsersResponse {
   // The retrieved Users in the same order as requested.
   repeated User users = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message GetCurrentUserRequest {}
+
+message GetCurrentUserResponse {
+  // The currently authenticated User.
+  User user = 1 [(buf.validate.field).required = true];
 }
 
 message ListUsersRequest {
