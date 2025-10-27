@@ -124,10 +124,10 @@ message CreatePoliciesRequest {
       max_len: 100
     }];
     // The Policy's visibility.
-    PolicyVisibility visibility = 3 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).enum.defined_only = true
-    ];
+    //
+    // If not specified, it uses the value from the instance or organization visibility control,
+    // which defaults to POLICY_VISIBILITY_PRIVATE.
+    PolicyVisibility visibility = 3 [(buf.validate.field).enum.defined_only = true];
     // The configurable description of the Policy.
     string description = 4 [(buf.validate.field).string.max_len = 350];
   }
