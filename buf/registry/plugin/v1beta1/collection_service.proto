@@ -95,9 +95,12 @@ message GetPluginCollectionAssociationsResponse {
   // The Associations for the requested Plugins.
   message Association {
     // The id of the Plugin.
-    string plugin_id = 1;
-    // The collection ids associated with the Plugin.
-    repeated string collection_ids = 2;
+    string plugin_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.tuuid = true
+    ];
+    // The Collection ids associated with the Plugin.
+    repeated string collection_ids = 2 [(buf.validate.field).repeated.items.string.tuuid = true];
   }
   // The Associations for the requested Plugins in the same order as requested.
   repeated Association associations = 1;
