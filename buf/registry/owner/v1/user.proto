@@ -71,10 +71,12 @@ message User {
   ];
 }
 
-// The state of the a User, either active or inactive.
+// The state of a User.
 enum UserState {
   USER_STATE_UNSPECIFIED = 0;
+  // The User is active.
   USER_STATE_ACTIVE = 1;
+  // The User is inactive.
   USER_STATE_INACTIVE = 2;
 }
 
