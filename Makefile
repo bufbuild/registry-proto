@@ -11,6 +11,7 @@ export PATH := $(BIN):$(PATH)
 export GOBIN := $(abspath $(BIN))
 
 COPYRIGHT_YEARS := 2023-2025
+LICENSE_IGNORE := --ignore '\.yaml$$' --ignore '\.yml$$'
 
 .PHONY: help
 help: ## Describe useful make targets
@@ -45,7 +46,8 @@ generate: $(BIN)/buf $(BIN)/license-header ## Format and regenerate license head
 	license-header \
 		--license-type apache \
 		--copyright-holder "Buf Technologies, Inc." \
-		--year-range "$(COPYRIGHT_YEARS)"
+		--year-range "$(COPYRIGHT_YEARS)" \
+		$(LICENSE_IGNORE)
 	buf format -w
 
 .PHONY: checkgenerate
