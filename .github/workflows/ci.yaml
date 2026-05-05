@@ -8,10 +8,9 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
-          # Must be able to run the latest version of `buf`.
-          go-version: '1.26'
-          # Check for latest Go version to run latest Buf version.
-          check-latest: true
+          # Must be able to run the latest version of `buf`, which updates
+          # every once in a while.
+          go-version: 'stable'
           # No caching needed; no Go files.
           cache: false
       - run: make
