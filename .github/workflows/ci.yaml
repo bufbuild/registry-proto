@@ -5,13 +5,12 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
-          fetch-depth: 1
-      - name: install
-        uses: actions/setup-go@v6
-      - name: make
-        run: make
-      - name: make checkgenerate
-        run: make checkgenerate
+          # Check for latest Go version to run latest Buf version.
+          check-latest: true
+          # No caching needed; no Go files.
+          cache: false
+      - run: make
+      - run: make checkgenerate
