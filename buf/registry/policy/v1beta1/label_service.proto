@@ -51,6 +51,8 @@ service LabelService {
   // Archive existing Labels.
   //
   // This operation is atomic. Either all Labels are archived or an error is returned.
+  //
+  // It is an error to archive the default Label.
   rpc ArchiveLabels(ArchiveLabelsRequest) returns (ArchiveLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
