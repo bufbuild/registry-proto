@@ -58,10 +58,10 @@ message Graph {
   // The registries for the Commits.
   //
   // Only registries that are *not* the registry that returned this
-  // Graph as present. For example, say buf.example.com/foo/bar depends
+  // Graph are present. For example, say buf.example.com/foo/bar depends
   // on buf.build/googleapis/googleapis. If we made a GetGraph call
   // against buf.example.com, only the Registry for buf.build
-  // and the Commit ID for buf.build/googleapis/googleaois will
+  // and the Commit ID for buf.build/googleapis/googleapis will
   // be present.
   repeated Registry registries = 3;
 }
