@@ -157,6 +157,7 @@ message UpdatePoliciesRequest {
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
     ];
+    reserved 3;
     // The deprecation status of the Policy.
     optional PolicyState state = 4 [
       (buf.validate.field).enum.defined_only = true,
