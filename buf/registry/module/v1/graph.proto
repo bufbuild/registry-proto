@@ -41,27 +41,31 @@ message Graph {
     // The Node of the end of the edge.
     Node to_node = 2 [(buf.validate.field).required = true];
   }
-  // A registry.
+  // A registry and Commit ID pair.
   //
-  // Used when federation is present.
-  message Registry {
-    // The hostname of the registry.
-    string hostname = 1 [(buf.validate.field).required = true];
-    // The commit IDs in the graph associated with this registry.
-    repeated string commit_ids = 2 [(buf.validate.field).repeated.items.string.tuuid = true];
+  // Used when federation is enabled to link a commit ID to another registry.
+  //
+  // Only commits that are *not* the registry that returned this Graph are present.
+  // For example, say buf.example.com/foo/bar depends on buf.build/googleapis/googleapis.
+  // If we made a GetGraph call against buf.example.com, only the registry for buf.build
+  // and the Commit ID for buf.build/googleapis/googleapis will be present.
+  message RegistryCommitID {
+    // The commit ID.
+    string commit_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.tuuid = true
+    ];
+    // The registry hostname.
+    string registry = 2 [(buf.validate.field).required = true];
   }
 
   // The nodes of the graph, each of which are Commits.
   repeated Commit commits = 1 [(buf.validate.field).repeated.min_items = 1];
   // The edges of the graph.
   repeated Edge edges = 2;
-  // The registries for the Commits.
+  // The registry/commit ID pairs for registries other than the callee.
   //
-  // Only registries that are *not* the registry that returned this
-  // Graph are present. For example, say buf.example.com/foo/bar depends
-  // on buf.build/googleapis/googleapis. If we made a GetGraph call
-  // against buf.example.com, only the Registry for buf.build
-  // and the Commit ID for buf.build/googleapis/googleapis will
-  // be present.
-  repeated Registry registries = 3;
+  // The pairs will be unique by commit ID, that is there will be only one
+  // RegistryCommitID for a given commit ID.
+  repeated RegistryCommitID registry_commit_ids = 3;
 }
