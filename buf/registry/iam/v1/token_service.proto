@@ -121,7 +121,14 @@ message CreateTokensRequest {
     string description = 4 [(buf.validate.field).string.max_len = 350];
     // The scopes of the Token.
     //
-    // If empty, the Token has the same permissions as its owning User, resolved each time it is used.
+    // If empty, the Token has no declared scope restrictions and its effective
+    // permissions are the owner's permissions resolved at request time.
+    //
+    // Otherwise, the Token's effective permissions are the intersection of these
+    // declared permissions and the owner's permissions resolved at request time.
+    //
+    // In other words, TokenScopes can restrict the permissions of a Token,
+    // but cannot add any permissions that the User does not already have.
     repeated TokenScope token_scopes = 5 [(buf.validate.field).repeated.max_items = 250];
   }
   // The Tokens to create.

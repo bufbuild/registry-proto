@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.iam.v1;
 
+import "buf/registry/iam/v1/validate.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
@@ -62,11 +63,14 @@ message Token {
   string description = 6 [(buf.validate.field).string.max_len = 350];
   // The scopes of the Token.
   //
-  // If empty, the Token has the same permissions as its owning User, now and in the future. If not
-  // empty, the Token has the intersection of the permissions defined in the TokenScopes and the
-  // permissions of the owning User at the time of the request. In other words, TokenScopes can
-  // restrict the permissions of a Token, but cannot add any permissions that the User does not
-  // have.
+  // If empty, the Token has no declared scope restrictions and its effective
+  // permissions are the owner's permissions resolved at request time.
+  //
+  // Otherwise, the Token's effective permissions are the intersection of these
+  // declared permissions and the owner's permissions resolved at request time.
+  //
+  // In other words, TokenScopes can restrict the permissions of a Token,
+  // but cannot add any permissions that the User does not already have.
   repeated TokenScope token_scopes = 7 [(buf.validate.field).repeated.max_items = 250];
 }
 
@@ -80,13 +84,15 @@ message TokenScope {
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
   // The permissions granted by the TokenScope.
-  // TODO(iam): add validation here once permissions are defined.
+  //
+  // Each entry is either a Permission name (e.g. "bsr.repository.delete") or
+  // a wildcard pattern ending in ".*" that matches all Permissions sharing a
+  // prefix (e.g. "bsr.repository.*").
   repeated string permissions = 2 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250,
     (buf.validate.field).repeated.unique = true,
-    (buf.validate.field).repeated.items.string.min_len = 1,
-    (buf.validate.field).repeated.items.string.max_len = 250
+    (buf.validate.field).repeated.items.string.(permission_pattern) = true
   ];
 }
 
