@@ -1,0 +1,90 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto2";
+
+package buf.registry.iam.v1;
+
+import "buf/validate/validate.proto";
+
+extend buf.validate.StringRules {
+  // A validation rule for permission names.
+  //
+  // Permission names are 2-255 character strings matching ^[a-z]([a-z0-9._-]*[a-z0-9])?([.][*])?$.
+  // They follow the convention "scheme.resource_type.verb" (e.g., "bsr.repository.delete",
+  // "iam.user_principal.self.update").
+  //
+  // Wildcard permissions end with ".*" (e.g., "bsr.repository.*"). The wildcard must
+  // immediately follow a "." — "bsr.repository_*" is not valid.
+  //
+  // Use (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE for optional fields.
+  optional bool permission_name = 11001 [
+    (buf.validate.predefined).cel = {
+      id: "string.permission_name.len"
+      message: "permission name must be between 2 and 255 characters"
+      expression: "this == '' || (this.size() >= 2 && this.size() <= 255)"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.permission_name.pattern"
+      message: "permission name must match ^[a-z]([a-z0-9._-]*[a-z0-9])?([.][*])?$"
+      expression: "this == '' || this.matches('^[a-z]([a-z0-9._-]*[a-z0-9])?([.][*])?$')"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.permission_name.empty"
+      message: "permission name must not be empty"
+      expression: "this != ''"
+    }
+  ];
+
+  // A validation rule for role names.
+  //
+  // A role name must be 2-32 characters, containing only lowercase alphanumeric characters or
+  // hyphens. Additionally, it must start with a lowercase letter and end with a lowercase letter or
+  // digit.
+  //
+  // Use (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE for optional fields.
+  optional bool role_name = 11003 [
+    (buf.validate.predefined).cel = {
+      id: "string.role_name.len"
+      message: "role name must be between 2 and 32 characters"
+      expression: "this == '' || (this.size() >= 2 && this.size() <= 32)"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.role_name.pattern"
+      message: "role name must match ^[a-z][a-z0-9-]*[a-z0-9]$"
+      expression: "this == '' || this.matches('^[a-z][a-z0-9-]*[a-z0-9]$')"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.role_name.empty"
+      message: "role name must not be empty"
+      expression: "this != ''"
+    }
+  ];
+
+  // A validation rule for resource type names.
+  //
+  // A resource type name must be 2-255 characters, containing only lowercase alphanumeric
+  // characters, periods, underscores, or hyphens. Additionally, it must start and end with a
+  // lowercase letter. Names follow the convention "scheme.entity_type" (e.g., "bsr.repository",
+  // "iam.user_principal").
+  //
+  // Use (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE for optional fields.
+  optional bool resource_type_name = 11004 [
+    (buf.validate.predefined).cel = {
+      id: "string.resource_type_name.len"
+      message: "resource type name must be between 2 and 255 characters"
+      expression: "this == '' || (this.size() >= 2 && this.size() <= 255)"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.resource_type_name.pattern"
+      message: "resource type name must match ^[a-z][a-z0-9._-]*[a-z]$"
+      expression: "this == '' || this.matches('^[a-z][a-z0-9._-]*[a-z]$')"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.resource_type_name.empty"
+      message: "resource type name must not be empty"
+      expression: "this != ''"
+    }
+  ];
+}

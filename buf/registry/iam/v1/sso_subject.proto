@@ -1,0 +1,57 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// SSOSubject represents a Principal authenticated via an SSO provider.
+//
+// SSO Subjects are created automatically when a user authenticates via an SSO provider for the
+// first time. They are immutable once created.
+//
+// There can be multiple SSO Subjects per Principal as multiple SSO accounts can be linked to a
+// single IAM Principal if Principal merging is enabled.
+//
+// Only User Principals can have SSO Subject Identities.
+message SSOSubject {
+  // The ID of the SSO Subject.
+  //
+  // The ID uniquely identifies the SSO Subject.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the SSO Subject was created.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The ID of the Principal who owns the SSO Subject.
+  string principal_id = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The subject from the SSO provider.
+  //
+  // The subject uniquely identifies the SSO Subject in IAM and in the SSO provider.
+  string subject = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+// SSOSubjectRef is a reference to an SSO Subject, either an id or a subject.
+message SSOSubjectRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the SSO Subject.
+    string id = 1 [(buf.validate.field).string.tuuid = true];
+    // The subject of the SSO Subject.
+    string subject = 2 [(buf.validate.field).string.max_len = 255];
+  }
+}

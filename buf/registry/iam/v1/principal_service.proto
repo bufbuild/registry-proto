@@ -1,0 +1,217 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/iam/v1/principal.proto";
+import "buf/validate/validate.proto";
+
+// Operate on Principals.
+service PrincipalService {
+  // Get the currently authenticated Principal.
+  //
+  // Returns an error if the request is not authenticated.
+  rpc GetCurrentPrincipal(GetCurrentPrincipalRequest) returns (GetCurrentPrincipalResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get Principals by ID or Name.
+  rpc GetPrincipals(GetPrincipalsRequest) returns (GetPrincipalsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List all Principals.
+  rpc ListPrincipals(ListPrincipalsRequest) returns (ListPrincipalsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create new Principals.
+  //
+  // This operation is atomic. Either all Principals are created or an error is returned.
+  rpc CreatePrincipals(CreatePrincipalsRequest) returns (CreatePrincipalsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Update existing Principals.
+  //
+  // This operation is atomic. Either all Principals are updated or an error is returned.
+  rpc UpdatePrincipals(UpdatePrincipalsRequest) returns (UpdatePrincipalsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Delete existing Principals.
+  //
+  // This operation is atomic. Either all Principals are deleted or an error is returned.
+  rpc DeletePrincipals(DeletePrincipalsRequest) returns (DeletePrincipalsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message GetCurrentPrincipalRequest {}
+
+message GetCurrentPrincipalResponse {
+  // The currently authenticated Principal.
+  Principal principal = 1 [(buf.validate.field).required = true];
+}
+
+message GetPrincipalsRequest {
+  // The Principals to request.
+  repeated PrincipalRef principal_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetPrincipalsResponse {
+  // The retrieved Principals in the same order as requested.
+  repeated Principal principals = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message ListPrincipalsRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // The maximum number of Principals to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The order to return the Principals.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 3 [(buf.validate.field).enum.defined_only = true];
+  // Only return Principals of these states.
+  //
+  // If empty, Principals of all states are returned.
+  repeated PrincipalState states = 4 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
+}
+
+message ListPrincipalsResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The list of Principals.
+  repeated Principal principals = 2;
+}
+
+message CreatePrincipalsRequest {
+  // An individual request to create a Principal.
+  message Value {
+    option (buf.validate.message).cel = {
+      id: "create_principal.invite_redemption_requires_user_type"
+      message: "invite_redemption is only valid for USER Principals"
+      expression: "!has(this.invite_redemption) || this.type == 1"
+    };
+    // The invite redemption code to redeem for creating the Principal.
+    message InviteRedemption {
+      // The raw redemption code for the Invite, as returned by CreateInvites.
+      string raw_redemption_code = 1 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).string.len = 32
+      ];
+      // The raw password to set for the created Principal's Password identity.
+      string raw_password = 2 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).string.min_len = 8,
+        (buf.validate.field).string.max_len = 4096
+      ];
+    }
+    // The name of the Principal.
+    string name = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.min_len = 2,
+      (buf.validate.field).string.max_len = 32,
+      (buf.validate.field).string.pattern = "^[a-z][a-z0-9-]*[a-z0-9]$"
+    ];
+    // The type of the Principal.
+    PrincipalType type = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum = {
+        defined_only: true
+        not_in: [
+          0,
+          3
+        ]
+      }
+    ];
+    // The email of the Principal.
+    //
+    // If the email is associated with a pending Invite, then invite_redemption must be set.
+    string email = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.email = true
+    ];
+    // The invite redemption to redeem for creating the Principal.
+    //
+    // If specified, the Principal is created by redeeming an Invite. The code must match a pending,
+    // non-expired Invite, and the email must match the email of the Invite. The Principal is created
+    // with a Password identity using the provided raw_password, and the Invite's Role Bindings are
+    // applied to the new Principal.
+    //
+    // Only valid for USER Principals.
+    InviteRedemption invite_redemption = 4;
+  }
+  // The Principals to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreatePrincipalsResponse {
+  // The created Principals in the same order as requested.
+  repeated Principal principals = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdatePrincipalsRequest {
+  // An individual request to update a Principal.
+  message Value {
+    // The Principal to update.
+    PrincipalRef principal_ref = 1 [(buf.validate.field).required = true];
+    // The state of the Principal.
+    optional PrincipalState state = 2 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+  }
+  // The Principals to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdatePrincipalsResponse {
+  // The updated Principals in the same order as requested.
+  repeated Principal principals = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeletePrincipalsRequest {
+  // The Principals to delete.
+  repeated PrincipalRef principal_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeletePrincipalsResponse {}

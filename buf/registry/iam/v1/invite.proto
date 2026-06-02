@@ -1,0 +1,91 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// Invite is an invitation for an end-user to create a Principal in registry IAM with pre-configured
+// Role Bindings.
+//
+// Invites are created by admins and redeemed by end-users in one of two ways:
+//
+//   - By provisioning via SSO, where the Invite is matched via the email address indicated by the
+//     SSO provider.
+//   - By invoking PrincipalService.CreatePrincipals with an email address and the correct redemption
+//     code, which creates a User Principal with a Password identity.
+//
+// Invites are unique by email address. It is an error to create an Invite for an email address already
+// associated with an existing Principal or a pending Invite.
+//
+// Invites can only result in the creation of User Principals.
+message Invite {
+  // The ID of the Invite.
+  //
+  // The ID uniquely identifies the Invite.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the Invite was created.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The time the Invite was last updated.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  // The email address of the invitee.
+  //
+  // The email is used to identify the end-user when they redeem the Invite by authenticating.
+  string email = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.email = true
+  ];
+  // The state of the Invite.
+  InviteState state = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The expiration time of the Invite, after which it cannot be redeemed.
+  google.protobuf.Timestamp expire_time = 6 [(buf.validate.field).required = true];
+  // The ID of the Role to bind to the redeemed Principal globally.
+  string global_role_id = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The Resource-scoped Roles to bind to the redeemed Principal.
+  repeated InviteResourceRole resource_roles = 8 [(buf.validate.field).repeated.max_items = 250];
+  // The ID of the Principal that redeemed the Invite.
+  //
+  // Only set when the state is INVITE_STATE_REDEEMED.
+  string redeemed_principal_id = 9 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.tuuid = true
+  ];
+}
+
+// InviteState is the state of an Invite.
+enum InviteState {
+  INVITE_STATE_UNSPECIFIED = 0;
+  // The Invite is pending and can be redeemed.
+  INVITE_STATE_PENDING = 1;
+  // The Invite has been redeemed by the invitee.
+  INVITE_STATE_REDEEMED = 2;
+  // The Invite has expired and can no longer be redeemed.
+  INVITE_STATE_EXPIRED = 3;
+}
+
+// InviteResourceRole is a Role to bind to the redeemed Principal on a specific Resource.
+message InviteResourceRole {
+  // The ID of the Role.
+  string role_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The ID of the Resource.
+  string resource_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+}

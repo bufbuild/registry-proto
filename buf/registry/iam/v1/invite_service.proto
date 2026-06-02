@@ -1,0 +1,232 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/iam/v1/invite.proto";
+import "buf/registry/iam/v1/role.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// Operate on Invites.
+service InviteService {
+  // Get Invites.
+  rpc GetInvites(GetInvitesRequest) returns (GetInvitesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List all Invites.
+  rpc ListInvites(ListInvitesRequest) returns (ListInvitesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create new Invites.
+  //
+  // This operation is atomic. Either all Invites are created or an error is returned.
+  //
+  // It is an error to create an Invite for an email address that already has a pending Invite or
+  // is already associated with an existing Principal.
+  rpc CreateInvites(CreateInvitesRequest) returns (CreateInvitesResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Update Invites.
+  //
+  // Only Invites in the PENDING state can be updated.
+  //
+  // This operation is atomic. Either all Invites are updated or an error is returned.
+  rpc UpdateInvites(UpdateInvitesRequest) returns (UpdateInvitesResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Delete Invites by ID.
+  //
+  // Only Invites in the PENDING state can be deleted.
+  //
+  // This operation is atomic. Either all Invites are deleted or an error is returned.
+  rpc DeleteInvites(DeleteInvitesRequest) returns (DeleteInvitesResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message GetInvitesRequest {
+  // The IDs of the Invites to get.
+  repeated string ids = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).repeated.items.string.tuuid = true
+  ];
+}
+
+message GetInvitesResponse {
+  // The retrieved Invites in the same order as requested.
+  repeated Invite invites = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message ListInvitesRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // The maximum number of Invites to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The order to return the Invites.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 3 [(buf.validate.field).enum.defined_only = true];
+  // Only return Invites of these states.
+  //
+  // If empty, Invites of all states are returned.
+  repeated InviteState states = 4 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
+  // Only return the Invites for this email address.
+  //
+  // If empty, Invites for all email addresses are returned.
+  string email = 5 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.email = true
+  ];
+}
+
+message ListInvitesResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The list of Invites.
+  repeated Invite invites = 2;
+}
+
+message CreateInvitesRequest {
+  // An individual request to create an Invite.
+  message Value {
+    // A Resource-scoped Role to bind to the redeemed Principal.
+    message ResourceRole {
+      // The Role to bind.
+      RoleRef role_ref = 1 [(buf.validate.field).required = true];
+      // The ID of the Resource to bind the Role on.
+      string resource_id = 2 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).string.tuuid = true
+      ];
+    }
+    // The email address of the invitee.
+    string email = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.email = true
+    ];
+    // The expiration time of the Invite.
+    google.protobuf.Timestamp expire_time = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).timestamp.gt_now = true
+    ];
+    // The Role to bind to the redeemed Principal globally.
+    RoleRef role_ref = 3 [(buf.validate.field).required = true];
+    // The Resource-scoped Roles to bind to the redeemed Principal.
+    repeated ResourceRole resource_roles = 4 [(buf.validate.field).repeated.max_items = 250];
+  }
+  // The Invites to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreateInvitesResponse {
+  // An individual value for a created Invite.
+  message Value {
+    // The created Invite.
+    Invite invite = 1 [(buf.validate.field).required = true];
+    // The raw redemption code for the Invite.
+    //
+    // This cannot be retrieved again later. The integrating application should include this code in
+    // the invitation email sent to the invitee.
+    string raw_redemption_code = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.len = 32
+    ];
+  }
+  // The created Invites in the same order as requested.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdateInvitesRequest {
+  // An individual request to update an Invite.
+  message Value {
+    // A Resource-scoped Role to bind to the redeemed Principal.
+    message ResourceRole {
+      // The Role to bind.
+      RoleRef role_ref = 1 [(buf.validate.field).required = true];
+      // The ID of the Resource to bind the Role on.
+      string resource_id = 2 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).string.tuuid = true
+      ];
+    }
+    // The ID of the Invite to update.
+    string id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.tuuid = true
+    ];
+    // The new Role to bind to the redeemed Principal globally.
+    //
+    // If not specified, the role is not updated.
+    RoleRef role_ref = 2;
+    // A wrapper for Resource-scoped Roles.
+    message ResourceRoles {
+      // The Resource-scoped Roles. An empty list clears all resource_roles.
+      repeated ResourceRole values = 1 [(buf.validate.field).repeated.max_items = 250];
+    }
+    // The new Resource-scoped Roles to bind to the redeemed Principal.
+    //
+    // If not specified, the resource_roles are not updated. If specified, replaces the existing
+    // resource_roles entirely.
+    ResourceRoles resource_roles = 3;
+    // The new expiration time of the Invite.
+    //
+    // If not specified, the expire_time is not updated. If specified, must be in the future.
+    google.protobuf.Timestamp expire_time = 4 [(buf.validate.field).timestamp.gt_now = true];
+  }
+  // The Invites to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdateInvitesResponse {
+  // The updated Invites in the same order as requested.
+  repeated Invite invites = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeleteInvitesRequest {
+  // The IDs of the Invites to delete.
+  repeated string ids = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).repeated.items.string.tuuid = true
+  ];
+}
+
+message DeleteInvitesResponse {}

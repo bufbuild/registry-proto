@@ -1,0 +1,30 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/iam/v1/validate.proto";
+import "buf/validate/validate.proto";
+
+// A Permission in registry IAM.
+//
+// Permissions are opaque strings granted to Subjects via Roles. Permissions are identified by their
+// name — they do not have a separate ID.
+message Permission {
+  // The name of the Permission.
+  //
+  // The name uniquely identifies the Permission across the entire system.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.(permission_name) = true
+  ];
+  // A human-readable description of the Permission.
+  string description = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+}

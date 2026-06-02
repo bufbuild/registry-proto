@@ -1,0 +1,123 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/iam/v1/scim_token.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// Operate on SCIMTokens.
+service SCIMTokenService {
+  // List all SCIMTokens.
+  rpc ListSCIMTokens(ListSCIMTokensRequest) returns (ListSCIMTokensResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create new SCIMTokens.
+  //
+  // This operation is atomic. Either all SCIMTokens are created or an error is returned.
+  rpc CreateSCIMTokens(CreateSCIMTokensRequest) returns (CreateSCIMTokensResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Delete SCIMTokens by ID.
+  //
+  // This operation is atomic. Either all SCIMTokens are deleted or an error is returned.
+  rpc DeleteSCIMTokens(DeleteSCIMTokensRequest) returns (DeleteSCIMTokensResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message ListSCIMTokensRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // A filter on the state of the SCIMToken.
+  enum SCIMTokenStateFilter {
+    SCIM_TOKEN_STATE_FILTER_UNSPECIFIED = 0;
+    // Return all SCIMTokens, regardless of their state.
+    SCIM_TOKEN_STATE_FILTER_ALL = 1;
+    // Return only active SCIMTokens.
+    SCIM_TOKEN_STATE_FILTER_ACTIVE_ONLY = 2;
+    // Return only expired SCIMTokens.
+    SCIM_TOKEN_STATE_FILTER_EXPIRED_ONLY = 3;
+  }
+  // The maximum number of SCIMTokens to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The order to return the SCIMTokens.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 3 [(buf.validate.field).enum.defined_only = true];
+  // The SCIMToken state filter on the returned SCIMTokens.
+  //
+  // If not specified, defaults to SCIM_TOKEN_STATE_FILTER_ACTIVE_ONLY.
+  SCIMTokenStateFilter scim_token_state_filter = 4 [(buf.validate.field).enum.defined_only = true];
+}
+
+message ListSCIMTokensResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The list of SCIMTokens.
+  repeated SCIMToken scim_tokens = 2;
+}
+
+message CreateSCIMTokensRequest {
+  // An individual request to create a SCIMToken.
+  message Value {
+    // The time the SCIMToken expires. The SCIMToken is valid until this time.
+    //
+    // If not specified, the scim_token is valid indefinitely.
+    google.protobuf.Timestamp expire_time = 1 [(buf.validate.field).timestamp.gt_now = true];
+  }
+  // The SCIMTokens to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreateSCIMTokensResponse {
+  // An individual value for a created SCIMToken.
+  message Value {
+    // The created SCIMToken.
+    SCIMToken scim_token = 1 [(buf.validate.field).required = true];
+    // The raw scim_token string that can be used for authentication.
+    //
+    // This cannot be retrieved again later.
+    string raw_scim_token = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 4096
+    ];
+  }
+  // The created SCIMTokens in the same order as requested.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeleteSCIMTokensRequest {
+  // The IDs of the SCIMTokens to delete.
+  repeated string ids = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).repeated.items.string.tuuid = true
+  ];
+}
+
+message DeleteSCIMTokensResponse {}

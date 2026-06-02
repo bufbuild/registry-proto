@@ -1,0 +1,29 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/iam/v1/validate.proto";
+import "buf/validate/validate.proto";
+
+// A ResourceType in registry IAM.
+//
+// ResourceTypes are identified by their name — they do not have a separate ID.
+message ResourceType {
+  // The name of the ResourceType.
+  //
+  // The name uniquely identifies the ResourceType.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.(resource_type_name) = true
+  ];
+  // A human-readable description of the ResourceType.
+  string description = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+}

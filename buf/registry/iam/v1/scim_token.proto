@@ -1,0 +1,32 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// SCIMToken represents an authentication token for SCIM in IAM.
+message SCIMToken {
+  // The ID of the SCIMToken.
+  //
+  // The ID uniquely identifies the SCIMToken.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the SCIMToken was created.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The time the SCIMToken expires. If not set, the SCIMToken does not expire.
+  google.protobuf.Timestamp expire_time = 3;
+  // The ID of the Principal who created the SCIMToken.
+  //
+  // The SCIMToken is not owned or associated with the Principal, this field is only for auditing.
+  string principal_id = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+}

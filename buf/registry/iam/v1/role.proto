@@ -1,0 +1,97 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/iam/v1/validate.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// A Role in IAM.
+//
+// Roles are named collections of permissions that are either global or owned by a Resource.
+// Permissions are opaque strings granted to Subjects.
+message Role {
+  // The ID of the Role.
+  //
+  // The ID uniquely identifies the Role.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the Role was created.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The time the Role was updated.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  // The ID of the Resource that the Role belongs to.
+  //
+  // If empty, the Role is a global Role.
+  string parent_resource_id = 4 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The type of the Resource this Role can be bound to, if any.
+  //
+  // If set, the Role can only be bound in a RoleBinding to a Resource of this type. This is
+  // not to be confused with parent_resource_id, which identifies the Resource which owns the Role.
+  //
+  // TOOD: would scoped_resource_type/resource_type_scope be clearer/more idomatic?
+  string applicable_resource_type = 5 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.(resource_type_name) = true
+  ];
+  // The name of the Role.
+  //
+  // The name uniquely identifies the Role within its owning Resource, or across the entire system
+  // for global Roles.
+  string name = 6 [(buf.validate.field).string.(role_name) = true];
+  // The permissions of the Role.
+  //
+  // Permissions are opaque strings. Apart from the validation rules defined here, the format of a
+  // permission is not defined but usually follows a pattern such as "service.entity.action".
+  //
+  // As a special-case, a permission can end with ".*" to indicate a wildcard. Such a permission
+  // matches any permission that has the same prefix before the ".*". For example, "service.*"
+  // matches "service.entity.action1" and "service.entity.action2", but not
+  // "other_service.entity.action".
+  repeated string permissions = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).repeated.items.string.(permission_name) = true
+  ];
+  // A human-readable description of the Role.
+  string description = 8 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+// RoleRef is a reference to a Role, either an id or a name.
+message RoleRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  message Name {
+    // The ID of the Resource.
+    //
+    // If empty, global Roles are searched.
+    string resource_id = 1 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.tuuid = true
+    ];
+    // The name of the Role.
+    string name = 2 [(buf.validate.field).string.(role_name) = true];
+  }
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Role.
+    string id = 1 [(buf.validate.field).string.tuuid = true];
+    // The name of the Role.
+    Name name = 2;
+  }
+}

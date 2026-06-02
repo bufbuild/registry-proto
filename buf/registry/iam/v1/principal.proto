@@ -1,0 +1,87 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// A Principal in registry IAM.
+message Principal {
+  // The ID of the Principal.
+  //
+  // The ID uniquely identifies the Principal.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the Principal was created.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The time the Principal was updated.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  // The name of the Principal.
+  //
+  // The name uniquely identifies the Principal.
+  string name = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 32,
+    (buf.validate.field).string.pattern = "^[a-z][a-z0-9-]*[a-z0-9]$"
+  ];
+  // The type of the Principal.
+  PrincipalType type = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The email of the Principal.
+  //
+  // The email is not unique across Principals.
+  string email = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.email = true
+  ];
+  // The state of the Principal.
+  PrincipalState state = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+}
+
+// PrincipalType is the type of a Principal in IAM.
+enum PrincipalType {
+  PRINCIPAL_TYPE_UNSPECIFIED = 0;
+  // The Principal is a user.
+  PRINCIPAL_TYPE_USER = 1;
+  // The Principal is a service account.
+  PRINCIPAL_TYPE_SERVICE_ACCOUNT = 2;
+}
+
+// PrincipalState is the state of a Principal.
+enum PrincipalState {
+  PRINCIPAL_STATE_UNSPECIFIED = 0;
+  // The Principal is active and can perform operations.
+  PRINCIPAL_STATE_ACTIVE = 1;
+  // The Principal is inactive and cannot perform operations.
+  PRINCIPAL_STATE_INACTIVE = 2;
+}
+
+// PrincipalRef is a reference to a Principal, either an id or a name.
+message PrincipalRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Principal.
+    string id = 1 [(buf.validate.field).string.tuuid = true];
+    // The name of the Principal.
+    string name = 2 [(buf.validate.field).string = {
+      min_len: 2
+      max_len: 32
+      pattern: "^[a-z][a-z0-9-]*[a-z0-9]$"
+    }];
+  }
+}

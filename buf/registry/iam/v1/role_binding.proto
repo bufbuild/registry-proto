@@ -1,0 +1,52 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// A RoleBinding in registry IAM.
+//
+// A RoleBinding associates a Role with a Subject. The Role is granted to the Subject for the
+// specified Resource, or for all Resources if the RoleBinding is global.
+//
+// A Subject may have multiple RoleBindings for the same Resource with the same Role, for example
+// if the RoleBinding is created for a Principal via multiple sources (e.g. manually and via an SSO
+// group).
+message RoleBinding {
+  // The ID of the RoleBinding.
+  //
+  // The ID uniquely identifies the RoleBinding.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The subject associated with this RoleBinding.
+  oneof subject {
+    option (buf.validate.oneof).required = true;
+    // The ID of the Principal associated with this RoleBinding.
+    string principal_id = 2 [(buf.validate.field).string.tuuid = true];
+  }
+  // The ID of the Role associated with this RoleBinding.
+  string role_id = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The ID of the Resource associated with this RoleBinding.
+  //
+  // If empty, the RoleBinding is global.
+  string resource_id = 4 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the RoleBinding was created.
+  google.protobuf.Timestamp create_time = 5 [(buf.validate.field).required = true];
+  // The time the RoleBinding was updated.
+  google.protobuf.Timestamp update_time = 6 [(buf.validate.field).required = true];
+  // The source of the RoleBinding, which indicates how it was created.
+  string source = 8 [(buf.validate.field).required = true];
+}
