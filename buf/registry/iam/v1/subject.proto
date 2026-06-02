@@ -1,0 +1,28 @@
+// Copyright 2020-2026 Buf Technologies, Inc.
+//
+// All rights reserved.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/iam/v1/principal.proto";
+import "buf/validate/validate.proto";
+
+// A Subject can only be a principal currently.
+message Subject {
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The Principal.
+    Principal principal = 1;
+  }
+}
+
+// SubjectRef is a reference to a Principal currently.
+message SubjectRef {
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The PrincipalRef.
+    PrincipalRef principal_ref = 1;
+  }
+}
