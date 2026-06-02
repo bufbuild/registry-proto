@@ -1,0 +1,82 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
+
+// Token authenticates a user with limited roles.
+//
+// Tokens are immutable once created. To change a Token's properties, delete it and create a new one.
+message Token {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The ID of the Token.
+  //
+  // The ID uniquely identifies the Token.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the Token was created.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The time the Token expires. If not set, the Token does not expire.
+  google.protobuf.Timestamp expire_time = 3;
+  // The name of the Token. Deleted tokens' names may be reused.
+  string name = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 3,
+    (buf.validate.field).string.max_len = 256
+  ];
+  // The ID of the user who owns the Token.
+  string user_id = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+
+  // The description of the Token. Optional.
+  string description = 6 [(buf.validate.field).string.max_len = 350];
+  // The scopes of the Token.
+  //
+  // If empty, the Token has the same permissions as the user, now and in the future. If not
+  // empty, the Token has the intersection of the permissions defined in the token_scopes and the
+  // permissions of the user at the time of the request. In other words, token_scopes can
+  // _restrict_ the permissions of a Token, but not _add_ any permissions that the user does
+  // not have.
+  repeated TokenScope token_scopes = 7 [(buf.validate.field).repeated.max_items = 250];
+}
+
+// A TokenScope is a restriction of the permissions of a Token to a specific Resource (or globally)
+// and set of roles.
+message TokenScope {
+  // The ID of the Resource that the TokenScope applies to.
+  //
+  // If empty, the TokenScope applies globally.
+  string resource_id = 1 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The roles of the TokenScope.
+  repeated string role_ids = 2 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).repeated.items.string.tuuid = true
+  ];
+}

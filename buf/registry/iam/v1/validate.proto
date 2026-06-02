@@ -1,0 +1,48 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto2";
+
+package buf.registry.iam.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
+
+extend buf.validate.StringRules {
+  // A validation rule for role names.
+  //
+  // A role name must be 2-32 characters, containing only lowercase alphanumeric characters or
+  // hyphens. Additionally, it must start with a lowercase letter and end with a lowercase letter or
+  // digit.
+  //
+  // Use (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE for optional fields.
+  optional bool role_name = 11003 [
+    (buf.validate.predefined).cel = {
+      id: "string.role_name.len"
+      message: "role name must be between 2 and 32 characters"
+      expression: "this == '' || (this.size() >= 2 && this.size() <= 32)"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.role_name.pattern"
+      message: "role name must match ^[a-z][a-z0-9-]*[a-z0-9]$"
+      expression: "this == '' || this.matches('^[a-z][a-z0-9-]*[a-z0-9]$')"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.role_name.empty"
+      message: "role name must not be empty"
+      expression: "this != ''"
+    }
+  ];
+}
