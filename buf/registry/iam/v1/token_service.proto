@@ -117,8 +117,6 @@ message CreateTokensRequest {
     //
     // If not set, the Token does not expire.
     google.protobuf.Timestamp expire_time = 3;
-    // The configurable description of the Token.
-    string description = 4 [(buf.validate.field).string.max_len = 350];
     // The scopes of the Token.
     //
     // If empty, the Token has no declared scope restrictions and its effective
@@ -129,7 +127,7 @@ message CreateTokensRequest {
     //
     // In other words, TokenScopes can restrict the permissions of a Token,
     // but cannot add any permissions that the User does not already have.
-    repeated TokenScope token_scopes = 5 [(buf.validate.field).repeated.max_items = 250];
+    repeated TokenScope token_scopes = 4 [(buf.validate.field).repeated.max_items = 250];
   }
   // The Tokens to create.
   repeated Value values = 1 [

@@ -59,8 +59,6 @@ message Token {
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
-  // The configurable description of the Token.
-  string description = 6 [(buf.validate.field).string.max_len = 350];
   // The scopes of the Token.
   //
   // If empty, the Token has no declared scope restrictions and its effective
@@ -71,7 +69,7 @@ message Token {
   //
   // In other words, TokenScopes can restrict the permissions of a Token,
   // but cannot add any permissions that the User does not already have.
-  repeated TokenScope token_scopes = 7 [(buf.validate.field).repeated.max_items = 250];
+  repeated TokenScope token_scopes = 6 [(buf.validate.field).repeated.max_items = 250];
 }
 
 // A TokenScope restricts a Token to a specific Resource (or globally) and a set of permissions.
