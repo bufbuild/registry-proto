@@ -19,7 +19,6 @@ package buf.registry.iam.v1;
 import "buf/registry/iam/v1/validate.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
-import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
 
@@ -36,25 +35,21 @@ message Role {
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
-  // The time the Role was created.
-  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
-  // The last time the Role was updated.
-  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The name of the Role.
   //
   // A name uniquely identifies a Role within the BSR instance.
-  string name = 4 [
+  string name = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.(role_name) = true
   ];
   // A human-readable description of what the Role allows.
-  string description = 5 [(buf.validate.field).string.max_len = 512];
+  string description = 3 [(buf.validate.field).string.max_len = 512];
   // The Permissions granted by this Role.
   //
   // Each entry is either a Permission name (e.g. "bsr.repository.delete") or
   // a wildcard pattern ending in ".*" that matches all Permissions sharing a
   // prefix (e.g. "bsr.repository.*").
-  repeated string permissions = 6 [
+  repeated string permissions = 4 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250,
     (buf.validate.field).repeated.unique = true,
