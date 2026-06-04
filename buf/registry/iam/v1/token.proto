@@ -72,9 +72,9 @@ message Token {
   repeated TokenScope token_scopes = 6 [(buf.validate.field).repeated.max_items = 250];
 }
 
-// A TokenScope restricts a Token to a specific Resource (or globally) and a set of permissions.
+// A TokenScope restricts a Token to a specific resource (or globally) and a set of permissions.
 message TokenScope {
-  // The id of the Resource that the TokenScope applies to.
+  // The id of the resource that the TokenScope applies to.
   //
   // If empty, the TokenScope applies globally.
   string resource_id = 1 [

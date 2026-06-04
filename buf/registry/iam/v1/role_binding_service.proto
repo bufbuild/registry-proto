@@ -1,0 +1,150 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/iam/v1/role.proto";
+import "buf/registry/iam/v1/role_binding.proto";
+import "buf/registry/owner/v1/owner.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
+
+// Operate on RoleBindings.
+service RoleBindingService {
+  // Get RoleBindings by id or by subject, Role, and scope.
+  rpc GetRoleBindings(GetRoleBindingsRequest) returns (GetRoleBindingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List RoleBindings.
+  rpc ListRoleBindings(ListRoleBindingsRequest) returns (ListRoleBindingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create new RoleBindings, granting Roles to subjects.
+  //
+  // A RoleBinding is uniquely identified by its (subject, Role, scope) tuple. Creating a
+  // RoleBinding that already exists is a no-op that returns the existing RoleBinding, so this
+  // operation is idempotent.
+  //
+  // This operation is atomic. Either all RoleBindings are created or an error is returned.
+  rpc CreateRoleBindings(CreateRoleBindingsRequest) returns (CreateRoleBindingsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Delete existing RoleBindings.
+  //
+  // This operation is atomic. Either all RoleBindings are deleted or an error is returned.
+  rpc DeleteRoleBindings(DeleteRoleBindingsRequest) returns (DeleteRoleBindingsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message GetRoleBindingsRequest {
+  // The references to the RoleBindings to retrieve.
+  repeated RoleBindingRef role_binding_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetRoleBindingsResponse {
+  // The retrieved RoleBindings in the same order as requested.
+  repeated RoleBinding role_bindings = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// The subject_refs, role_refs, and scopes filters are combined with AND: a RoleBinding is returned
+// only if it matches at least one entry within each filter that is set. Within a single filter,
+// entries are combined with OR.
+message ListRoleBindingsRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The order to return the RoleBindings.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 3 [(buf.validate.field).enum.defined_only = true];
+  // Only return RoleBindings that grant a Role to one of these subjects.
+  //
+  // If empty, RoleBindings are not filtered by subject.
+  repeated buf.registry.owner.v1.OwnerRef subject_refs = 4;
+  // Only return RoleBindings that grant one of these Roles.
+  //
+  // If empty, RoleBindings are not filtered by Role.
+  repeated RoleRef role_refs = 5;
+  // Only return RoleBindings with one of these scopes.
+  //
+  // To list the RoleBindings that indirectly apply to a resource, enumerate its scope hierarchy explicitly.
+  // (e.g. the Repository, its parent Organization, and the instance).
+  //
+  // If empty, RoleBindings are not filtered by scope.
+  repeated RoleBindingScope scopes = 6;
+}
+
+message ListRoleBindingsResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed RoleBindings.
+  repeated RoleBinding role_bindings = 2;
+}
+
+message CreateRoleBindingsRequest {
+  // An individual request to create a RoleBinding.
+  message Value {
+    // The subject to grant the Role to.
+    //
+    // If the subject is an Organization, Organization members inherit the permissions of the
+    // Organization's Roles.
+    buf.registry.owner.v1.OwnerRef subject_ref = 1 [(buf.validate.field).required = true];
+    // The Role to grant.
+    RoleRef role_ref = 2 [(buf.validate.field).required = true];
+    // The scope to grant the Role for.
+    RoleBindingScope scope = 3 [(buf.validate.field).required = true];
+  }
+  // The RoleBindings to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreateRoleBindingsResponse {
+  // The created RoleBindings in the same order as requested.
+  repeated RoleBinding role_bindings = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeleteRoleBindingsRequest {
+  // The references to the RoleBindings to delete.
+  repeated RoleBindingRef role_binding_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeleteRoleBindingsResponse {}
