@@ -163,7 +163,7 @@ message UpdateOrganizationsRequest {
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
     ];
-    OrganizationVisibility visibility = 5 [
+    optional OrganizationVisibility visibility = 5 [
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
     ];
