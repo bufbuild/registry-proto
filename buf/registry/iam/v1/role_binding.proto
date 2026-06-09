@@ -75,14 +75,16 @@ message RoleBindingScope {
   // The type of a resource in the BSR.
   enum ResourceType {
     RESOURCE_TYPE_UNSPECIFIED = 0;
+    // The resource is a User.
+    RESOURCE_TYPE_USER = 1;
     // The resource is an Organization.
-    RESOURCE_TYPE_ORGANIZATION = 1;
+    RESOURCE_TYPE_ORGANIZATION = 2;
     // The resource is a Repository.
-    RESOURCE_TYPE_REPOSITORY = 2;
+    RESOURCE_TYPE_REPOSITORY = 3;
     // The resource is a Plugin.
-    RESOURCE_TYPE_PLUGIN = 3;
+    RESOURCE_TYPE_PLUGIN = 4;
     // The resource is a Policy.
-    RESOURCE_TYPE_POLICY = 4;
+    RESOURCE_TYPE_POLICY = 5;
   }
   // InstanceScope scopes a RoleBinding to the entire instance.
   message InstanceScope {}
