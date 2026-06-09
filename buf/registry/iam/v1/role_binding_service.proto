@@ -43,6 +43,8 @@ service RoleBindingService {
   // operation is idempotent.
   //
   // This operation is atomic. Either all RoleBindings are created or an error is returned.
+  // TODO: I think we are leaning toward deleting this RPC and having specialized RPCs for
+  // setting roles of users and orgs.
   rpc CreateRoleBindings(CreateRoleBindingsRequest) returns (CreateRoleBindingsResponse) {
     option idempotency_level = IDEMPOTENT;
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.role-binding.create";
@@ -50,6 +52,8 @@ service RoleBindingService {
   // Delete existing RoleBindings.
   //
   // This operation is atomic. Either all RoleBindings are deleted or an error is returned.
+  // TODO: I think we are leaning toward deleting this RPC and having specialized RPCs for
+  // setting roles of users and orgs.
   rpc DeleteRoleBindings(DeleteRoleBindingsRequest) returns (DeleteRoleBindingsResponse) {
     option idempotency_level = IDEMPOTENT;
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.role-binding.delete";
