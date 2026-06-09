@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.iam.v1;
 
+import "buf/registry/owner/v1/user.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/validate/validate.proto";
@@ -54,18 +55,17 @@ message Token {
     (buf.validate.field).string.max_len = 256
   ];
   // The id of the User that owns the Token.
-  // TODO(iam): user_owner_id? Are we going to have service accounts?
-  string owner_id = 5 [
+  string user_id = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
   // The scopes of the Token.
   //
   // If empty, the Token has no declared scope restrictions and its effective
-  // permissions are the owner's permissions resolved at request time.
+  // permissions are the user's permissions resolved at request time.
   //
   // Otherwise, the Token's effective permissions are the intersection of these
-  // declared permissions and the owner's permissions resolved at request time.
+  // declared permissions and the user's permissions resolved at request time.
   //
   // In other words, TokenScopes can restrict the permissions of a Token,
   // but cannot add any permissions that the User does not already have.
@@ -97,13 +97,26 @@ message TokenScope {
 // TokenRef is a reference to a Token, currently only an id.
 //
 // This is used in requests.
-// TODO(iam): delete this if we aren't going to make it possible to ref by name?
 message TokenRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  message Name {
+    // The reference to the user which owns the token.
+    // TODO(pkw): Should this default to the user calling the TokenService?
+    buf.registry.owner.v1.UserRef user_ref = 1;
+    // The name of the token.
+    string name = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.min_len = 3,
+      (buf.validate.field).string.max_len = 256
+    ];
+  }
 
   oneof value {
     option (buf.validate.oneof).required = true;
     // The id of the Token.
     string id = 1 [(buf.validate.field).string.tuuid = true];
+    // The unique name of the user's token.
+    Name name = 2;
   }
 }
