@@ -59,9 +59,7 @@ message Organization {
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
-  OrganizationVisibility visibility = 8 [
-    (buf.validate.field).enum.defined_only = true
-  ];
+  OrganizationVisibility visibility = 8 [(buf.validate.field).enum.defined_only = true];
 }
 
 // The verification status of an Organization.
