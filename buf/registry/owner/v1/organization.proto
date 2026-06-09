@@ -59,6 +59,9 @@ message Organization {
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
+  OrganizationVisibility visibility = 8 [
+    (buf.validate.field).enum.defined_only = true
+  ];
 }
 
 // The verification status of an Organization.
@@ -70,6 +73,15 @@ enum OrganizationVerificationStatus {
   ORGANIZATION_VERIFICATION_STATUS_VERIFIED = 2;
   // The Organization is an official organization of the BSR owner.
   ORGANIZATION_VERIFICATION_STATUS_OFFICIAL = 3;
+}
+
+// The visibility of an Organization, currently either public or private.
+enum OrganizationVisibility {
+  ORGANIZATION_VISIBILITY_UNSPECIFIED = 0;
+  // ORGANIZATION_VISIBILITY_PUBLIC says that the organization is publicly available.
+  ORGANIZATION_VISIBILITY_PUBLIC = 1;
+  // ORGANIZATION_VISIBILITY_PRIVATE says that the organization is private.
+  ORGANIZATION_VISIBILITY_PRIVATE = 2;
 }
 
 // OrganizationRef is a reference to an Organization, either an id or a name.
