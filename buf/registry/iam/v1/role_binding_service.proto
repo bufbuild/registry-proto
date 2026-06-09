@@ -104,7 +104,7 @@ message ListRoleBindingsRequest {
   // Only return RoleBindings with one of these scopes.
   //
   // To list the RoleBindings that indirectly apply to a resource, enumerate its scope hierarchy explicitly.
-  // (e.g. the Repository, its parent Organization, and the instance).
+  // (e.g. the Module, its parent Organization, and the instance).
   //
   // If empty, RoleBindings are not filtered by scope.
   repeated RoleBindingScope scopes = 6;

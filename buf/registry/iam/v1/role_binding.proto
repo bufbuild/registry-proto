@@ -79,8 +79,8 @@ message RoleBindingScope {
     RESOURCE_TYPE_USER = 1;
     // The resource is an Organization.
     RESOURCE_TYPE_ORGANIZATION = 2;
-    // The resource is a Repository.
-    RESOURCE_TYPE_REPOSITORY = 3;
+    // The resource is a Module.
+    RESOURCE_TYPE_MODULE = 3;
     // The resource is a Plugin.
     RESOURCE_TYPE_PLUGIN = 4;
     // The resource is a Policy.
