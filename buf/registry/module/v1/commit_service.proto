@@ -18,6 +18,7 @@ package buf.registry.module.v1;
 
 import "buf/registry/module/v1/commit.proto";
 import "buf/registry/module/v1/resource.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
@@ -27,10 +28,12 @@ service CommitService {
   // Get Commits.
   rpc GetCommits(GetCommitsRequest) returns (GetCommitsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.get";
   }
   // List Commits for a given Module, Label, or Commit.
   rpc ListCommits(ListCommitsRequest) returns (ListCommitsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.list";
   }
 }
 

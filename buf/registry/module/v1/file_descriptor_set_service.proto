@@ -18,6 +18,7 @@ package buf.registry.module.v1;
 
 import "buf/registry/module/v1/commit.proto";
 import "buf/registry/module/v1/resource.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/descriptor.proto";
 
@@ -28,6 +29,7 @@ service FileDescriptorSetService {
   // Get the compiled FileDescriptorSet for the given Module, Label, or Commit.
   rpc GetFileDescriptorSet(GetFileDescriptorSetRequest) returns (GetFileDescriptorSetResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.file-descriptor-set.get";
   }
 }
 
