@@ -46,9 +46,9 @@ message Role {
   string description = 3 [(buf.validate.field).string.max_len = 512];
   // The Permissions granted by this Role.
   //
-  // Each entry is either a Permission name (e.g. "bsr.repository.delete") or
+  // Each entry is either a Permission name (e.g. "bsr.module.delete") or
   // a wildcard pattern ending in ".*" that matches all Permissions sharing a
-  // prefix (e.g. "bsr.repository.*").
+  // prefix (e.g. "bsr.module.*").
   repeated string permissions = 4 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250,

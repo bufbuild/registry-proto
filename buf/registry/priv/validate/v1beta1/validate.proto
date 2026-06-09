@@ -28,7 +28,7 @@ extend buf.validate.StringRules {
   // letters, digits, and internal hyphens, and ends with a lowercase
   // alphanumeric character. Components may not contain consecutive hyphens.
   //
-  // For example, "bsr.repository.delete".
+  // For example, "bsr.module.delete".
   //
   // Use (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE for optional fields.
   optional bool permission_name = 12001 [
@@ -39,7 +39,7 @@ extend buf.validate.StringRules {
     },
     (buf.validate.predefined).cel = {
       id: "string.permission_name.pattern"
-      message: "permission name must be a dotted identifier where each component starts with a lowercase letter, contains lowercase letters, digits, and internal hyphens, and ends with a lowercase alphanumeric character (e.g. \"bsr.repository.delete\")"
+      message: "permission name must be a dotted identifier where each component starts with a lowercase letter, contains lowercase letters, digits, and internal hyphens, and ends with a lowercase alphanumeric character (e.g. \"bsr.module.delete\")"
       expression: "this == '' || this.matches('^[a-z][a-z0-9]*(-[a-z0-9]+)*([.][a-z][a-z0-9]*(-[a-z0-9]+)*)*$')"
     },
     (buf.validate.predefined).cel = {
@@ -53,7 +53,7 @@ extend buf.validate.StringRules {
   //
   // A Permission pattern is either a concrete Permission name or a Permission
   // name followed by ".*" to match all Permissions sharing the preceding
-  // prefix, for example "bsr.repository.*".
+  // prefix, for example "bsr.module.*".
   //
   // Patterns are used when granting Permissions (for example in a TokenScope),
   // not when naming a concrete Permission.
@@ -67,7 +67,7 @@ extend buf.validate.StringRules {
     },
     (buf.validate.predefined).cel = {
       id: "string.permission_pattern.pattern"
-      message: "permission pattern must be a permission name, optionally ending with \".*\" to match all permissions sharing a prefix, where each component starts with a lowercase letter, contains lowercase letters, digits, and internal hyphens, and ends with a lowercase alphanumeric character (e.g. \"bsr.repository.delete\" or \"bsr.repository.*\")"
+      message: "permission pattern must be a permission name, optionally ending with \".*\" to match all permissions sharing a prefix, where each component starts with a lowercase letter, contains lowercase letters, digits, and internal hyphens, and ends with a lowercase alphanumeric character (e.g. \"bsr.module.delete\" or \"bsr.module.*\")"
       expression: "this == '' || this.matches('^[a-z][a-z0-9]*(-[a-z0-9]+)*([.][a-z][a-z0-9]*(-[a-z0-9]+)*)*([.][*])?$')"
     },
     (buf.validate.predefined).cel = {

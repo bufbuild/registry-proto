@@ -35,7 +35,7 @@ message Permission {
   // The name of the Permission.
   //
   // It is a stable, dotted identifier that uniquely identifies the Permission across the BSR
-  // (e.g. "bsr.repository.delete").
+  // (e.g. "bsr.module.delete").
   string name = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.permission_name) = true

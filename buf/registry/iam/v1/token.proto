@@ -83,9 +83,9 @@ message TokenScope {
   ];
   // The permissions granted by the TokenScope.
   //
-  // Each entry is either a Permission name (e.g. "bsr.repository.delete") or
+  // Each entry is either a Permission name (e.g. "bsr.module.delete") or
   // a wildcard pattern ending in ".*" that matches all Permissions sharing a
-  // prefix (e.g. "bsr.repository.*").
+  // prefix (e.g. "bsr.module.*").
   repeated string permissions = 2 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250,
