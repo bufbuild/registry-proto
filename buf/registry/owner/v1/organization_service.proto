@@ -18,6 +18,7 @@ package buf.registry.owner.v1;
 
 import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/owner/v1/user.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
@@ -27,28 +28,33 @@ service OrganizationService {
   // Get Organizations by id or name.
   rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.get";
   }
   // List Organizations, usually by User.
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.list";
   }
   // Create new Organizations.
   //
   // This operation is atomic. Either all Organizations are created or an error is returned.
   rpc CreateOrganizations(CreateOrganizationsRequest) returns (CreateOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.create";
   }
   // Update existing organizations.
   //
   // This operation is atomic. Either all Organizations are updated or an error is returned.
   rpc UpdateOrganizations(UpdateOrganizationsRequest) returns (UpdateOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.update";
   }
   // Delete existing organizations.
   //
   // This operation is atomic. Either all Organizations are deleted or an error is returned.
   rpc DeleteOrganizations(DeleteOrganizationsRequest) returns (DeleteOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.delete";
   }
 }
 

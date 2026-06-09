@@ -18,6 +18,7 @@ package buf.registry.owner.v1;
 
 import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/owner/v1/user.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
@@ -27,26 +28,31 @@ service UserService {
   // Get Users by id or name.
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.get";
   }
   // Get the currently authenticated User.
   rpc GetCurrentUser(GetCurrentUserRequest) returns (GetCurrentUserResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).no_required_permission = true;
   }
   // List Users, usually by Organization.
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.list";
   }
   // Create new Users.
   //
   // This operation is atomic. Either all Users are created or an error is returned.
   rpc CreateUsers(CreateUsersRequest) returns (CreateUsersResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.create";
   }
   // Update existing Users.
   //
   // This operation is atomic. Either all Users are updated or an error is returned.
   rpc UpdateUsers(UpdateUsersRequest) returns (UpdateUsersResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.update";
   }
   // Delete existing Users.
   //
@@ -56,6 +62,7 @@ service UserService {
   // only one User will be deleted.
   rpc DeleteUsers(DeleteUsersRequest) returns (DeleteUsersResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.delete";
   }
 }
 

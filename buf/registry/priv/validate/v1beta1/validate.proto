@@ -14,11 +14,11 @@
 
 syntax = "proto2";
 
-package buf.registry.iam.v1;
+package buf.registry.priv.validate.v1beta1;
 
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/priv/validate/v1beta1";
 
 extend buf.validate.StringRules {
   // A validation rule for concrete Permission names.

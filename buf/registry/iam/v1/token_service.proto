@@ -18,6 +18,7 @@ package buf.registry.iam.v1;
 
 import "buf/registry/iam/v1/token.proto";
 import "buf/registry/owner/v1/user.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -28,10 +29,12 @@ service TokenService {
   // Get Tokens by id.
   rpc GetTokens(GetTokensRequest) returns (GetTokensResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.token.get";
   }
   // List Tokens, usually for a User.
   rpc ListTokens(ListTokensRequest) returns (ListTokensResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.token.list";
   }
   // Create new Tokens.
   //
@@ -41,12 +44,15 @@ service TokenService {
   // This operation is atomic. Either all Tokens are created or an error is returned.
   //
   // This operation is not idempotent: each call mints a new Token with a new secret value.
-  rpc CreateTokens(CreateTokensRequest) returns (CreateTokensResponse);
+  rpc CreateTokens(CreateTokensRequest) returns (CreateTokensResponse) {
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.token.create";
+  }
   // Delete existing Tokens.
   //
   // This operation is atomic. Either all Tokens are deleted or an error is returned.
   rpc DeleteTokens(DeleteTokensRequest) returns (DeleteTokensResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.token.delete";
   }
 }
 

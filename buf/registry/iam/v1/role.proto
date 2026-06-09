@@ -16,8 +16,8 @@ syntax = "proto3";
 
 package buf.registry.iam.v1;
 
-import "buf/registry/iam/v1/validate.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
@@ -40,7 +40,7 @@ message Role {
   // A name uniquely identifies a Role within the BSR instance.
   string name = 2 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.(role_name) = true
+    (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.role_name) = true
   ];
   // A human-readable description of what the Role allows.
   string description = 3 [(buf.validate.field).string.max_len = 512];
@@ -53,7 +53,7 @@ message Role {
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250,
     (buf.validate.field).repeated.unique = true,
-    (buf.validate.field).repeated.items.string.(permission_pattern) = true
+    (buf.validate.field).repeated.items.string.(buf.registry.priv.validate.v1beta1.permission_pattern) = true
   ];
 }
 
@@ -70,6 +70,6 @@ message RoleRef {
     // The name of the Role.
     //
     // A Role name is unique within the BSR instance.
-    string name = 2 [(buf.validate.field).string.(role_name) = true];
+    string name = 2 [(buf.validate.field).string.(buf.registry.priv.validate.v1beta1.role_name) = true];
   }
 }

@@ -16,8 +16,8 @@ syntax = "proto3";
 
 package buf.registry.iam.v1;
 
-import "buf/registry/iam/v1/validate.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
@@ -38,7 +38,7 @@ message Permission {
   // (e.g. "bsr.repository.delete").
   string name = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.(permission_name) = true
+    (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.permission_name) = true
   ];
   // A human-readable description of what the Permission allows.
   string description = 2 [(buf.validate.field).string.max_len = 512];

@@ -16,8 +16,8 @@ syntax = "proto3";
 
 package buf.registry.iam.v1;
 
-import "buf/registry/iam/v1/validate.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -90,7 +90,7 @@ message TokenScope {
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250,
     (buf.validate.field).repeated.unique = true,
-    (buf.validate.field).repeated.items.string.(permission_pattern) = true
+    (buf.validate.field).repeated.items.string.(buf.registry.priv.validate.v1beta1.permission_pattern) = true
   ];
 }
 

@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.iam.v1;
 
 import "buf/registry/iam/v1/role.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
@@ -26,10 +27,12 @@ service RoleService {
   // Get Roles by id or name.
   rpc GetRoles(GetRolesRequest) returns (GetRolesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.role.get";
   }
   // List Roles.
   rpc ListRoles(ListRolesRequest) returns (ListRolesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.role.list";
   }
 }
 
