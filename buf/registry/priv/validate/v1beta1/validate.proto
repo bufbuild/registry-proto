@@ -55,7 +55,7 @@ extend buf.validate.StringRules {
   // name followed by ".*" to match all Permissions sharing the preceding
   // prefix, for example "bsr.module.*".
   //
-  // Patterns are used when granting Permissions (for example in a TokenScope),
+  // Patterns are used when granting Permissions (for example in ScopedPermissions),
   // not when naming a concrete Permission.
   //
   // Use (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE for optional fields.

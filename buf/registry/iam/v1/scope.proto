@@ -23,7 +23,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // The scope that a grant or restriction applies to.
 //
 // A Scope is either the entire instance or a single resource. It is shared by RoleBindings and
-// TokenScopes so that both use the same scoping semantics.
+// ScopedPermissions so that both use the same scoping semantics.
 message Scope {
   // The type of a resource in the BSR.
   enum ResourceType {
