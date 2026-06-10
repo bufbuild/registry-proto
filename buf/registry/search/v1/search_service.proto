@@ -48,21 +48,17 @@ service SearchService {
   }
 }
 
+enum SortOrder {
+  SORT_ORDER_UNSPECIFIED = 0;
+  SORT_ORDER_NAME_ASC = 1;
+  SORT_ORDER_NAME_DESC = 2;
+  SORT_ORDER_CREATE_DATE_ASC = 3;
+  SORT_ORDER_CREATE_DATE_DESC = 4;
+  SORT_ORDER_MOD_DATE_ASC = 5;
+  SORT_ORDER_MOD_DATE_DESC = 6;
+}
+
 message SearchRequest {
-  // The kind of an item that can be matched by a search.
-  enum Kind {
-    KIND_UNSPECIFIED = 0;
-    // Match Users.
-    KIND_USER = 1;
-    // Match Organizations.
-    KIND_ORGANIZATION = 2;
-    // Match Modules.
-    KIND_MODULE = 3;
-    // Match Plugins.
-    KIND_PLUGIN = 4;
-    // Match Policies.
-    KIND_POLICY = 5;
-  }
   // The search query.
   string query = 1 [
     (buf.validate.field).required = true,
@@ -76,21 +72,18 @@ message SearchRequest {
   //
   // If empty, the first page is returned.
   string page_token = 3 [(buf.validate.field).string.max_len = 4096];
-  // The kinds of items to match.
-  //
-  // If empty, items of all kinds are matched.
-  repeated Kind kinds = 4 [
-    // there are only 5 kinds of items, increase if we add more
-    (buf.validate.field).repeated.max_items = 5,
-    (buf.validate.field).repeated.unique = true,
-    (buf.validate.field).repeated.items.enum.defined_only = true,
-    (buf.validate.field).repeated.items.enum.not_in = 0
-  ];
   // The specific Owners to limit matched resources to.
   //
   // If empty, resources are not filtered by Owner. Owners themselves are only matched
   // when this is empty.
   repeated buf.registry.owner.v1.OwnerRef owner_refs = 5;
+  // Sort order for results
+  //
+  // If unspecified, use SORT_ORDER_NAME_ASC
+  optional SortOrder sort_order = 6 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
 }
 
 message SearchResponse {
@@ -142,6 +135,13 @@ message SearchContentRequest {
   //
   // If empty, content is not filtered by Module.
   repeated buf.registry.module.v1.ModuleRef module_refs = 6;
+  // Sort order for results
+  //
+  // If unspecified, use SORT_ORDER_NAME_ASC
+  optional SortOrder sort_order = 7 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
 }
 
 message SearchContentResponse {

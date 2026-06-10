@@ -17,7 +17,6 @@ syntax = "proto3";
 package buf.registry.webhook.v1;
 
 import "buf/registry/module/v1/module.proto";
-import "buf/registry/owner/v1/owner.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/webhook/v1/webhook.proto";
 import "buf/validate/validate.proto";
@@ -84,7 +83,7 @@ message ListWebhooksRequest {
     // Order by create_time oldest to newest.
     ORDER_CREATE_TIME_ASC = 2;
   }
-  // The maximum number of items to return.
+  // The maximum number of items to return on a page.
   //
   // The default value is 10.
   uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
@@ -92,22 +91,17 @@ message ListWebhooksRequest {
   //
   // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
-  // The specific Owners to list Webhooks for.
-  //
-  // This matches Webhooks scoped to the Owner; it does not match Webhooks scoped to a
-  // Module owned by the Owner. If empty, Webhooks are not filtered by Owner.
-  repeated buf.registry.owner.v1.OwnerRef owner_refs = 3;
   // The specific Modules to list Webhooks for.
   //
   // If empty, Webhooks are not filtered by Module.
   //
   // If both owner_refs and module_refs are empty, all Webhooks on the instance are
   // listed, but this functionality is limited to Users with the necessary permissions.
-  repeated buf.registry.module.v1.ModuleRef module_refs = 4;
+  repeated buf.registry.module.v1.ModuleRef module_refs = 3;
   // The order to return the Webhooks.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
-  Order order = 5 [(buf.validate.field).enum.defined_only = true];
+  Order order = 4 [(buf.validate.field).enum.defined_only = true];
 }
 
 message ListWebhooksResponse {
@@ -122,21 +116,13 @@ message ListWebhooksResponse {
 message CreateWebhooksRequest {
   // An individual request to create a Webhook.
   message Value {
-    // The scope of the Webhook.
-    oneof scope {
-      option (buf.validate.oneof).required = true;
-      // The User or Organization to scope the Webhook to.
-      //
-      // The Webhook receives the subscribed Events for all Modules owned by the Owner.
-      buf.registry.owner.v1.OwnerRef owner_ref = 1;
-      // The Module to scope the Webhook to.
-      //
-      // The Webhook receives the subscribed Events for this Module only. Module-scoped
-      // Webhooks never receive EVENT_TYPE_MODULE_CREATED Events.
-      buf.registry.module.v1.ModuleRef module_ref = 2;
-    }
+    // The Module to scope the Webhook to.
+    //
+    // The Webhook receives the subscribed Events for this Module only.
+    buf.registry.module.v1.ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+
     // The types of Events that the Webhook subscribes to.
-    repeated EventType event_types = 3 [
+    repeated EventType event_types = 2 [
       (buf.validate.field).repeated.min_items = 1,
       (buf.validate.field).repeated.max_items = 16,
       (buf.validate.field).repeated.unique = true,
@@ -144,7 +130,7 @@ message CreateWebhooksRequest {
       (buf.validate.field).repeated.items.enum.not_in = 0
     ];
     // The URL that Events are delivered to.
-    string url = 4 [
+    string url = 3 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 1024
@@ -153,13 +139,13 @@ message CreateWebhooksRequest {
     //
     // The secret is write-only and is never returned. If empty, deliveries are not
     // signed.
-    string secret = 5 [
+    string secret = 4 [
       (buf.validate.field).string.min_len = 16,
       (buf.validate.field).string.max_len = 256,
       (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
     ];
     // The configurable description of the Webhook.
-    string description = 6 [(buf.validate.field).string.max_len = 350];
+    string description = 5 [(buf.validate.field).string.max_len = 350];
   }
   // The Webhooks to create.
   repeated Value values = 1 [

@@ -56,10 +56,8 @@ message Event {
     ModuleCommitPushedPayload module_commit_pushed = 4;
     // The payload for EVENT_TYPE_MODULE_LABEL_MOVED.
     ModuleLabelMovedPayload module_label_moved = 5;
-    // The payload for EVENT_TYPE_MODULE_CREATED.
-    ModuleCreatedPayload module_created = 6;
     // The payload for EVENT_TYPE_MODULE_DELETED.
-    ModuleDeletedPayload module_deleted = 7;
+    ModuleDeletedPayload module_deleted = 6;
   }
 }
 
@@ -84,12 +82,6 @@ message ModuleLabelMovedPayload {
     (buf.validate.field).string.tuuid = true,
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
-}
-
-// The payload of an Event of type EVENT_TYPE_MODULE_CREATED.
-message ModuleCreatedPayload {
-  // The Module that was created.
-  buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
 }
 
 // The payload of an Event of type EVENT_TYPE_MODULE_DELETED.
