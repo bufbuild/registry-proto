@@ -130,6 +130,11 @@ message CreateOrganizationsRequest {
     //
     // If not set, the Organization will default to VERIFICATION_STATUS_UNVERIFIED.
     OrganizationVerificationStatus verification_status = 4 [(buf.validate.field).enum.defined_only = true];
+    // If not set, the Organization will default to ORGANIZATION_VISIBILITY_PUBLIC.
+    optional OrganizationVisibility visibility = 5 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
   }
   // The Organizations to create.
   repeated Value values = 1 [
@@ -161,6 +166,10 @@ message UpdateOrganizationsRequest {
     ];
     // The verification status of the Organization.
     optional OrganizationVerificationStatus verification_status = 4 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+    optional OrganizationVisibility visibility = 5 [
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
     ];
