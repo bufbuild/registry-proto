@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.iam.v1;
 
 import "buf/registry/iam/v1/role.proto";
+import "buf/registry/iam/v1/scope.proto";
 import "buf/registry/owner/v1/owner.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
@@ -26,7 +27,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // A RoleBinding on the BSR.
 //
-// A RoleBinding grants a Role to a RoleBindingSubject with a RoleBindingScope.
+// A RoleBinding grants a Role to a RoleBindingSubject with a Scope.
 //
 // A RoleBinding is uniquely identified by its subject, Role, and scope.
 //
@@ -50,7 +51,7 @@ message RoleBinding {
     (buf.validate.field).string.tuuid = true
   ];
   // The scope of the RoleBinding.
-  RoleBindingScope scope = 5 [(buf.validate.field).required = true];
+  Scope scope = 5 [(buf.validate.field).required = true];
 }
 
 // The subject of a RoleBinding.
@@ -68,52 +69,6 @@ message RoleBindingSubject {
   }
 }
 
-// The scope that a RoleBinding applies to.
-//
-// A scope is either the entire instance or a single resource.
-message RoleBindingScope {
-  // The type of a resource in the BSR.
-  enum ResourceType {
-    RESOURCE_TYPE_UNSPECIFIED = 0;
-    // The resource is a User.
-    RESOURCE_TYPE_USER = 1;
-    // The resource is an Organization.
-    RESOURCE_TYPE_ORGANIZATION = 2;
-    // The resource is a Module.
-    RESOURCE_TYPE_MODULE = 3;
-    // The resource is a Plugin.
-    RESOURCE_TYPE_PLUGIN = 4;
-    // The resource is a Policy.
-    RESOURCE_TYPE_POLICY = 5;
-  }
-  // InstanceScope scopes a RoleBinding to the entire instance.
-  message InstanceScope {}
-  // ResourceScope scopes a RoleBinding to a single resource.
-  //
-  // If the resource owns other resources (e.g. Organizations),
-  // those resources are also included in the scope.
-  message ResourceScope {
-    // The id of the resource.
-    string resource_id = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.tuuid = true
-    ];
-    // The type of the resource that resource_id refers to.
-    ResourceType resource_type = 2 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).enum.defined_only = true,
-      (buf.validate.field).enum.not_in = 0
-    ];
-  }
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // The Role applies to all resources on the instance.
-    InstanceScope instance = 1;
-    // The Role applies to a single resource.
-    ResourceScope resource = 2;
-  }
-}
-
 // RoleBindingRef is a reference to a RoleBinding, either by its id or by the subject, Role, and
 // scope that uniquely identify it.
 //
@@ -128,7 +83,7 @@ message RoleBindingRef {
     // The Role that is granted.
     RoleRef role_ref = 2 [(buf.validate.field).required = true];
     // The scope that the Role is granted for.
-    RoleBindingScope scope = 3 [(buf.validate.field).required = true];
+    Scope scope = 3 [(buf.validate.field).required = true];
   }
   oneof value {
     option (buf.validate.oneof).required = true;

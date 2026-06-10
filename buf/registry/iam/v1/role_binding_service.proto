@@ -18,6 +18,7 @@ package buf.registry.iam.v1;
 
 import "buf/registry/iam/v1/role.proto";
 import "buf/registry/iam/v1/role_binding.proto";
+import "buf/registry/iam/v1/scope.proto";
 import "buf/registry/owner/v1/owner.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
@@ -111,7 +112,7 @@ message ListRoleBindingsRequest {
   // (e.g. the Module, its parent Organization, and the instance).
   //
   // If empty, RoleBindings are not filtered by scope.
-  repeated RoleBindingScope scopes = 6;
+  repeated Scope scopes = 6;
 }
 
 message ListRoleBindingsResponse {
@@ -134,7 +135,7 @@ message CreateRoleBindingsRequest {
     // The Role to grant.
     RoleRef role_ref = 2 [(buf.validate.field).required = true];
     // The scope to grant the Role for.
-    RoleBindingScope scope = 3 [(buf.validate.field).required = true];
+    Scope scope = 3 [(buf.validate.field).required = true];
   }
   // The RoleBindings to create.
   repeated Value values = 1 [
