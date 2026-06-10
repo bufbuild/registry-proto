@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.owner.v1;
 
 import "buf/registry/owner/v1/organization.proto";
+import "buf/registry/owner/v1/organization_settings.proto";
 import "buf/registry/owner/v1/user.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
@@ -55,6 +56,18 @@ service OrganizationService {
   rpc DeleteOrganizations(DeleteOrganizationsRequest) returns (DeleteOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.delete";
+  }
+  // Get the settings for Organizations.
+  rpc GetOrganizationSettings(GetOrganizationSettingsRequest) returns (GetOrganizationSettingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.settings.get";
+  }
+  // Update the settings for Organizations.
+  //
+  // This operation is atomic. Either all settings are updated or an error is returned.
+  rpc UpdateOrganizationSettings(UpdateOrganizationSettingsRequest) returns (UpdateOrganizationSettingsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.settings.update";
   }
 }
 
@@ -195,3 +208,74 @@ message DeleteOrganizationsRequest {
 }
 
 message DeleteOrganizationsResponse {}
+
+message GetOrganizationSettingsRequest {
+  // The Organizations to get settings for.
+  repeated OrganizationRef organization_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetOrganizationSettingsResponse {
+  // The retrieved settings in the same order as requested.
+  repeated OrganizationSettings organization_settings = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdateOrganizationSettingsRequest {
+  // An individual request to update the settings of an Organization.
+  message Value {
+    // The full replacement set of visibility defaults for an Organization.
+    message ResourceVisibilityDefaults {
+      // The visibility defaults.
+      //
+      // There must be at most one entry per ResourceType.
+      repeated ResourceVisibilityDefault values = 1 [
+        (buf.validate.field).repeated.max_items = 16,
+        (buf.validate.field).cel = {
+          id: "values.resource_type_unique"
+          message: "resource_type must be unique across values"
+          expression: "this.map(e, e.resource_type).unique()"
+        }
+      ];
+    }
+    // The full replacement set of base Roles for an Organization.
+    message BaseResourceRoles {
+      // The base Roles.
+      //
+      // There must be at most one entry per ResourceType.
+      repeated BaseResourceRole values = 1 [
+        (buf.validate.field).repeated.max_items = 16,
+        (buf.validate.field).cel = {
+          id: "values.resource_type_unique"
+          message: "resource_type must be unique across values"
+          expression: "this.map(e, e.resource_type).unique()"
+        }
+      ];
+    }
+    // The Organization whose settings to update.
+    OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
+    // The visibility defaults to set for the Organization.
+    //
+    // If set, the entire set of visibility defaults is replaced with the given set. An
+    // empty set removes all Organization-level visibility defaults. If not set, the
+    // visibility defaults are not modified.
+    ResourceVisibilityDefaults resource_visibility_defaults = 2;
+    // The base Roles to set for the Organization.
+    //
+    // If set, the entire set of base Roles is replaced with the given set. An empty set
+    // removes all base Roles, in which case access to resources owned by the Organization
+    // is determined solely by RoleBindings. If not set, the base Roles are not modified.
+    BaseResourceRoles base_resource_roles = 3;
+  }
+  // The settings to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdateOrganizationSettingsResponse {
+  // The updated settings in the same order as given on the request.
+  repeated OrganizationSettings organization_settings = 1 [(buf.validate.field).repeated.min_items = 1];
+}

@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.owner.v1;
 
 import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/owner/v1/owner_verification_request.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
@@ -34,6 +35,36 @@ service OwnerService {
     // Organization requires the bsr.organization.get Permission.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
+  // Request verification of an Owner.
+  //
+  // Verification itself is not self-serve: this creates a pending OwnerVerificationRequest
+  // for administrators of the instance to act on. Approval is performed by updating the
+  // Owner's verification status via UpdateUsers or UpdateOrganizations, which requires the
+  // necessary instance-level permissions and removes the pending request. A request can be
+  // withdrawn or dismissed via DeleteOwnerVerificationRequests.
+  //
+  // An Owner has at most one OwnerVerificationRequest at a time. If a pending request
+  // already exists for the Owner, it is returned unchanged.
+  rpc RequestOwnerVerification(RequestOwnerVerificationRequest) returns (RequestOwnerVerificationResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.owner.verification.request";
+  }
+  // List pending OwnerVerificationRequests, usually by Owner.
+  rpc ListOwnerVerificationRequests(ListOwnerVerificationRequestsRequest) returns (ListOwnerVerificationRequestsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.owner.verification.list";
+  }
+  // Delete pending OwnerVerificationRequests.
+  //
+  // This withdraws a request when called by its requester, or dismisses it when called by
+  // an administrator of the instance. The Owner's verification status is not changed.
+  //
+  // This operation is atomic. Either all OwnerVerificationRequests are deleted or an error
+  // is returned.
+  rpc DeleteOwnerVerificationRequests(DeleteOwnerVerificationRequestsRequest) returns (DeleteOwnerVerificationRequestsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.owner.verification.delete";
+  }
 }
 
 message GetOwnersRequest {
@@ -48,3 +79,66 @@ message GetOwnersResponse {
   // The retrieved Users or Organizations in the same order as requested.
   repeated Owner owners = 1 [(buf.validate.field).repeated.min_items = 1];
 }
+
+message RequestOwnerVerificationRequest {
+  // The Owner to request verification for.
+  OwnerRef owner_ref = 1 [(buf.validate.field).required = true];
+  // The comment to record with the request, for example a justification for why the Owner
+  // should be verified.
+  //
+  // If a pending OwnerVerificationRequest already exists for the Owner, the existing
+  // comment is not modified.
+  string comment = 2 [(buf.validate.field).string.max_len = 2048];
+}
+
+message RequestOwnerVerificationResponse {
+  // The pending OwnerVerificationRequest.
+  OwnerVerificationRequest owner_verification_request = 1 [(buf.validate.field).required = true];
+}
+
+message ListOwnerVerificationRequestsRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The specific Owners to list OwnerVerificationRequests for.
+  //
+  // If this is empty, all pending OwnerVerificationRequests on the instance are listed,
+  // but this functionality is limited to Users with the necessary permissions.
+  repeated OwnerRef owner_refs = 3;
+  // The order to return the OwnerVerificationRequests.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 4 [(buf.validate.field).enum.defined_only = true];
+}
+
+message ListOwnerVerificationRequestsResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed OwnerVerificationRequests.
+  repeated OwnerVerificationRequest owner_verification_requests = 2;
+}
+
+message DeleteOwnerVerificationRequestsRequest {
+  // The OwnerVerificationRequests to delete.
+  repeated OwnerVerificationRequestRef owner_verification_request_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeleteOwnerVerificationRequestsResponse {}

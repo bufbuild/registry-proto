@@ -1,0 +1,112 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.search.v1;
+
+import "buf/registry/module/v1/module.proto";
+import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/plugin/v1beta1/plugin.proto";
+import "buf/registry/policy/v1beta1/policy.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/search/v1";
+
+// A single result of a search for Owners and resources.
+message SearchResult {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The matched User or Organization.
+    buf.registry.owner.v1.Owner owner = 1;
+    // The matched Module.
+    buf.registry.module.v1.Module module = 2;
+    // The matched Plugin.
+    buf.registry.plugin.v1beta1.Plugin plugin = 3;
+    // The matched Policy.
+    buf.registry.policy.v1beta1.Policy policy = 4;
+  }
+}
+
+// A single result of a search of the content of Modules.
+//
+// A result locates a match within the content of a Module: either a named element of the
+// Protobuf schema, or a file. The match is located within the content of the Commit
+// identified by commit_id.
+message ContentSearchResult {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // A match on a named element of the Protobuf schema, such as a message or a service.
+  message Element {
+    // The type of a matched named element.
+    //
+    // This is a subset of the named elements of the Protobuf language. Additional types
+    // may be added over time.
+    enum Type {
+      TYPE_UNSPECIFIED = 0;
+      // The element is a service.
+      TYPE_SERVICE = 1;
+      // The element is a method of a service.
+      TYPE_METHOD = 2;
+      // The element is a message.
+      TYPE_MESSAGE = 3;
+      // The element is an enum.
+      TYPE_ENUM = 4;
+      // The element is an extension.
+      TYPE_EXTENSION = 5;
+    }
+    // The fully qualified name of the matched element, for example
+    // "acme.weather.v1.WeatherService".
+    string fully_qualified_name = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 1024,
+      (buf.validate.field).string.pattern = "^[a-zA-Z_][a-zA-Z0-9_]*([.][a-zA-Z_][a-zA-Z0-9_]*)*$"
+    ];
+    // The type of the matched element.
+    Type type = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+  }
+  // A match on a file.
+  //
+  // The matched file is identified by the file_path of the ContentSearchResult. Additional
+  // match information, such as snippets, may be added over time.
+  message File {}
+
+  // The Module whose content the match was found in.
+  buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
+  // The id of the Commit whose content the match was found in.
+  string commit_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The path of the file that the match was found in, relative to the root of the Module.
+  string file_path = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 4096,
+    (buf.validate.field).string.not_contains = "\\"
+  ];
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The match is a named element of the Protobuf schema.
+    Element element = 4;
+    // The match is a file.
+    File file = 5;
+  }
+}

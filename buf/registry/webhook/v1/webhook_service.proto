@@ -1,0 +1,246 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.webhook.v1;
+
+import "buf/registry/module/v1/module.proto";
+import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/webhook/v1/webhook.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/webhook/v1";
+
+// Operate on Webhooks.
+service WebhookService {
+  // Get Webhooks by id.
+  rpc GetWebhooks(GetWebhooksRequest) returns (GetWebhooksResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.get";
+  }
+  // List Webhooks, usually by Owner or Module.
+  rpc ListWebhooks(ListWebhooksRequest) returns (ListWebhooksResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.list";
+  }
+  // Create new Webhooks.
+  //
+  // This operation is atomic. Either all Webhooks are created or an error is returned.
+  rpc CreateWebhooks(CreateWebhooksRequest) returns (CreateWebhooksResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.create";
+  }
+  // Update existing Webhooks.
+  //
+  // The scope of a Webhook cannot be updated; delete the Webhook and create a new one
+  // instead.
+  //
+  // This operation is atomic. Either all Webhooks are updated or an error is returned.
+  rpc UpdateWebhooks(UpdateWebhooksRequest) returns (UpdateWebhooksResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.update";
+  }
+  // Delete existing Webhooks.
+  //
+  // This operation is atomic. Either all Webhooks are deleted or an error is returned.
+  rpc DeleteWebhooks(DeleteWebhooksRequest) returns (DeleteWebhooksResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.delete";
+  }
+}
+
+message GetWebhooksRequest {
+  // The Webhooks to request.
+  repeated WebhookRef webhook_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetWebhooksResponse {
+  // The retrieved Webhooks in the same order as requested.
+  repeated Webhook webhooks = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message ListWebhooksRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The specific Owners to list Webhooks for.
+  //
+  // This matches Webhooks scoped to the Owner; it does not match Webhooks scoped to a
+  // Module owned by the Owner. If empty, Webhooks are not filtered by Owner.
+  repeated buf.registry.owner.v1.OwnerRef owner_refs = 3;
+  // The specific Modules to list Webhooks for.
+  //
+  // If empty, Webhooks are not filtered by Module.
+  //
+  // If both owner_refs and module_refs are empty, all Webhooks on the instance are
+  // listed, but this functionality is limited to Users with the necessary permissions.
+  repeated buf.registry.module.v1.ModuleRef module_refs = 4;
+  // The order to return the Webhooks.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 5 [(buf.validate.field).enum.defined_only = true];
+}
+
+message ListWebhooksResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed Webhooks.
+  repeated Webhook webhooks = 2;
+}
+
+message CreateWebhooksRequest {
+  // An individual request to create a Webhook.
+  message Value {
+    // The scope of the Webhook.
+    oneof scope {
+      option (buf.validate.oneof).required = true;
+      // The User or Organization to scope the Webhook to.
+      //
+      // The Webhook receives the subscribed Events for all Modules owned by the Owner.
+      buf.registry.owner.v1.OwnerRef owner_ref = 1;
+      // The Module to scope the Webhook to.
+      //
+      // The Webhook receives the subscribed Events for this Module only. Module-scoped
+      // Webhooks never receive EVENT_TYPE_MODULE_CREATED Events.
+      buf.registry.module.v1.ModuleRef module_ref = 2;
+    }
+    // The types of Events that the Webhook subscribes to.
+    repeated EventType event_types = 3 [
+      (buf.validate.field).repeated.min_items = 1,
+      (buf.validate.field).repeated.max_items = 16,
+      (buf.validate.field).repeated.unique = true,
+      (buf.validate.field).repeated.items.enum.defined_only = true,
+      (buf.validate.field).repeated.items.enum.not_in = 0
+    ];
+    // The URL that Events are delivered to.
+    string url = 4 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).string.max_len = 1024
+    ];
+    // The secret used to sign deliveries to the Webhook.
+    //
+    // The secret is write-only and is never returned. If empty, deliveries are not
+    // signed.
+    string secret = 5 [
+      (buf.validate.field).string.min_len = 16,
+      (buf.validate.field).string.max_len = 256,
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+    ];
+    // The configurable description of the Webhook.
+    string description = 6 [(buf.validate.field).string.max_len = 350];
+  }
+  // The Webhooks to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreateWebhooksResponse {
+  // The created Webhooks in the same order as given on the request.
+  repeated Webhook webhooks = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdateWebhooksRequest {
+  // An individual request to update a Webhook.
+  message Value {
+    // The full replacement set of Event types for a Webhook.
+    message EventTypes {
+      // The types of Events that the Webhook subscribes to.
+      repeated EventType values = 1 [
+        (buf.validate.field).repeated.min_items = 1,
+        (buf.validate.field).repeated.max_items = 16,
+        (buf.validate.field).repeated.unique = true,
+        (buf.validate.field).repeated.items.enum.defined_only = true,
+        (buf.validate.field).repeated.items.enum.not_in = 0
+      ];
+    }
+    // The Webhook to update.
+    WebhookRef webhook_ref = 1 [(buf.validate.field).required = true];
+    // The types of Events to subscribe the Webhook to.
+    //
+    // If set, the entire set of Event types is replaced with the given set. If not set,
+    // the Event types are not modified.
+    EventTypes event_types = 2;
+    // The URL that Events are delivered to.
+    optional string url = 3 [
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).string.max_len = 1024
+    ];
+    // The secret used to sign deliveries to the Webhook.
+    //
+    // The secret is write-only and is never returned. If set to a non-empty value, the
+    // secret is replaced. If set to an empty value, the secret is removed and deliveries
+    // are no longer signed. If not set, the secret is not modified.
+    optional string secret = 4 [
+      (buf.validate.field).cel = {
+        id: "secret_empty_or_valid_length"
+        message: "secret must be empty or between 16 and 256 characters"
+        expression: "this == '' || (this.size() >= 16 && this.size() <= 256)"
+      },
+      (buf.validate.field).string.max_len = 256
+    ];
+    // The configurable description of the Webhook.
+    optional string description = 5 [(buf.validate.field).string.max_len = 350];
+    // The state of the Webhook.
+    //
+    // Set to STATE_DISABLED to pause deliveries without deleting the Webhook, and to
+    // STATE_ENABLED to resume them.
+    optional Webhook.State state = 6 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+  }
+  // The Webhooks to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdateWebhooksResponse {
+  // The updated Webhooks in the same order as given on the request.
+  repeated Webhook webhooks = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeleteWebhooksRequest {
+  // The Webhooks to delete.
+  repeated WebhookRef webhook_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeleteWebhooksResponse {}

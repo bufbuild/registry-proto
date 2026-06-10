@@ -1,0 +1,121 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.admin.v1;
+
+import "buf/registry/admin/v1/instance_settings.proto";
+import "buf/registry/owner/v1/organization_settings.proto";
+import "buf/registry/plugin/v1beta1/plugin.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/admin/v1";
+
+// Operate on the settings of a BSR instance.
+//
+// Granting instance administration itself is not part of this service: server-admin
+// grants are RoleBindings with an instance Scope, managed via
+// buf.registry.iam.v1.RoleBindingService.
+service InstanceSettingsService {
+  // Get the settings for the instance.
+  rpc GetInstanceSettings(GetInstanceSettingsRequest) returns (GetInstanceSettingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.instance.settings.get";
+  }
+  // Update the settings for the instance.
+  //
+  // Only the fields that are set are updated.
+  rpc UpdateInstanceSettings(UpdateInstanceSettingsRequest) returns (UpdateInstanceSettingsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.instance.settings.update";
+  }
+}
+
+message GetInstanceSettingsRequest {}
+
+message GetInstanceSettingsResponse {
+  // The retrieved settings.
+  InstanceSettings instance_settings = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateInstanceSettingsRequest {
+  // The full replacement set of visibility defaults for the instance.
+  message ResourceVisibilityDefaults {
+    // The visibility defaults.
+    //
+    // There must be at most one entry per ResourceType.
+    repeated buf.registry.owner.v1.ResourceVisibilityDefault values = 1 [
+      (buf.validate.field).repeated.max_items = 16,
+      (buf.validate.field).cel = {
+        id: "values.resource_type_unique"
+        message: "resource_type must be unique across values"
+        expression: "this.map(e, e.resource_type).unique()"
+      }
+    ];
+  }
+  // The full replacement set of Plugin management rules for the instance.
+  message PluginRules {
+    // An individual Plugin management rule.
+    message Value {
+      // The Plugin that the rule applies to.
+      buf.registry.plugin.v1beta1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+      // The state of the Plugin on the instance.
+      PluginRule.State state = 2 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).enum.defined_only = true,
+        (buf.validate.field).enum.not_in = 0
+      ];
+      // The version constraints for the Plugin on the instance.
+      //
+      // A Plugin version must satisfy all constraints to be used. If empty, all versions
+      // may be used.
+      repeated VersionConstraint version_constraints = 3 [(buf.validate.field).repeated.max_items = 16];
+    }
+    // The Plugin management rules.
+    //
+    // There must be at most one entry per Plugin.
+    repeated Value values = 1 [(buf.validate.field).repeated.max_items = 250];
+  }
+  // The full replacement set of Plugins whose generated SDKs are recommended on the
+  // instance.
+  message RecommendedPlugins {
+    // The Plugins whose generated SDKs are recommended.
+    repeated buf.registry.plugin.v1beta1.PluginRef values = 1 [(buf.validate.field).repeated.max_items = 50];
+  }
+  // The visibility defaults to set for the instance.
+  //
+  // If set, the entire set of visibility defaults is replaced with the given set. An
+  // empty set removes all instance-level visibility defaults. If not set, the visibility
+  // defaults are not modified.
+  ResourceVisibilityDefaults resource_visibility_defaults = 1;
+  // The Plugin management rules to set for the instance.
+  //
+  // If set, the entire set of rules is replaced with the given set. An empty set removes
+  // all rules, in which case all Plugins are enabled with no version constraints. If not
+  // set, the rules are not modified.
+  PluginRules plugin_rules = 2;
+  // The Plugins whose generated SDKs are recommended on the instance.
+  //
+  // If set, the entire set of recommended Plugins is replaced with the given set. An
+  // empty set removes all recommendations. If not set, the recommendations are not
+  // modified.
+  RecommendedPlugins recommended_plugins = 3;
+}
+
+message UpdateInstanceSettingsResponse {
+  // The updated settings.
+  InstanceSettings instance_settings = 1 [(buf.validate.field).required = true];
+}

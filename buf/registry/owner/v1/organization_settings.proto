@@ -1,0 +1,133 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.owner.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/priv/validate/v1beta1/validate.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
+
+// The settings of an Organization.
+//
+// Settings control the behavior of the Organization and the resources it owns. Every
+// Organization has settings: an Organization whose settings have never been updated
+// has settings consisting entirely of server-applied defaults.
+message OrganizationSettings {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Organization that the settings belong to.
+  string organization_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The visibility defaults for resources owned by the Organization.
+  //
+  // There is at most one entry per ResourceType. A ResourceType without an entry has no
+  // Organization-level visibility default, and instance-level visibility defaults, if
+  // any, apply.
+  repeated ResourceVisibilityDefault resource_visibility_defaults = 2 [
+    (buf.validate.field).repeated.max_items = 16,
+    (buf.validate.field).cel = {
+      id: "resource_visibility_defaults.resource_type_unique"
+      message: "resource_type must be unique across resource_visibility_defaults"
+      expression: "this.map(e, e.resource_type).unique()"
+    }
+  ];
+  // The base Roles granted to all members of the Organization on resources owned by the
+  // Organization.
+  //
+  // There is at most one entry per ResourceType. A ResourceType without an entry grants
+  // Organization members no base Role on resources of that type; access is determined
+  // solely by RoleBindings.
+  repeated BaseResourceRole base_resource_roles = 3 [
+    (buf.validate.field).repeated.max_items = 16,
+    (buf.validate.field).cel = {
+      id: "base_resource_roles.resource_type_unique"
+      message: "resource_type must be unique across base_resource_roles"
+      expression: "this.map(e, e.resource_type).unique()"
+    }
+  ];
+}
+
+// The type of a resource that can be owned by an Organization.
+enum ResourceType {
+  RESOURCE_TYPE_UNSPECIFIED = 0;
+  // The resource is a Module.
+  RESOURCE_TYPE_MODULE = 1;
+  // The resource is a Plugin.
+  RESOURCE_TYPE_PLUGIN = 2;
+  // The resource is a Policy.
+  RESOURCE_TYPE_POLICY = 3;
+}
+
+// The visibility of a resource owned by an Organization.
+enum ResourceVisibility {
+  RESOURCE_VISIBILITY_UNSPECIFIED = 0;
+  // The resource is publicly available.
+  RESOURCE_VISIBILITY_PUBLIC = 1;
+  // The resource is private.
+  RESOURCE_VISIBILITY_PRIVATE = 2;
+}
+
+// The visibility default for resources of a given ResourceType owned by an Organization.
+message ResourceVisibilityDefault {
+  // The type of resource that the visibility default applies to.
+  ResourceType resource_type = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The visibility to apply to a newly created resource of this type when no visibility
+  // is specified at creation time.
+  ResourceVisibility visibility = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // Whether the visibility is enforced rather than a fallback.
+  //
+  // If true, resources of this type owned by the Organization must have this visibility:
+  // creating a resource with, or updating a resource to, any other visibility is an error.
+  //
+  // If false, the visibility is only applied when no visibility is specified at creation
+  // time, and resources of this type may be created with or updated to any visibility.
+  //
+  // A strict instance-level visibility default for the same ResourceType, if present,
+  // takes precedence over the Organization-level default.
+  bool strict = 3;
+}
+
+// A base Role granted to all members of an Organization on all resources of a given
+// ResourceType owned by the Organization.
+message BaseResourceRole {
+  // The type of resource that the base Role applies to.
+  ResourceType resource_type = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The name of the Role granted to all members of the Organization.
+  //
+  // A Role name uniquely identifies a Role within the BSR instance. The Role must exist
+  // and must grant Permissions applicable to the ResourceType, otherwise an error is
+  // returned when the settings are updated.
+  string role_name = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.role_name) = true
+  ];
+}
