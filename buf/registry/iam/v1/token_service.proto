@@ -133,7 +133,14 @@ message CreateTokensRequest {
     //
     // In other words, ScopedPermissions can restrict the permissions of a Token,
     // but cannot add any permissions that the User does not already have.
-    repeated ScopedPermission scoped_permissions = 4 [(buf.validate.field).repeated.max_items = 250];
+    repeated ScopedPermission scoped_permissions = 4 [
+      (buf.validate.field).repeated.max_items = 250,
+      (buf.validate.field).cel = {
+        id: "scoped_permissions.unique"
+        message: "scoped permissions must have unique scope and permission pairs"
+        expression: "this.map(sp, (has(sp.scope.instance) ? 'instance' : string(sp.scope.resource.resource_type) + '/' + sp.scope.resource.resource_id) + '|' + sp.permission).unique()"
+      }
+    ];
   }
   // The Tokens to create.
   repeated Value values = 1 [

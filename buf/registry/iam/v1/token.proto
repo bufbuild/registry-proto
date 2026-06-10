@@ -70,7 +70,14 @@ message Token {
   //
   // In other words, ScopedPermissions can restrict the permissions of a Token,
   // but cannot add any permissions that the User does not already have.
-  repeated ScopedPermission scoped_permissions = 6 [(buf.validate.field).repeated.max_items = 250];
+  repeated ScopedPermission scoped_permissions = 6 [
+    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).cel = {
+      id: "scoped_permissions.unique"
+      message: "scoped permissions must have unique scope and permission pairs"
+      expression: "this.map(sp, (has(sp.scope.instance) ? 'instance' : string(sp.scope.resource.resource_type) + '/' + sp.scope.resource.resource_id) + '|' + sp.permission).unique()"
+    }
+  ];
 }
 
 // A permission that applies within a specific Scope.
