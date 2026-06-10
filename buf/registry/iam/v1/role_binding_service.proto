@@ -101,18 +101,18 @@ message ListRoleBindingsRequest {
   // Only return RoleBindings that grant a Role to one of these subjects.
   //
   // If empty, RoleBindings are not filtered by subject.
-  repeated buf.registry.owner.v1.OwnerRef subject_refs = 4;
+  repeated buf.registry.owner.v1.OwnerRef subject_refs = 4 [(buf.validate.field).repeated.max_items = 250];
   // Only return RoleBindings that grant one of these Roles.
   //
   // If empty, RoleBindings are not filtered by Role.
-  repeated RoleRef role_refs = 5;
+  repeated RoleRef role_refs = 5 [(buf.validate.field).repeated.max_items = 250];
   // Only return RoleBindings with one of these scopes.
   //
   // To list the RoleBindings that indirectly apply to a resource, enumerate its scope hierarchy explicitly.
   // (e.g. the Module, its parent Organization, and the instance).
   //
   // If empty, RoleBindings are not filtered by scope.
-  repeated Scope scopes = 6;
+  repeated Scope scopes = 6 [(buf.validate.field).repeated.max_items = 250];
 }
 
 message ListRoleBindingsResponse {

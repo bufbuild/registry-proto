@@ -85,7 +85,7 @@ message MethodConstraints {
     // The name of the Permission required to invoke this RPC.
     //
     // The value is the name of a Permission registered on the BSR (e.g.
-    // "bsr.repository.delete").
+    // "bsr.module.delete").
     string required_permission = 1 [(buf.validate.field).string.(buf.registry.priv.validate.v1beta1.permission_name) = true];
     // Explicitly declares that invoking this RPC requires no Permission.
     //

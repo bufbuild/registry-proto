@@ -90,7 +90,7 @@ message ListTokensRequest {
   //
   // If empty, all Tokens the currently authenticated User has access to are listed. Listing Tokens
   // for other Users is limited to Users with the necessary permissions.
-  repeated buf.registry.owner.v1.UserRef user_refs = 3;
+  repeated buf.registry.owner.v1.UserRef user_refs = 3 [(buf.validate.field).repeated.max_items = 250];
   // The order to return the Tokens.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
@@ -112,7 +112,7 @@ message CreateTokensRequest {
     // The User that will own the Token.
     //
     // If not set, defaults to the currently authenticated User.
-    buf.registry.owner.v1.UserRef owner_ref = 1;
+    buf.registry.owner.v1.UserRef user_ref = 1;
     // The name of the Token.
     string name = 2 [
       (buf.validate.field).required = true,
@@ -158,7 +158,10 @@ message CreateTokensResponse {
     //
     // This is the bearer credential used to authenticate as the Token. It is returned only here, at
     // creation time, and cannot be retrieved afterwards.
-    string secret = 2 [(buf.validate.field).required = true];
+    string secret = 2 [
+      debug_redact = true,
+      (buf.validate.field).required = true
+    ];
   }
   // The created Tokens in the same order as given on the request.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
