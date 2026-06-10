@@ -26,6 +26,11 @@ import "buf/validate/validate.proto";
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
 
 // Operate on RoleBindings.
+//
+// This service is a read-only view of grants. RoleBindings are created and deleted via
+// specialized higher-level APIs, such as the
+// buf.registry.owner.v1.OrganizationMembershipService for grants within an Organization and the
+// buf.registry.module.v1.ModuleContributorService for grants on a Module.
 service RoleBindingService {
   // Get RoleBindings by id or by subject, Role, and scope.
   rpc GetRoleBindings(GetRoleBindingsRequest) returns (GetRoleBindingsResponse) {
@@ -36,28 +41,6 @@ service RoleBindingService {
   rpc ListRoleBindings(ListRoleBindingsRequest) returns (ListRoleBindingsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.role-binding.list";
-  }
-  // Create new RoleBindings, granting Roles to subjects.
-  //
-  // A RoleBinding is uniquely identified by its (subject, Role, scope) tuple. Creating a
-  // RoleBinding that already exists is a no-op that returns the existing RoleBinding, so this
-  // operation is idempotent.
-  //
-  // This operation is atomic. Either all RoleBindings are created or an error is returned.
-  // TODO: I think we are leaning toward deleting this RPC and having specialized RPCs for
-  // setting roles of users and orgs.
-  rpc CreateRoleBindings(CreateRoleBindingsRequest) returns (CreateRoleBindingsResponse) {
-    option idempotency_level = IDEMPOTENT;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.role-binding.create";
-  }
-  // Delete existing RoleBindings.
-  //
-  // This operation is atomic. Either all RoleBindings are deleted or an error is returned.
-  // TODO: I think we are leaning toward deleting this RPC and having specialized RPCs for
-  // setting roles of users and orgs.
-  rpc DeleteRoleBindings(DeleteRoleBindingsRequest) returns (DeleteRoleBindingsResponse) {
-    option idempotency_level = IDEMPOTENT;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.role-binding.delete";
   }
 }
 
@@ -123,38 +106,3 @@ message ListRoleBindingsResponse {
   // The listed RoleBindings.
   repeated RoleBinding role_bindings = 2;
 }
-
-message CreateRoleBindingsRequest {
-  // An individual request to create a RoleBinding.
-  message Value {
-    // The subject to grant the Role to.
-    //
-    // If the subject is an Organization, Organization members inherit the permissions of the
-    // Organization's Roles.
-    buf.registry.owner.v1.OwnerRef subject_ref = 1 [(buf.validate.field).required = true];
-    // The Role to grant.
-    RoleRef role_ref = 2 [(buf.validate.field).required = true];
-    // The scope to grant the Role for.
-    Scope scope = 3 [(buf.validate.field).required = true];
-  }
-  // The RoleBindings to create.
-  repeated Value values = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
-  ];
-}
-
-message CreateRoleBindingsResponse {
-  // The created RoleBindings in the same order as requested.
-  repeated RoleBinding role_bindings = 1 [(buf.validate.field).repeated.min_items = 1];
-}
-
-message DeleteRoleBindingsRequest {
-  // The references to the RoleBindings to delete.
-  repeated RoleBindingRef role_binding_refs = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
-  ];
-}
-
-message DeleteRoleBindingsResponse {}

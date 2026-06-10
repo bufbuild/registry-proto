@@ -1,0 +1,197 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1;
+
+import "buf/registry/module/v1/module.proto";
+import "buf/registry/module/v1/module_contributor.proto";
+import "buf/registry/owner/v1/user.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
+
+// Operate on ModuleContributors.
+//
+// ModuleContributors grant Users a role on a specific Module. The write RPCs operate only on
+// direct role assignments; assignments managed by IdP group mappings cannot be modified via this
+// service.
+//
+// This is the API for managing per-Module grants. Grants within an Organization are managed via
+// the buf.registry.owner.v1.OrganizationMembershipService, and the
+// buf.registry.iam.v1.RoleBindingService exposes a read-only view of the underlying grants.
+service ModuleContributorService {
+  // Get ModuleContributors by Module and User.
+  rpc GetModuleContributors(GetModuleContributorsRequest) returns (GetModuleContributorsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module-contributor.get";
+  }
+  // List ModuleContributors, usually for a Module or a User.
+  rpc ListModuleContributors(ListModuleContributorsRequest) returns (ListModuleContributorsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module-contributor.list";
+  }
+  // Create new ModuleContributors, granting Users roles on Modules.
+  //
+  // This creates a direct role assignment. It is an error to create a ModuleContributor for a
+  // User that already has a direct role assignment on the Module.
+  //
+  // This operation is atomic. Either all ModuleContributors are created or an error is returned.
+  rpc CreateModuleContributors(CreateModuleContributorsRequest) returns (CreateModuleContributorsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module-contributor.create";
+  }
+  // Update the role of existing ModuleContributors.
+  //
+  // This sets the role of the User's direct role assignment, creating a direct role assignment
+  // if the User's contributor grant is currently managed only by IdP group mappings.
+  //
+  // This operation is atomic. Either all ModuleContributors are updated or an error is returned.
+  rpc UpdateModuleContributors(UpdateModuleContributorsRequest) returns (UpdateModuleContributorsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module-contributor.update";
+  }
+  // Delete existing ModuleContributors, removing Users' roles on Modules.
+  //
+  // This deletes the User's direct role assignment. Role assignments managed by IdP group
+  // mappings are unaffected: if the User also has an IdP-managed assignment, they remain a
+  // contributor via that assignment, and if the User's grant consists only of IdP-managed
+  // assignments, there is no direct assignment to delete and an error is returned.
+  //
+  // This operation is atomic. Either all ModuleContributors are deleted or an error is returned.
+  rpc DeleteModuleContributors(DeleteModuleContributorsRequest) returns (DeleteModuleContributorsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module-contributor.delete";
+  }
+}
+
+message GetModuleContributorsRequest {
+  // The references to the ModuleContributors to retrieve.
+  repeated ModuleContributorRef module_contributor_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetModuleContributorsResponse {
+  // The retrieved ModuleContributors in the same order as requested.
+  repeated ModuleContributor module_contributors = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// The module_refs and user_refs filters are combined with AND: a ModuleContributor is returned
+// only if it matches at least one entry within each filter that is set. Within a single filter,
+// entries are combined with OR.
+message ListModuleContributorsRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The order to return the ModuleContributors.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 3 [(buf.validate.field).enum.defined_only = true];
+  // Only return ModuleContributors on one of these Modules.
+  //
+  // If empty, ModuleContributors are not filtered by Module.
+  repeated ModuleRef module_refs = 4 [(buf.validate.field).repeated.max_items = 250];
+  // Only return ModuleContributors for one of these Users.
+  //
+  // If empty, ModuleContributors are not filtered by User.
+  repeated buf.registry.owner.v1.UserRef user_refs = 5 [(buf.validate.field).repeated.max_items = 250];
+}
+
+message ListModuleContributorsResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed ModuleContributors.
+  repeated ModuleContributor module_contributors = 2;
+}
+
+message CreateModuleContributorsRequest {
+  // An individual request to create a ModuleContributor.
+  message Value {
+    // The Module to grant the role on.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The User to grant the role to.
+    buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
+    // The role to grant to the User.
+    ModuleContributorRole role = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+  }
+  // The ModuleContributors to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreateModuleContributorsResponse {
+  // The created ModuleContributors in the same order as given on the request.
+  repeated ModuleContributor module_contributors = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdateModuleContributorsRequest {
+  // An individual request to update a ModuleContributor.
+  message Value {
+    // The Module that the role is granted on.
+    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    // The User whose role to update.
+    buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
+    // The role to grant to the User.
+    ModuleContributorRole role = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+  }
+  // The ModuleContributors to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdateModuleContributorsResponse {
+  // The updated ModuleContributors in the same order as given on the request.
+  repeated ModuleContributor module_contributors = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeleteModuleContributorsRequest {
+  // The references to the ModuleContributors to delete.
+  repeated ModuleContributorRef module_contributor_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeleteModuleContributorsResponse {}

@@ -39,6 +39,11 @@ The Instance Scope is always valid, so the field enumerates only the valid resou
 | `bsr.label.list-history` | Instance, Organization, User, Module |
 | `bsr.label.unarchive` | Instance, Organization, User, Module |
 | `bsr.label.update` | Instance, Organization, User, Module |
+| `bsr.module-contributor.create` | Instance, Organization, User, Module |
+| `bsr.module-contributor.delete` | Instance, Organization, User, Module |
+| `bsr.module-contributor.get` | Instance, Organization, User, Module |
+| `bsr.module-contributor.list` | Instance, Organization, User, Module |
+| `bsr.module-contributor.update` | Instance, Organization, User, Module |
 | `bsr.module.create` | Instance, Organization, User |
 | `bsr.module.delete` | Instance, Organization, User, Module |
 | `bsr.module.download` | Instance, Organization, User, Module |
@@ -46,13 +51,18 @@ The Instance Scope is always valid, so the field enumerates only the valid resou
 | `bsr.module.list` | Instance, Organization, User |
 | `bsr.module.update` | Instance, Organization, User, Module |
 | `bsr.module.upload` | Instance, Organization, User, Module |
+| `bsr.organization-membership.create` | Instance, Organization |
+| `bsr.organization-membership.delete` | Instance, Organization |
+| `bsr.organization-membership.get` | Instance, Organization, User |
+| `bsr.organization-membership.list` | Instance, Organization, User |
+| `bsr.organization-membership.update` | Instance, Organization |
+| `bsr.organization-settings.get` | Instance, Organization |
+| `bsr.organization-settings.update` | Instance, Organization |
 | `bsr.organization.create` | Instance |
 | `bsr.organization.delete` | Instance, Organization |
 | `bsr.organization.get` | Instance, Organization |
 | `bsr.organization.list` | Instance |
 | `bsr.organization.update` | Instance, Organization |
-| `bsr.role-binding.create` | Instance, Organization, User, Module, Plugin, Policy |
-| `bsr.role-binding.delete` | Instance, Organization, User, Module, Plugin, Policy |
 | `bsr.role-binding.get` | Instance, Organization, User, Module, Plugin, Policy |
 | `bsr.role-binding.list` | Instance, Organization, User, Module, Plugin, Policy |
 | `bsr.role.get` | Instance |

@@ -1,0 +1,124 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.module.v1;
+
+import "buf/registry/module/v1/module.proto";
+import "buf/registry/owner/v1/user.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
+
+// A ModuleContributor on the BSR.
+//
+// A ModuleContributor grants a User a role on a specific Module, independent of any access the
+// User derives from membership in the Organization that owns the Module. A User's effective
+// access to a Module is the highest of their contributor role and any role derived from
+// Organization membership. A User has at most one ModuleContributor per Module.
+//
+// A contributor grant is composed of one or more role assignments, at most one per
+// ModuleContributorRoleSource. Only direct role assignments can be modified via the API;
+// assignments managed by IdP group mappings are managed by the identity provider integration.
+message ModuleContributor {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Module that the role is granted on.
+  string module_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The id of the User that the role is granted to.
+  string user_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the User first became a contributor to the Module.
+  google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
+  // The last time any role assignment of the contributor was updated.
+  google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
+  // The effective contributor role of the User on the Module.
+  //
+  // This is the highest-ranked role across all role assignments.
+  ModuleContributorRole role = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The individual role assignments that make up the contributor grant, at most one per
+  // ModuleContributorRoleSource.
+  repeated ModuleContributorRoleAssignment role_assignments = 6 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// An individual role assignment within a ModuleContributor.
+message ModuleContributorRoleAssignment {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The assigned role.
+  ModuleContributorRole role = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The source of the assignment.
+  ModuleContributorRoleSource source = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+}
+
+// The role of a contributor User on a Module.
+//
+// There is intentionally no owner role: a Module cannot have per-User owner grants.
+// Owner access to a Module comes from owning it: Users with the owner role in the
+// Organization that owns the Module have owner access, as does a User that owns the
+// Module directly.
+enum ModuleContributorRole {
+  MODULE_CONTRIBUTOR_ROLE_UNSPECIFIED = 0;
+  // The User can administer the Module.
+  MODULE_CONTRIBUTOR_ROLE_ADMIN = 1;
+  // The User can write to the Module.
+  MODULE_CONTRIBUTOR_ROLE_WRITE = 2;
+  // The User can write only non-default content of the Module, for example pushing to a
+  // non-default Label.
+  MODULE_CONTRIBUTOR_ROLE_LIMITED_WRITE = 3;
+  // The User can read the Module.
+  MODULE_CONTRIBUTOR_ROLE_READ = 4;
+}
+
+// The source of a role assignment within a ModuleContributor.
+enum ModuleContributorRoleSource {
+  MODULE_CONTRIBUTOR_ROLE_SOURCE_UNSPECIFIED = 0;
+  // The role was assigned directly, either via the API or the web interface.
+  MODULE_CONTRIBUTOR_ROLE_SOURCE_DIRECT = 1;
+  // The role was assigned via an IdP group mapping.
+  MODULE_CONTRIBUTOR_ROLE_SOURCE_IDP_GROUP = 2;
+}
+
+// ModuleContributorRef is a reference to a ModuleContributor, which is uniquely identified by its
+// Module and User.
+//
+// This is used in requests.
+message ModuleContributorRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The Module that the role is granted on.
+  ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+  // The User that the role is granted to.
+  buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
+}

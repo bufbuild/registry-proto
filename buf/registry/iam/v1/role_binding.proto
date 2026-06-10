@@ -31,8 +31,9 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 //
 // A RoleBinding is uniquely identified by its subject, Role, and scope.
 //
-// RoleBindings are immutable once created. To change a grant, delete the RoleBinding and create a
-// new one.
+// RoleBindings are immutable once created. They are managed via specialized higher-level APIs,
+// such as the buf.registry.owner.v1.OrganizationMembershipService for grants within an
+// Organization and the buf.registry.module.v1.ModuleContributorService for grants on a Module.
 message RoleBinding {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
