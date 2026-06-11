@@ -47,7 +47,7 @@ message OrganizationMembership {
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
-  // The time the User first became a member of the Organization.
+  // The time the User became a member of the Organization.
   google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
   // The last time any role assignment of the membership was updated.
   google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
