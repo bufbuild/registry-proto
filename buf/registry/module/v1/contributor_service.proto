@@ -25,37 +25,33 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Operate on the Contributors of a Module.
 //
-// A Contributor is a User granted an explicit ResourceRole on a Module. This service manages
-// only roles with source RESOURCE_ROLE_SOURCE_DIRECT. Roles inherited from the owning
-// Organization, or granted via an identity provider group or configuration, are not managed
-// here.
+// A Contributor is a User with a role assigned directly on a Module. This service manages
+// only directly-assigned roles. Roles inherited from membership in the owning Organization,
+// or granted via an identity-provider group mapping, are not managed here.
 service ContributorService {
   // List the Contributors of a Module.
+  //
+  // Only Users with a directly-assigned role on the Module are listed. Users that have
+  // access only through membership in the owning Organization or an identity-provider
+  // group mapping are not included.
   rpc ListContributors(ListContributorsRequest) returns (ListContributorsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Grant explicit roles to Users on Modules.
+  // Create or update the directly-assigned roles of Users on Modules.
   //
-  // It is an error to grant a role to a User that already has an explicit role on the
-  // Module; use UpdateContributors to change an existing role.
+  // If the User does not have a directly-assigned role on the Module, one is created;
+  // otherwise, the existing role is updated.
   //
-  // This operation is atomic. Either all Contributors are created or an error is returned.
-  rpc CreateContributors(CreateContributorsRequest) returns (CreateContributorsResponse) {
+  // This operation is atomic. Either all Contributors are created/updated or an error is
+  // returned.
+  rpc CreateOrUpdateContributors(CreateOrUpdateContributorsRequest) returns (CreateOrUpdateContributorsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
-  // Update the explicit roles of existing Contributors on Modules.
+  // Revoke the directly-assigned roles of Contributors on Modules.
   //
-  // It is an error to update a User that does not already have an explicit role on the
-  // Module; use CreateContributors to grant an initial role.
-  //
-  // This operation is atomic. Either all Contributors are updated or an error is returned.
-  rpc UpdateContributors(UpdateContributorsRequest) returns (UpdateContributorsResponse) {
-    option idempotency_level = IDEMPOTENT;
-  }
-  // Revoke the explicit roles of Contributors on Modules.
-  //
-  // This removes the explicit role only. A User may retain access to the Module through a
-  // role inherited from the owning Organization.
+  // This removes the directly-assigned role only. A User may retain access to the Module
+  // through a role inherited from the owning Organization or an identity-provider group
+  // mapping.
   //
   // This operation is atomic. Either all Contributors are deleted or an error is returned.
   rpc DeleteContributors(DeleteContributorsRequest) returns (DeleteContributorsResponse) {
@@ -97,70 +93,41 @@ message ListContributorsResponse {
   repeated Contributor contributors = 2;
 }
 
-message CreateContributorsRequest {
-  // An individual request to grant a role to a User on a Module.
+message CreateOrUpdateContributorsRequest {
+  // An individual request to set the directly-assigned role of a User on a Module.
   message Value {
-    // The Module to grant the role on.
+    // The Module to set the role on.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-    // The User to grant the role to.
+    // The User to set the role for.
     buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
-    // The role to grant.
+    // The role to assign.
     //
     // This may not be lower than any role the User already inherits from the owning
     // Organization.
-    ResourceRole role = 3 [
+    ModuleRole role = 3 [
       (buf.validate.field).required = true,
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
     ];
   }
-  // The Contributors to create.
+  // The Contributors to create or update.
   repeated Value values = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250
   ];
 }
 
-message CreateContributorsResponse {
-  // The created Contributors in the same order as given on the request.
-  repeated Contributor contributors = 1 [(buf.validate.field).repeated.min_items = 1];
-}
-
-message UpdateContributorsRequest {
-  // An individual request to update the role of a Contributor on a Module.
-  message Value {
-    // The Module the Contributor has a role on.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-    // The User whose role is being updated.
-    buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
-    // The new role to assign.
-    //
-    // This may not be lower than any role the User already inherits from the owning
-    // Organization.
-    ResourceRole role = 3 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).enum.defined_only = true,
-      (buf.validate.field).enum.not_in = 0
-    ];
-  }
-  // The Contributors to update.
-  repeated Value values = 1 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
-  ];
-}
-
-message UpdateContributorsResponse {
-  // The updated Contributors in the same order as given on the request.
+message CreateOrUpdateContributorsResponse {
+  // The created or updated Contributors in the same order as given on the request.
   repeated Contributor contributors = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message DeleteContributorsRequest {
-  // An individual request to revoke a User's explicit role on a Module.
+  // An individual request to revoke a User's directly-assigned role on a Module.
   message Value {
     // The Module to revoke the role on.
     ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-    // The User whose explicit role is being revoked.
+    // The User whose directly-assigned role is being revoked.
     buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
   }
   // The Contributors to delete.

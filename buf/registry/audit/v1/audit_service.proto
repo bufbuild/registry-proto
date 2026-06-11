@@ -20,6 +20,7 @@ import "buf/registry/audit/v1/action.proto";
 import "buf/registry/audit/v1/event.proto";
 import "buf/registry/audit/v1/resource.proto";
 import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/owner/v1/user.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -57,10 +58,10 @@ message ListEventsRequest {
   // The list order.
   enum Order {
     ORDER_UNSPECIFIED = 0;
-    // Order by event_time newest to oldest.
-    ORDER_EVENT_TIME_DESC = 1;
-    // Order by event_time oldest to newest.
-    ORDER_EVENT_TIME_ASC = 2;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
   }
   // The maximum number of items to return.
   //
@@ -78,10 +79,10 @@ message ListEventsRequest {
   //
   // If not set, there is no upper bound.
   google.protobuf.Timestamp end_time = 4;
-  // Filter to events performed by any of the given actors.
+  // Filter to events performed by any of the given Users.
   //
   // If empty, events from all actors are returned.
-  repeated buf.registry.owner.v1.OwnerRef actor_refs = 5 [(buf.validate.field).repeated.max_items = 250];
+  repeated buf.registry.owner.v1.UserRef actor_refs = 5 [(buf.validate.field).repeated.max_items = 250];
   // Filter to events affecting any of the resources with these ids.
   //
   // If empty, events for resources with any id are returned.
@@ -109,7 +110,7 @@ message ListEventsRequest {
   ];
   // The order to return the Events.
   //
-  // If not specified, defaults to ORDER_EVENT_TIME_DESC.
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
   Order order = 10 [(buf.validate.field).enum.defined_only = true];
 }
 

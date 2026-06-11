@@ -83,7 +83,7 @@ message SDKInfo {
   // time the SDK is generated (for example, a Python distribution name, which may carry a
   // server-added suffix to guarantee uniqueness). Because this RPC has no side effects, a name that
   // has not yet been assigned is reported as empty rather than being allocated on read.
-  optional string package_name = 3;
+  string package_name = 3;
   // The resolved Module Commit that the SDK was generated from.
   Module module = 4 [(buf.validate.field).required = true];
   // The resolved generation Plugin build that produced the SDK.

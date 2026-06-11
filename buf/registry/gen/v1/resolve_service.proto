@@ -84,12 +84,18 @@ message GetSDKInfosRequest {
     buf.registry.module.v1.ResourceRef module_ref = 1 [(buf.validate.field).required = true];
     // The generation Plugin that produces the SDK.
     buf.registry.plugin.v1.GenerationPluginRef plugin_ref = 2 [(buf.validate.field).required = true];
+    // The package registry to resolve install metadata for.
+    //
+    // A generation Plugin produces SDKs for exactly one registry. If set, this must match the
+    // resolved Plugin's registry, and is used to validate the request. If unset, the resolved
+    // Plugin's registry is used.
+    buf.registry.plugin.v1.PackageRegistry registry = 3 [(buf.validate.field).enum.defined_only = true];
     // An optional SDK version string to validate.
     //
     // If set, it is validated against the resolved Module Commit and Plugin build, and the same
     // string is returned on the resulting SDKInfo. If unset, the version is resolved from the
     // module_ref and plugin_ref.
-    string sdk_version = 3 [
+    string version = 4 [
       (buf.validate.field).string.max_len = 250,
       (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
     ];

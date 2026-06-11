@@ -24,19 +24,18 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // PluginRef references a Plugin by id or fully-qualified name.
 //
 // It is pure identity, carrying no Plugin-type or version information, so it addresses both check
-// and generation Plugins. This is the first v1 slice of the plugin package; the Plugin entity,
-// Labels, Commits, and services remain in buf.registry.plugin.v1beta1 until promoted.
+// and generation Plugins.
 message PluginRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   // The fully-qualified name of a Plugin: owner plus Plugin name.
   message Name {
-    // The Organization owner name.
+    // The name of the Organization owner.
     string owner = 1 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.max_len = 32
     ];
-    // The Plugin name.
+    // The name of the Plugin.
     string plugin = 2 [(buf.validate.field).string = {
       min_len: 2
       max_len: 100
@@ -108,7 +107,9 @@ message GenerationPluginVersion {
   // The resolved semver version of the Plugin, for example "v1.2.0".
   string version = 4 [(buf.validate.field).required = true];
   // The resolved revision of the Plugin version.
-  uint32 revision = 5;
+  //
+  // Revisions start at 1.
+  uint32 revision = 5 [(buf.validate.field).uint32.gte = 1];
 }
 
 // PackageRegistry identifies a language package registry that a generation Plugin publishes its

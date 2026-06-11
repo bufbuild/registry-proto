@@ -18,16 +18,16 @@ package buf.registry.module.v1;
 
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
 
-// A Contributor is a User that has a role on a Module.
+// A Contributor is a User with a role assigned directly on a Module.
 //
-// Contributors model per-Module access for Modules owned by an Organization. The role this
-// service manages is the one assigned directly to the User on the Module. A User may also
-// have access without a directly-assigned role, by inheriting one from membership in the
-// owning Organization or from an identity-provider group mapping. effective_role reflects
-// that combined access.
+// Contributors model per-Module access for Modules owned by an Organization. A User may
+// also have access to a Module without being a Contributor, by inheriting a role from
+// membership in the owning Organization or from an identity-provider group mapping.
+// effective_role reflects that combined access.
 message Contributor {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
@@ -41,36 +41,42 @@ message Contributor {
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
+  // The time the Contributor was created, that is when the User was granted a role
+  // directly on the Module.
+  google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
+  // The last time the Contributor was updated, that is when the User's directly-assigned
+  // role on the Module was last changed.
+  google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
   // The role assigned directly to the User on the Module.
-  //
-  // This is the only role managed by the ContributorService. It is
-  // RESOURCE_ROLE_UNSPECIFIED if the User has no directly-assigned role, for example if the
-  // User is a Contributor only through an identity-provider group mapping.
-  ResourceRole role = 3 [(buf.validate.field).enum.defined_only = true];
+  ModuleRole role = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
   // The role the User effectively has on the Module.
   //
   // This is the combined result of the directly-assigned role, any roles from
   // identity-provider group mappings, and any role inherited from membership in the owning
-  // Organization. It is always set, and is always greater than or equal to role.
-  ResourceRole effective_role = 4 [
+  // Organization. It is always greater than or equal to role.
+  ModuleRole effective_role = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).enum.not_in = 0
   ];
 }
 
-// ResourceRole is the role a User has on a resource, such as a Module.
+// ModuleRole is the role a User has on a Module.
 //
 // Roles are ordered by increasing privilege. Each role includes all the capabilities of the
 // roles below it.
-enum ResourceRole {
-  RESOURCE_ROLE_UNSPECIFIED = 0;
-  // Pull and view the resource and its contents.
-  RESOURCE_ROLE_READ = 1;
-  // RESOURCE_ROLE_READ, plus push new Commits. Does not allow managing Labels.
-  RESOURCE_ROLE_LIMITED_WRITE = 2;
-  // RESOURCE_ROLE_LIMITED_WRITE, plus create and move Labels.
-  RESOURCE_ROLE_WRITE = 3;
-  // RESOURCE_ROLE_WRITE, plus manage the resource's settings and Contributors.
-  RESOURCE_ROLE_ADMIN = 4;
+enum ModuleRole {
+  MODULE_ROLE_UNSPECIFIED = 0;
+  // Pull and view the Module and its contents.
+  MODULE_ROLE_READ = 1;
+  // MODULE_ROLE_READ, plus push new Commits. Does not allow managing Labels.
+  MODULE_ROLE_LIMITED_WRITE = 2;
+  // MODULE_ROLE_LIMITED_WRITE, plus create and move Labels.
+  MODULE_ROLE_WRITE = 3;
+  // MODULE_ROLE_WRITE, plus manage the Module's settings and Contributors.
+  MODULE_ROLE_ADMIN = 4;
 }

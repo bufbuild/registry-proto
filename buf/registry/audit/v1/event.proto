@@ -28,7 +28,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Event is an immutable record of an action that occurred within the BSR.
 //
-// Every Event answers four questions: when the action occurred (event_time), who performed it
+// Every Event answers four questions: when the action occurred (create_time), who performed it
 // (actor), what was done (action), and which resource was affected (resource). Action-specific
 // details are carried in the details field.
 message Event {
@@ -46,19 +46,16 @@ message Event {
     //
     // This may be empty if it was never recorded or has been redacted by the instance's
     // data-retention policy.
-    string ip = 3 [(buf.validate.field).string.max_len = 64];
+    string ip_address = 3 [(buf.validate.field).string.max_len = 64];
   }
 
   // The id of the Event.
-  //
-  // This is a UUID that also encodes event_time (a ULID stored in UUID form), so it is
-  // monotonic with respect to time and stable as a pagination cursor.
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
   // The time the action occurred.
-  google.protobuf.Timestamp event_time = 2 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
   // The principal that performed the action.
   Actor actor = 3 [(buf.validate.field).required = true];
   // The action that was performed.

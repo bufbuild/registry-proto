@@ -77,8 +77,6 @@ message ConvertRequest {
 message ConvertResponse {
   // The converted message, encoded as the requested output_format.
   bytes payload = 1;
-  // Note: a `commit` field can be added later (additive) to report the Commit
-  // that a resource_ref schema_source resolved to, if a use case arises.
 }
 
 message GetJSONSchemaRequest {
@@ -105,6 +103,4 @@ message GetJSONSchemaResponse {
   // handing to JSON Schema tooling. It is intended for editor validation and
   // autocompletion, not a lossless representation of the type's descriptor.
   string json_schema = 1 [(buf.validate.field).required = true];
-  // Note: a `commit` field can be added later (additive) to report the Commit
-  // that a resource_ref schema_source resolved to, if a use case arises.
 }
