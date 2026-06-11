@@ -1,0 +1,142 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.plugin.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1";
+
+// PluginRef references a Plugin by id or fully-qualified name.
+//
+// It is pure identity, carrying no Plugin-type or version information, so it addresses both check
+// and generation Plugins.
+message PluginRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The fully-qualified name of a Plugin: owner plus Plugin name.
+  message Name {
+    // The name of the Organization owner.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 32
+    ];
+    // The name of the Plugin.
+    string plugin = 2 [(buf.validate.field).string = {
+      min_len: 2
+      max_len: 100
+    }];
+  }
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Plugin.
+    string id = 1 [(buf.validate.field).string.tuuid = true];
+    // The fully-qualified name of the Plugin.
+    Name name = 2;
+  }
+}
+
+// GenerationPluginRef references a specific build of a generation Plugin: a PluginRef plus an
+// optional semver version and revision.
+//
+// Generation Plugins (protoc executable Plugins such as protoc-gen-go) publish their output to
+// language package registries, so - like an npm package or Go module - they are addressed by name
+// and semver version rather than by a content-addressed Commit. This is one of two version models
+// in this package: check Plugins are content-addressed via Commit/Label, while generation Plugins
+// are addressed by semver version plus a revision.
+//
+// A revision identifies a rebuild of the same version against a new base image - for example, a
+// base-image security patch - without the version itself changing. All revisions of a version are
+// intended to produce functionally identical output.
+//
+//   - version unset: the latest version is used.
+//   - version set, revision unset: the latest revision of that version is used.
+//   - both set: that exact build is used.
+message GenerationPluginRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+  option (buf.validate.message).cel = {
+    id: "generation_plugin_ref.revision_requires_version"
+    message: "revision cannot be set without a version"
+    expression: "!has(this.revision) || has(this.version)"
+  };
+
+  // The Plugin.
+  PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+  // The semver version to use, for example "v1.2.0". If unset, the latest version is used.
+  //
+  // The version must begin with "v" and must not contain a build metadata component.
+  optional string version = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 250
+    pattern: "^v[0-9]+(\\.[0-9]+){0,2}(-[0-9A-Za-z.-]+)?$"
+  }];
+  // The build revision, starting at 1. If unset, the latest revision is used. Requires a version.
+  optional uint32 revision = 3 [(buf.validate.field).uint32.gte = 1];
+}
+
+// GenerationPluginVersion is a specific resolved build of a generation Plugin: the Plugin's identity
+// together with the resolved semver version and revision.
+//
+// This is the response-side counterpart of GenerationPluginRef. Where a GenerationPluginRef may
+// leave version or revision unset to mean "latest", a GenerationPluginVersion always identifies the
+// exact build that was resolved.
+message GenerationPluginVersion {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Plugin.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The name of the Organization that owns the Plugin.
+  string owner = 2 [(buf.validate.field).required = true];
+  // The name of the Plugin.
+  string name = 3 [(buf.validate.field).required = true];
+  // The resolved semver version of the Plugin, for example "v1.2.0".
+  string version = 4 [(buf.validate.field).required = true];
+  // The resolved revision of the Plugin version.
+  //
+  // Revisions start at 1.
+  uint32 revision = 5 [(buf.validate.field).uint32.gte = 1];
+}
+
+// PackageRegistry identifies a language package registry that a generation Plugin publishes its
+// output to - for example, the Go module proxy or the npm registry.
+//
+// A generation Plugin targets exactly one PackageRegistry, which determines where the SDKs it
+// produces are published. This is distinct from the BSR itself, which is a registry of Modules and
+// Plugins.
+enum PackageRegistry {
+  PACKAGE_REGISTRY_UNSPECIFIED = 0;
+  // The Go module proxy.
+  PACKAGE_REGISTRY_GO = 1;
+  // The npm registry.
+  PACKAGE_REGISTRY_NPM = 2;
+  // A Maven repository.
+  PACKAGE_REGISTRY_MAVEN = 3;
+  // The Swift package registry.
+  PACKAGE_REGISTRY_SWIFT = 4;
+  // A Python package index.
+  PACKAGE_REGISTRY_PYTHON = 5;
+  // The Cargo registry (crates).
+  PACKAGE_REGISTRY_CARGO = 7;
+  // A NuGet feed.
+  PACKAGE_REGISTRY_NUGET = 8;
+  // A CMake registry.
+  PACKAGE_REGISTRY_CMAKE = 9;
+}
