@@ -86,3 +86,53 @@ message GenerationPluginRef {
   // The build revision, starting at 1. If unset, the latest revision is used. Requires a version.
   optional uint32 revision = 3 [(buf.validate.field).uint32.gte = 1];
 }
+
+// GenerationPluginVersion is a specific resolved build of a generation Plugin: the Plugin's identity
+// together with the resolved semver version and revision.
+//
+// This is the response-side counterpart of GenerationPluginRef. Where a GenerationPluginRef may
+// leave version or revision unset to mean "latest", a GenerationPluginVersion always identifies the
+// exact build that was resolved.
+message GenerationPluginVersion {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Plugin.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The name of the Organization that owns the Plugin.
+  string owner = 2 [(buf.validate.field).required = true];
+  // The name of the Plugin.
+  string name = 3 [(buf.validate.field).required = true];
+  // The resolved semver version of the Plugin, for example "v1.2.0".
+  string version = 4 [(buf.validate.field).required = true];
+  // The resolved revision of the Plugin version.
+  uint32 revision = 5;
+}
+
+// PackageRegistry identifies a language package registry that a generation Plugin publishes its
+// output to - for example, the Go module proxy or the npm registry.
+//
+// A generation Plugin targets exactly one PackageRegistry, which determines where the SDKs it
+// produces are published. This is distinct from the BSR itself, which is a registry of Modules and
+// Plugins.
+enum PackageRegistry {
+  PACKAGE_REGISTRY_UNSPECIFIED = 0;
+  // The Go module proxy.
+  PACKAGE_REGISTRY_GO = 1;
+  // The npm registry.
+  PACKAGE_REGISTRY_NPM = 2;
+  // A Maven repository.
+  PACKAGE_REGISTRY_MAVEN = 3;
+  // The Swift package registry.
+  PACKAGE_REGISTRY_SWIFT = 4;
+  // A Python package index.
+  PACKAGE_REGISTRY_PYTHON = 5;
+  // The Cargo registry (crates).
+  PACKAGE_REGISTRY_CARGO = 6;
+  // A NuGet feed.
+  PACKAGE_REGISTRY_NUGET = 7;
+  // A CMake registry.
+  PACKAGE_REGISTRY_CMAKE = 8;
+}

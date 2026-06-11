@@ -54,7 +54,7 @@ message ResolveSDKVersionsRequest {
     // A generation Plugin produces SDKs for exactly one registry. If set, this must match the
     // resolved Plugin's registry, and is used to validate the request. If unset, the resolved
     // Plugin's registry is used.
-    SDKRegistry registry = 3 [(buf.validate.field).enum.defined_only = true];
+    buf.registry.plugin.v1.PackageRegistry registry = 3 [(buf.validate.field).enum.defined_only = true];
   }
   // The SDK versions to resolve.
   repeated Value values = 1 [
@@ -68,7 +68,7 @@ message ResolveSDKVersionsResponse {
   message Value {
     // The resolved SDK version string.
     //
-    // The format is determined by the resolved Plugin's SDKRegistry.
+    // The format is determined by the resolved Plugin's PackageRegistry.
     string version = 1 [(buf.validate.field).required = true];
   }
   // The resolved SDK versions, in the same order as requested.
