@@ -18,8 +18,6 @@ A Scope is valid for a Permission when the resources the Permission operates on 
   A token Permission is valid on a User but not on an Organization, because Organizations do not contain Tokens.
 - Create and list Permissions target a collection, so the narrowest valid Scope is the container, not the resource itself.
   For example, `bsr.module.create` is valid on an Organization or User but not on a Module, and `bsr.organization.create` is valid only on the Instance.
-- Role Permissions are Instance-only because Roles are registered on the instance and are not owned by any resource.
-- RoleBinding Permissions are valid on every Scope because RoleBindings attach to every resource type.
 
 The valid scopes of a Permission are exposed via the `bindable_resource_types` field on the `Permission` message.
 The Instance Scope is always valid, so the field enumerates only the valid resource types; the "Bindable resource types" column below lists Instance explicitly for readability.
@@ -63,10 +61,6 @@ The Instance Scope is always valid, so the field enumerates only the valid resou
 | `bsr.organization.get` | Instance, Organization |
 | `bsr.organization.list` | Instance |
 | `bsr.organization.update` | Instance, Organization |
-| `bsr.role-binding.get` | Instance, Organization, User, Module, Plugin, Policy |
-| `bsr.role-binding.list` | Instance, Organization, User, Module, Plugin, Policy |
-| `bsr.role.get` | Instance |
-| `bsr.role.list` | Instance |
 | `bsr.token.create` | Instance, User |
 | `bsr.token.delete` | Instance, User |
 | `bsr.token.get` | Instance, User |

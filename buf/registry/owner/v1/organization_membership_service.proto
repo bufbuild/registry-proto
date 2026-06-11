@@ -29,9 +29,6 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // Memberships grant Users a role within an Organization. The write RPCs operate only on direct
 // role assignments; assignments managed by JIT provisioning or IdP group mappings cannot be
 // modified via this service.
-//
-// This is the API for managing the grants that apply within an Organization. The
-// buf.registry.iam.v1.RoleBindingService exposes a read-only view of the underlying grants.
 service OrganizationMembershipService {
   // Get OrganizationMemberships by Organization and User.
   rpc GetOrganizationMemberships(GetOrganizationMembershipsRequest) returns (GetOrganizationMembershipsResponse) {

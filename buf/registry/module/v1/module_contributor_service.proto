@@ -31,8 +31,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // service.
 //
 // This is the API for managing per-Module grants. Grants within an Organization are managed via
-// the buf.registry.owner.v1.OrganizationMembershipService, and the
-// buf.registry.iam.v1.RoleBindingService exposes a read-only view of the underlying grants.
+// the buf.registry.owner.v1.OrganizationMembershipService.
 service ModuleContributorService {
   // Get ModuleContributors by Module and User.
   rpc GetModuleContributors(GetModuleContributorsRequest) returns (GetModuleContributorsResponse) {

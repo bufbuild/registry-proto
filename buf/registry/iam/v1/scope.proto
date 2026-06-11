@@ -21,10 +21,9 @@ import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
 
-// The scope that a grant or restriction applies to.
+// The scope that a restriction applies to.
 //
-// A Scope is either the entire instance or a single resource. It is shared by RoleBindings and
-// ScopedPermissions so that both use the same scoping semantics.
+// A Scope is either the entire instance or a single resource.
 message Scope {
   // Instance scopes to the entire instance.
   message Instance {}

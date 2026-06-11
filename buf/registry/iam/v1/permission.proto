@@ -26,8 +26,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // A Permission on the BSR.
 //
 // A Permission is an atomic capability that gates access to one or more RPCs. Permissions are
-// registered by the system and granted to Users via Roles, and may be further restricted on a
-// Token via ScopedPermissions.
+// registered by the system and granted to Users, and may be further restricted on a Token via
+// ScopedPermissions.
 //
 // A Permission is identified by its name; it does not have a separate id.
 message Permission {
