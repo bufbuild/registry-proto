@@ -47,6 +47,16 @@ service TokenService {
   rpc CreateTokens(CreateTokensRequest) returns (CreateTokensResponse) {
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.token.create";
   }
+  // Update existing Tokens.
+  //
+  // Updating a Token does not change its secret value. To rotate a Token's credential, delete it
+  // and create a new one.
+  //
+  // This operation is atomic. Either all Tokens are updated or an error is returned.
+  rpc UpdateTokens(UpdateTokensRequest) returns (UpdateTokensResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.token.update";
+  }
   // Delete existing Tokens.
   //
   // This operation is atomic. Either all Tokens are deleted or an error is returned.
@@ -165,6 +175,59 @@ message CreateTokensResponse {
   }
   // The created Tokens in the same order as given on the request.
   repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdateTokensRequest {
+  // An individual request to update a Token.
+  message Value {
+    // A replacement list of ScopedPermissions.
+    //
+    // A message is used so that an unset field can be distinguished from an empty list.
+    message ScopedPermissions {
+      // The scoped permissions of the Token.
+      //
+      // If empty, the Token has no declared permission restrictions and its effective
+      // permissions are the owner's permissions resolved at request time.
+      //
+      // Otherwise, the Token's effective permissions are the intersection of these
+      // declared permissions and the owner's permissions resolved at request time.
+      //
+      // In other words, ScopedPermissions can restrict the permissions of a Token,
+      // but cannot add any permissions that the User does not already have.
+      repeated ScopedPermission scoped_permissions = 1 [
+        (buf.validate.field).repeated.max_items = 250,
+        (buf.validate.field).cel = {
+          id: "scoped_permissions.unique"
+          message: "scoped permissions must have unique scope and permission pairs"
+          expression: "this.map(sp, (has(sp.scope.instance) ? 'instance' : string(sp.scope.resource.resource_type) + '/' + sp.scope.resource.resource_id) + '|' + sp.permission).unique()"
+        }
+      ];
+    }
+    // The reference to the Token to update.
+    TokenRef token_ref = 1 [(buf.validate.field).required = true];
+    // The name of the Token.
+    //
+    // If not set, the name is not updated.
+    optional string name = 2 [
+      (buf.validate.field).string.min_len = 3,
+      (buf.validate.field).string.max_len = 256
+    ];
+    // The scoped permissions of the Token, replacing all existing scoped permissions.
+    //
+    // If not set, the scoped permissions are not updated. If set with an empty list, all
+    // permission restrictions are removed from the Token.
+    ScopedPermissions scoped_permissions = 3;
+  }
+  // The Tokens to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdateTokensResponse {
+  // The updated Tokens in the same order as given on the request.
+  repeated Token tokens = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message DeleteTokensRequest {
