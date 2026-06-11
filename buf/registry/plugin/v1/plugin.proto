@@ -51,3 +51,38 @@ message PluginRef {
     Name name = 2;
   }
 }
+
+// GenerationPluginRef references a specific build of a generation Plugin: a PluginRef plus an
+// optional semver version and revision.
+//
+// Generation Plugins (protoc executable Plugins such as protoc-gen-go) publish their output to
+// language package registries, so - like an npm package or Go module - they are addressed by name
+// and semver version rather than by a content-addressed Commit. This is one of two version models
+// in this package: check Plugins are content-addressed via Commit/Label, while generation Plugins
+// are addressed by semver version plus a revision.
+//
+// A revision identifies a rebuild of the same version against a new base image - for example, a
+// base-image security patch - without the version itself changing. All revisions of a version are
+// intended to produce functionally identical output.
+//
+//   - version unset: the latest version is used.
+//   - version set, revision unset: the latest revision of that version is used.
+//   - both set: that exact build is used.
+message GenerationPluginRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+  option (buf.validate.message).cel = {
+    id: "generation_plugin_ref.revision_requires_version"
+    message: "revision cannot be set without a version"
+    expression: "!has(this.revision) || has(this.version)"
+  };
+
+  // The Plugin.
+  PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+  // The semver version to use, for example "v1.2.0". If unset, the latest version is used.
+  optional string version = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 250
+  }];
+  // The build revision, starting at 1. If unset, the latest revision is used. Requires a version.
+  optional uint32 revision = 3 [(buf.validate.field).uint32.gte = 1];
+}

@@ -16,9 +16,9 @@ syntax = "proto3";
 
 package buf.registry.gen.v1;
 
-import "buf/registry/gen/v1/plugin.proto";
 import "buf/registry/gen/v1/sdk.proto";
 import "buf/registry/module/v1/resource.proto";
+import "buf/registry/plugin/v1/plugin.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/gen/v1";
@@ -48,7 +48,7 @@ message ResolveSDKVersionsRequest {
     // See the documentation on ResourceRef for resource resolution details.
     buf.registry.module.v1.ResourceRef module_ref = 1 [(buf.validate.field).required = true];
     // The generation Plugin that produces the SDK.
-    GenerationPluginRef plugin_ref = 2 [(buf.validate.field).required = true];
+    buf.registry.plugin.v1.GenerationPluginRef plugin_ref = 2 [(buf.validate.field).required = true];
     // The package registry to resolve the version for.
     //
     // A generation Plugin produces SDKs for exactly one registry. If set, this must match the
@@ -83,7 +83,7 @@ message GetSDKInfosRequest {
     // See the documentation on ResourceRef for resource resolution details.
     buf.registry.module.v1.ResourceRef module_ref = 1 [(buf.validate.field).required = true];
     // The generation Plugin that produces the SDK.
-    GenerationPluginRef plugin_ref = 2 [(buf.validate.field).required = true];
+    buf.registry.plugin.v1.GenerationPluginRef plugin_ref = 2 [(buf.validate.field).required = true];
     // An optional SDK version string to validate.
     //
     // If set, it is validated against the resolved Module Commit and Plugin build, and the same

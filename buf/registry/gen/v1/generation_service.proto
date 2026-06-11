@@ -17,8 +17,8 @@ syntax = "proto3";
 package buf.registry.gen.v1;
 
 import "buf/registry/gen/v1/file.proto";
-import "buf/registry/gen/v1/plugin.proto";
 import "buf/registry/module/v1/resource.proto";
+import "buf/registry/plugin/v1/plugin.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/descriptor.proto";
 
@@ -44,7 +44,7 @@ message GenerateCodeRequest {
   // An individual generation request for a single Plugin.
   message PluginGeneration {
     // The Plugin to execute.
-    GenerationPluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+    buf.registry.plugin.v1.GenerationPluginRef plugin_ref = 1 [(buf.validate.field).required = true];
     // The options to pass to the Plugin.
     //
     // These are merged into a single, comma-separated parameter string when invoking the Plugin.
