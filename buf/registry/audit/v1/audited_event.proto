@@ -1,0 +1,85 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.audit.v1;
+
+import "buf/registry/audit/v1/action.proto";
+import "buf/registry/audit/v1/actor.proto";
+import "buf/registry/audit/v1/resource.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/audit/v1";
+
+// AuditedEvent is an immutable record of an action that occurred within the BSR.
+//
+// Every AuditedEvent answers four questions: when the action occurred (event_time), who
+// performed it (actor), what was done (action), and which resource was affected (resource).
+// Action-specific details are carried in the details field.
+message AuditedEvent {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the AuditedEvent.
+  //
+  // This is a UUID that also encodes event_time (a ULID stored in UUID form), so it is
+  // monotonic with respect to time and stable as a pagination cursor.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the action occurred.
+  google.protobuf.Timestamp event_time = 2 [(buf.validate.field).required = true];
+  // The principal that performed the action.
+  Actor actor = 3 [(buf.validate.field).required = true];
+  // The action that was performed.
+  //
+  // action is the primary, queryable description of what happened. The full vocabulary is
+  // discoverable by enumerating the Action enum.
+  Action action = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  // The resource the action was performed on.
+  Resource resource = 5 [(buf.validate.field).required = true];
+  // Metadata about the request that triggered the action.
+  RequestMetadata request_metadata = 6;
+  // Action-specific structured details.
+  //
+  // The shape of details is keyed by action; for example, ACTION_ORGANIZATION_MEMBER_ADDED
+  // carries the granted role and its source. details is intended for human and agent
+  // consumption and for forward compatibility, allowing new fields to be carried without a
+  // schema change.
+  google.protobuf.Struct details = 7;
+}
+
+// RequestMetadata captures context about the request that triggered an audited action.
+message RequestMetadata {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The User-Agent header of the request, if any.
+  string user_agent = 1 [(buf.validate.field).string.max_len = 1024];
+  // The id of the trace associated with the request, if any.
+  //
+  // This can be used to correlate the event with server-side telemetry.
+  string trace_id = 2 [(buf.validate.field).string.max_len = 255];
+  // The IP address of the request, if any.
+  //
+  // This may be empty if it was never recorded or has been redacted by the instance's
+  // data-retention policy.
+  string ip = 3 [(buf.validate.field).string.max_len = 64];
+}

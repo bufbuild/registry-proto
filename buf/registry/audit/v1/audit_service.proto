@@ -1,0 +1,126 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.audit.v1;
+
+import "buf/registry/audit/v1/action.proto";
+import "buf/registry/audit/v1/audited_event.proto";
+import "buf/registry/audit/v1/resource.proto";
+import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/audit/v1";
+
+// AuditService provides read-only access to the BSR audit log.
+//
+// The audit log is an immutable, append-only record of actions taken within the BSR.
+service AuditService {
+  // Get AuditedEvents by id.
+  rpc GetAuditedEvents(GetAuditedEventsRequest) returns (GetAuditedEventsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // List AuditedEvents, optionally filtered by time range, actor, resource, and/or action.
+  rpc ListAuditedEvents(ListAuditedEventsRequest) returns (ListAuditedEventsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message GetAuditedEventsRequest {
+  // The ids of the AuditedEvents to retrieve.
+  repeated string audited_event_ids = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).repeated.items.string.tuuid = true
+  ];
+}
+
+message GetAuditedEventsResponse {
+  // The retrieved AuditedEvents in the same order as requested.
+  repeated AuditedEvent audited_events = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message ListAuditedEventsRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by event_time newest to oldest.
+    ORDER_EVENT_TIME_DESC = 1;
+    // Order by event_time oldest to newest.
+    ORDER_EVENT_TIME_ASC = 2;
+  }
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // Only return events at or after this time, inclusive.
+  //
+  // If not set, there is no lower bound.
+  google.protobuf.Timestamp start_time = 3;
+  // Only return events before this time, exclusive.
+  //
+  // If not set, there is no upper bound.
+  google.protobuf.Timestamp end_time = 4;
+  // Filter to events performed by any of the given actors.
+  //
+  // If empty, events from all actors are returned.
+  repeated buf.registry.owner.v1.OwnerRef actor_refs = 5 [(buf.validate.field).repeated.max_items = 250];
+  // Filter to events whose affected resource matches any of the given filters.
+  //
+  // If empty, events for all resources are returned.
+  repeated AuditedEventResourceFilter resource_filters = 6 [(buf.validate.field).repeated.max_items = 250];
+  // Filter to events whose action matches any of the given actions.
+  //
+  // If empty, events for all actions are returned.
+  repeated Action actions = 7 [
+    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).repeated.items.enum.defined_only = true
+  ];
+  // The order to return the AuditedEvents.
+  //
+  // If not specified, defaults to ORDER_EVENT_TIME_DESC.
+  Order order = 8 [(buf.validate.field).enum.defined_only = true];
+}
+
+// AuditedEventResourceFilter selects AuditedEvents by their affected resource.
+message AuditedEventResourceFilter {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+  option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // Match the single resource with this id.
+    string resource_id = 1 [(buf.validate.field).string.tuuid = true];
+    // Match all resources owned by this User or Organization.
+    buf.registry.owner.v1.OwnerRef owner_ref = 2;
+    // Match all resources of this type.
+    ResourceType resource_type = 3 [(buf.validate.field).enum.defined_only = true];
+  }
+}
+
+message ListAuditedEventsResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed AuditedEvents.
+  repeated AuditedEvent audited_events = 2;
+}

@@ -1,0 +1,53 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.plugin.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1";
+
+// PluginRef references a Plugin by id or fully-qualified name.
+//
+// It is pure identity, carrying no Plugin-type or version information, so it addresses both check
+// and generation Plugins. This is the first v1 slice of the plugin package; the Plugin entity,
+// Labels, Commits, and services remain in buf.registry.plugin.v1beta1 until promoted.
+message PluginRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The fully-qualified name of a Plugin: owner plus Plugin name.
+  message Name {
+    // The Organization owner name.
+    string owner = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.max_len = 32
+    ];
+    // The Plugin name.
+    string plugin = 2 [(buf.validate.field).string = {
+      min_len: 2
+      max_len: 100
+    }];
+  }
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Plugin.
+    string id = 1 [(buf.validate.field).string.tuuid = true];
+    // The fully-qualified name of the Plugin.
+    Name name = 2;
+  }
+}
