@@ -49,8 +49,7 @@ service TokenService {
   }
   // Update existing Tokens.
   //
-  // Updating a Token does not change its secret value. To rotate a Token's credential, delete it
-  // and create a new one.
+  // Updating a Token does not change its secret value.
   //
   // This operation is atomic. Either all Tokens are updated or an error is returned.
   rpc UpdateTokens(UpdateTokensRequest) returns (UpdateTokensResponse) {

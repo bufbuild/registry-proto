@@ -31,10 +31,10 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // restricted to a subset of the User's permissions via ScopedPermissions.
 //
 // A Token's name and ScopedPermissions may be updated after creation. All other properties are
-// immutable: to change them, delete the Token and create a new one.
+// immutable.
 //
 // The secret value of a Token is returned only when the Token is created, via CreateTokensResponse.
-// It cannot be retrieved afterwards, and never changes for the lifetime of the Token.
+// It cannot be retrieved afterwards.
 message Token {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
