@@ -26,15 +26,15 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/audit/v1";
 
-// AuditedEvent is an immutable record of an action that occurred within the BSR.
+// Event is an immutable record of an action that occurred within the BSR.
 //
-// Every AuditedEvent answers four questions: when the action occurred (event_time), who
-// performed it (actor), what was done (action), and which resource was affected (resource).
-// Action-specific details are carried in the details field.
-message AuditedEvent {
+// Every Event answers four questions: when the action occurred (event_time), who performed it
+// (actor), what was done (action), and which resource was affected (resource). Action-specific
+// details are carried in the details field.
+message Event {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The id of the AuditedEvent.
+  // The id of the Event.
   //
   // This is a UUID that also encodes event_time (a ULID stored in UUID form), so it is
   // monotonic with respect to time and stable as a pagination cursor.

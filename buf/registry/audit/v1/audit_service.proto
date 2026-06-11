@@ -17,10 +17,9 @@ syntax = "proto3";
 package buf.registry.audit.v1;
 
 import "buf/registry/audit/v1/action.proto";
-import "buf/registry/audit/v1/audited_event.proto";
+import "buf/registry/audit/v1/event.proto";
 import "buf/registry/audit/v1/resource.proto";
 import "buf/registry/owner/v1/owner.proto";
-import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -30,31 +29,31 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 //
 // The audit log is an immutable, append-only record of actions taken within the BSR.
 service AuditService {
-  // Get AuditedEvents by id.
-  rpc GetAuditedEvents(GetAuditedEventsRequest) returns (GetAuditedEventsResponse) {
+  // Get Events by id.
+  rpc GetEvents(GetEventsRequest) returns (GetEventsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // List AuditedEvents, optionally filtered by time range, actor, resource, and/or action.
-  rpc ListAuditedEvents(ListAuditedEventsRequest) returns (ListAuditedEventsResponse) {
+  // List Events, optionally filtered by time range, actor, resource, and/or action.
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
-message GetAuditedEventsRequest {
-  // The ids of the AuditedEvents to retrieve.
-  repeated string audited_event_ids = 1 [
+message GetEventsRequest {
+  // The ids of the Events to retrieve.
+  repeated string event_ids = 1 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 250,
     (buf.validate.field).repeated.items.string.tuuid = true
   ];
 }
 
-message GetAuditedEventsResponse {
-  // The retrieved AuditedEvents in the same order as requested.
-  repeated AuditedEvent audited_events = 1 [(buf.validate.field).repeated.min_items = 1];
+message GetEventsResponse {
+  // The retrieved Events in the same order as requested.
+  repeated Event events = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message ListAuditedEventsRequest {
+message ListEventsRequest {
   // The list order.
   enum Order {
     ORDER_UNSPECIFIED = 0;
@@ -83,44 +82,42 @@ message ListAuditedEventsRequest {
   //
   // If empty, events from all actors are returned.
   repeated buf.registry.owner.v1.OwnerRef actor_refs = 5 [(buf.validate.field).repeated.max_items = 250];
-  // Filter to events whose affected resource matches any of the given filters.
+  // Filter to events affecting any of the resources with these ids.
   //
-  // If empty, events for all resources are returned.
-  repeated AuditedEventResourceFilter resource_filters = 6 [(buf.validate.field).repeated.max_items = 250];
-  // Filter to events whose action matches any of the given actions.
+  // If empty, events for resources with any id are returned.
+  repeated string resource_ids = 6 [
+    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).repeated.items.string.tuuid = true
+  ];
+  // Filter to events affecting resources owned by any of these Users or Organizations.
   //
-  // If empty, events for all actions are returned.
-  repeated Action actions = 7 [
+  // If empty, events for resources with any owner are returned.
+  repeated buf.registry.owner.v1.OwnerRef resource_owner_refs = 7 [(buf.validate.field).repeated.max_items = 250];
+  // Filter to events affecting resources of any of these types.
+  //
+  // If empty, events for resources of any type are returned.
+  repeated ResourceType resource_types = 8 [
     (buf.validate.field).repeated.max_items = 250,
     (buf.validate.field).repeated.items.enum.defined_only = true
   ];
-  // The order to return the AuditedEvents.
+  // Filter to events whose action matches any of the given actions.
+  //
+  // If empty, events for all actions are returned.
+  repeated Action actions = 9 [
+    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).repeated.items.enum.defined_only = true
+  ];
+  // The order to return the Events.
   //
   // If not specified, defaults to ORDER_EVENT_TIME_DESC.
-  Order order = 8 [(buf.validate.field).enum.defined_only = true];
+  Order order = 10 [(buf.validate.field).enum.defined_only = true];
 }
 
-// AuditedEventResourceFilter selects AuditedEvents by their affected resource.
-message AuditedEventResourceFilter {
-  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
-  option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
-
-  oneof value {
-    option (buf.validate.oneof).required = true;
-    // Match the single resource with this id.
-    string resource_id = 1 [(buf.validate.field).string.tuuid = true];
-    // Match all resources owned by this User or Organization.
-    buf.registry.owner.v1.OwnerRef owner_ref = 2;
-    // Match all resources of this type.
-    ResourceType resource_type = 3 [(buf.validate.field).enum.defined_only = true];
-  }
-}
-
-message ListAuditedEventsResponse {
+message ListEventsResponse {
   // The next page token.
   //
   // If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
-  // The listed AuditedEvents.
-  repeated AuditedEvent audited_events = 2;
+  // The listed Events.
+  repeated Event events = 2;
 }
