@@ -1,0 +1,106 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.schema.v1;
+
+import "buf/registry/schema/v1/format.proto";
+import "buf/registry/schema/v1/schema_source.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/schema/v1";
+
+// Operate on schema-derived representations of Protobuf types.
+//
+// These operations are distinct from retrieving raw descriptors: to get the
+// compiled FileDescriptorSet for a Module, use
+// buf.registry.module.v1.FileDescriptorSetService.
+service SchemaService {
+  // Convert a serialized message between formats using a schema.
+  rpc Convert(ConvertRequest) returns (ConvertResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get an approximate JSON Schema for a message type within a schema.
+  rpc GetJSONSchema(GetJSONSchemaRequest) returns (GetJSONSchemaResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message ConvertRequest {
+  // The schema that resolves type_name.
+  SchemaSource schema_source = 1 [(buf.validate.field).required = true];
+  // The fully-qualified name of the message type to convert, e.g. "acme.weather.v1.Units".
+  //
+  // Must resolve to a message within the schema or its dependencies.
+  string type_name = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "fqn_no_period_prefix"
+      message: "fully-qualified names should not start with a '.'"
+      expression: "!this.startsWith('.')"
+    }
+  ];
+  // The serialized message, encoded as input_format.
+  //
+  // May be empty, representing an empty message.
+  bytes payload = 3;
+  // The format that payload is encoded in.
+  Format input_format = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The desired format of the converted message.
+  Format output_format = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // If true, fields in payload that cannot be resolved against the schema are
+  // discarded. If false (the default), an unresolvable field causes the
+  // conversion to fail.
+  bool discard_unknown = 6;
+}
+
+message ConvertResponse {
+  // The converted message, encoded as the requested output_format.
+  bytes payload = 1;
+}
+
+message GetJSONSchemaRequest {
+  // The schema that resolves type_name.
+  SchemaSource schema_source = 1 [(buf.validate.field).required = true];
+  // The fully-qualified name of the message type, e.g. "acme.weather.v1.Units".
+  //
+  // Must resolve to a message within the schema or its dependencies. Only
+  // message types are supported.
+  string type_name = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "fqn_no_period_prefix"
+      message: "fully-qualified names should not start with a '.'"
+      expression: "!this.startsWith('.')"
+    }
+  ];
+}
+
+message GetJSONSchemaResponse {
+  // An approximate JSON Schema for the JSON encoding of type_name.
+  //
+  // This is a JSON document (UTF-8 text), suitable for writing to a file or
+  // handing to JSON Schema tooling. It is intended for editor validation and
+  // autocompletion, not a lossless representation of the type's descriptor.
+  string json_schema = 1 [(buf.validate.field).required = true];
+}
