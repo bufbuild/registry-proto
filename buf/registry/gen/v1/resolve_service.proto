@@ -48,13 +48,10 @@ message ResolveSDKVersionsRequest {
     // See the documentation on ResourceRef for resource resolution details.
     buf.registry.module.v1.ResourceRef module_ref = 1 [(buf.validate.field).required = true];
     // The generation Plugin that produces the SDK.
-    buf.registry.plugin.v1.GenerationPluginRef plugin_ref = 2 [(buf.validate.field).required = true];
-    // The package registry to resolve the version for.
     //
-    // A generation Plugin produces SDKs for exactly one registry. If set, this must match the
-    // resolved Plugin's registry, and is used to validate the request. If unset, the resolved
-    // Plugin's registry is used.
-    buf.registry.plugin.v1.PackageRegistry registry = 3 [(buf.validate.field).enum.defined_only = true];
+    // The resolved Plugin's PackageRegistry determines the registry the SDK version is
+    // resolved for, and the format of the returned version string.
+    buf.registry.plugin.v1.GenerationPluginRef plugin_ref = 2 [(buf.validate.field).required = true];
   }
   // The SDK versions to resolve.
   repeated Value values = 1 [
@@ -83,19 +80,26 @@ message GetSDKInfosRequest {
     // See the documentation on ResourceRef for resource resolution details.
     buf.registry.module.v1.ResourceRef module_ref = 1 [(buf.validate.field).required = true];
     // The generation Plugin that produces the SDK.
+    //
+    // The resolved Plugin's PackageRegistry determines the registry the install metadata is
+    // resolved for.
     buf.registry.plugin.v1.GenerationPluginRef plugin_ref = 2 [(buf.validate.field).required = true];
-    // The package registry to resolve install metadata for.
+    // An optional SDK version string, used to resolve and validate the SDK.
     //
-    // A generation Plugin produces SDKs for exactly one registry. If set, this must match the
-    // resolved Plugin's registry, and is used to validate the request. If unset, the resolved
-    // Plugin's registry is used.
-    buf.registry.plugin.v1.PackageRegistry registry = 3 [(buf.validate.field).enum.defined_only = true];
-    // An optional SDK version string to validate.
+    // An SDK version string encodes both a Module Commit and a Plugin build. If set, it is
+    // used as follows:
+    //   - If module_ref references a Module without a Label or Commit, the Commit encoded in
+    //     version is resolved. Otherwise, the Commit resolved from module_ref is validated
+    //     against version.
+    //   - If plugin_ref does not specify a version, the Plugin build encoded in version is
+    //     resolved. Otherwise, the Plugin build resolved from plugin_ref is validated against
+    //     version.
     //
-    // If set, it is validated against the resolved Module Commit and Plugin build, and the same
-    // string is returned on the resulting SDKInfo. If unset, the version is resolved from the
-    // module_ref and plugin_ref.
-    string version = 4 [
+    // This allows a caller holding only an SDK version string - for example, from a lock file
+    // - to resolve it back to the exact Module Commit and Plugin build it was generated from.
+    //
+    // If unset, the version is resolved from module_ref and plugin_ref alone.
+    string version = 3 [
       (buf.validate.field).string.max_len = 250,
       (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
     ];

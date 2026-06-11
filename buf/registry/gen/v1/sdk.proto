@@ -41,7 +41,7 @@ message SDKInfo {
       (buf.validate.field).required = true,
       (buf.validate.field).string.tuuid = true
     ];
-    // The name of the Organization that owns the Module.
+    // The name of the User or Organization that owns the Module.
     //
     // This is the name as resolved at the time of the request; it can change if the owner is
     // renamed. The id is the durable identifier.

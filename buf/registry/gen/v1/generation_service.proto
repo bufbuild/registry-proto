@@ -109,7 +109,7 @@ message GenerateCodeRequest {
   // Each Plugin produces a corresponding entry in the response, in the same order.
   repeated PluginGeneration plugins = 3 [
     (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250
+    (buf.validate.field).repeated.max_items = 20
   ];
   // Whether to generate code for imports from the input.
   //

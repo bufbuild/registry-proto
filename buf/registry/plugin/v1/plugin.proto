@@ -78,9 +78,12 @@ message GenerationPluginRef {
   // The Plugin.
   PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
   // The semver version to use, for example "v1.2.0". If unset, the latest version is used.
+  //
+  // The version must begin with "v" and must not contain a build metadata component.
   optional string version = 2 [(buf.validate.field).string = {
     min_len: 1
     max_len: 250
+    pattern: "^v[0-9]+(\\.[0-9]+){0,2}(-[0-9A-Za-z.-]+)?$"
   }];
   // The build revision, starting at 1. If unset, the latest revision is used. Requires a version.
   optional uint32 revision = 3 [(buf.validate.field).uint32.gte = 1];
@@ -131,9 +134,9 @@ enum PackageRegistry {
   // A Python package index.
   PACKAGE_REGISTRY_PYTHON = 5;
   // The Cargo registry (crates).
-  PACKAGE_REGISTRY_CARGO = 6;
+  PACKAGE_REGISTRY_CARGO = 7;
   // A NuGet feed.
-  PACKAGE_REGISTRY_NUGET = 7;
+  PACKAGE_REGISTRY_NUGET = 8;
   // A CMake registry.
-  PACKAGE_REGISTRY_CMAKE = 8;
+  PACKAGE_REGISTRY_CMAKE = 9;
 }
