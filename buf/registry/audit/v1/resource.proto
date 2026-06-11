@@ -57,27 +57,53 @@ message Resource {
 // ResourceType is the type of resource affected by an audited action.
 enum ResourceType {
   RESOURCE_TYPE_UNSPECIFIED = 0;
+  // A User.
   RESOURCE_TYPE_USER = 1;
+  // An Organization.
   RESOURCE_TYPE_ORGANIZATION = 2;
+  // A member of an Organization.
   RESOURCE_TYPE_ORGANIZATION_MEMBER = 3;
+  // An identity-provider group mapping of an Organization.
   RESOURCE_TYPE_ORGANIZATION_IDP_GROUP = 9;
+  // A Module.
   RESOURCE_TYPE_MODULE = 4;
+  // A Contributor of a Module.
   RESOURCE_TYPE_MODULE_CONTRIBUTOR = 5;
+  // A Commit of a Module.
   RESOURCE_TYPE_MODULE_COMMIT = 6;
+  // An identity-provider group mapping of a Module.
   RESOURCE_TYPE_MODULE_IDP_GROUP = 18;
+  // A Policy.
   RESOURCE_TYPE_POLICY = 17;
+  // A Commit of a Policy.
   RESOURCE_TYPE_POLICY_COMMIT = 19;
+  // A Label of a Policy.
   RESOURCE_TYPE_POLICY_LABEL = 20;
+  // A Policy enforcement.
   RESOURCE_TYPE_POLICY_ENFORCEMENT = 22;
+  // A Plugin.
   RESOURCE_TYPE_PLUGIN = 7;
+  // A Commit of a Plugin.
   RESOURCE_TYPE_PLUGIN_COMMIT = 15;
+  // A curated Plugin.
+  //
+  // Curated Plugins are a legacy concept that no longer exists. Only present on
+  // historical Events.
   RESOURCE_TYPE_CURATED_PLUGIN = 8;
+  // A Token.
   RESOURCE_TYPE_TOKEN = 10;
+  // A SCIM token.
   RESOURCE_TYPE_SCIM_TOKEN = 11;
+  // A Label of a Module.
   RESOURCE_TYPE_MODULE_LABEL = 12;
+  // The BSR instance itself, for instance-wide settings changes.
   RESOURCE_TYPE_SERVER = 13;
+  // A device authorization grant.
   RESOURCE_TYPE_DEVICE_AUTHORIZATION_GRANT = 14;
+  // A Label of a Plugin.
   RESOURCE_TYPE_PLUGIN_LABEL = 16;
+  // An SDK Plugin version constraint.
   RESOURCE_TYPE_SDK_PLUGIN_CONSTRAINT = 21;
+  // An authorization request.
   RESOURCE_TYPE_AUTHORIZATION_REQUEST = 23;
 }

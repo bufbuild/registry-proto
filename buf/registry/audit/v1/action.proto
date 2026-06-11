@@ -21,89 +21,192 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // Action is the set of actions that the BSR records in its audit log.
 enum Action {
   ACTION_UNSPECIFIED = 0;
+  // An Organization was created.
   ACTION_ORGANIZATION_CREATED = 1;
+  // An Organization was deleted.
   ACTION_ORGANIZATION_DELETED = 2;
+  // A User was added as a member of an Organization.
   ACTION_ORGANIZATION_MEMBER_ADDED = 3;
+  // The role of a member of an Organization was changed.
+  //
+  // Superseded by ACTION_ORGANIZATION_MEMBER_ROLES_CHANGED. Only present on historical
+  // Events.
   ACTION_ORGANIZATION_MEMBER_ROLE_CHANGED = 4 [deprecated = true];
+  // The roles of a member of an Organization were changed.
   ACTION_ORGANIZATION_MEMBER_ROLES_CHANGED = 50;
+  // A User was removed as a member of an Organization.
   ACTION_ORGANIZATION_MEMBER_REMOVED = 5;
+  // An identity-provider group mapping was added to an Organization.
   ACTION_ORGANIZATION_IDP_GROUP_ADDED = 21;
+  // An identity-provider group mapping of an Organization was updated.
   ACTION_ORGANIZATION_IDP_GROUP_UPDATED = 59;
+  // An identity-provider group mapping was removed from an Organization.
   ACTION_ORGANIZATION_IDP_GROUP_REMOVED = 22;
+  // The resource visibility control setting of an Organization was changed.
   ACTION_ORGANIZATION_RESOURCE_VISIBILITY_CONTROL_CHANGED = 81;
+  // The uniqueness policy of an Organization was enabled.
   ACTION_ORGANIZATION_UNIQUENESS_POLICY_ENABLED = 82;
+  // The uniqueness policy of an Organization was disabled.
   ACTION_ORGANIZATION_UNIQUENESS_POLICY_DISABLED = 83;
+  // A Module was created.
   ACTION_MODULE_CREATED = 6;
+  // A Module was deprecated.
   ACTION_MODULE_DEPRECATED = 48;
+  // A Module was undeprecated.
   ACTION_MODULE_UNDEPRECATED = 49;
+  // A Module was deleted.
   ACTION_MODULE_DELETED = 7;
+  // A Commit was pushed to a Module.
   ACTION_MODULE_COMMIT_PUSHED = 8;
+  // A User was added as a Contributor of a Module.
   ACTION_MODULE_CONTRIBUTOR_ADDED = 9;
+  // The role of a Contributor of a Module was changed.
   ACTION_MODULE_CONTRIBUTOR_ROLE_CHANGED = 10;
+  // The roles of a Contributor of a Module were changed.
   ACTION_MODULE_CONTRIBUTOR_ROLES_CHANGED = 63;
+  // A User was removed as a Contributor of a Module.
   ACTION_MODULE_CONTRIBUTOR_REMOVED = 11;
+  // The visibility of a Module was changed.
   ACTION_MODULE_VISIBILITY_CHANGED = 12;
+  // The default Label name of a Module was changed.
   ACTION_MODULE_DEFAULT_LABEL_NAME_CHANGED = 40;
+  // An identity-provider group mapping was added to a Module.
   ACTION_MODULE_IDP_GROUP_ADDED = 60;
+  // An identity-provider group mapping of a Module was updated.
   ACTION_MODULE_IDP_GROUP_UPDATED = 61;
+  // An identity-provider group mapping was removed from a Module.
   ACTION_MODULE_IDP_GROUP_REMOVED = 62;
+  // A Policy was created.
   ACTION_POLICY_CREATED = 54;
+  // A Policy was deleted.
   ACTION_POLICY_DELETED = 55;
+  // A Policy was deprecated.
   ACTION_POLICY_DEPRECATED = 56;
+  // A Policy was undeprecated.
   ACTION_POLICY_UNDEPRECATED = 57;
+  // The visibility of a Policy was changed.
   ACTION_POLICY_VISIBILITY_CHANGED = 58;
+  // A Commit was pushed to a Policy.
   ACTION_POLICY_COMMIT_PUSHED = 64;
+  // A Label was created on a Policy.
   ACTION_POLICY_LABEL_CREATED = 65;
+  // A Label of a Policy was moved to a different Commit.
   ACTION_POLICY_LABEL_MOVED = 66;
+  // A Label of a Policy was archived.
   ACTION_POLICY_LABEL_ARCHIVED = 67;
+  // A Label of a Policy was unarchived.
   ACTION_POLICY_LABEL_UNARCHIVED = 68;
+  // A Plugin was created.
   ACTION_PLUGIN_CREATED = 13;
+  // A Plugin was deleted.
   ACTION_PLUGIN_DELETED = 14;
+  // A Plugin was deprecated.
   ACTION_PLUGIN_DEPRECATED = 51;
+  // A Plugin was undeprecated.
   ACTION_PLUGIN_UNDEPRECATED = 52;
+  // The visibility of a Plugin was changed.
   ACTION_PLUGIN_VISIBILITY_CHANGED = 53;
+  // A Commit was pushed to a Plugin.
   ACTION_PLUGIN_COMMIT_PUSHED = 43;
+  // A curated Plugin was created.
+  //
+  // Curated Plugins are a legacy concept that no longer exists. Only present on
+  // historical Events.
   ACTION_CURATED_PLUGIN_CREATED = 20;
+  // A curated Plugin was deleted.
+  //
+  // Curated Plugins are a legacy concept that no longer exists. Only present on
+  // historical Events.
   ACTION_CURATED_PLUGIN_DELETED = 31;
+  // The status of a curated Plugin was updated.
+  //
+  // Curated Plugins are a legacy concept that no longer exists. Only present on
+  // historical Events.
   ACTION_CURATED_PLUGIN_STATUS_UPDATED = 78;
+  // A User was created.
   ACTION_USER_CREATED = 15;
+  // A User was deleted.
   ACTION_USER_DELETED = 16;
+  // A User was deactivated.
   ACTION_USER_DEACTIVATED = 17;
+  // A User logged in.
   ACTION_USER_LOGGED_IN = 18;
+  // A User logged out.
   ACTION_USER_LOGGED_OUT = 19;
+  // A Token was created.
   ACTION_TOKEN_CREATED = 23;
+  // A Token was deleted.
   ACTION_TOKEN_DELETED = 24;
+  // A User was reactivated.
   ACTION_USER_REACTIVATED = 25;
+  // A SCIM token was created.
   ACTION_SCIM_TOKEN_CREATED = 26;
+  // A SCIM token was deleted.
   ACTION_SCIM_TOKEN_DELETED = 27;
+  // A Commit of a Module was deleted.
+  //
+  // Commits are now immutable, so this action can no longer occur. Only present on
+  // historical Events.
   ACTION_MODULE_COMMIT_DELETED = 28 [deprecated = true];
+  // A Label was created on a Module.
   ACTION_MODULE_LABEL_CREATED = 29;
+  // A Label of a Module was moved to a different Commit.
   ACTION_MODULE_LABEL_MOVED = 30;
+  // A Label of a Module was archived.
   ACTION_MODULE_LABEL_ARCHIVED = 38;
+  // A Label of a Module was unarchived.
   ACTION_MODULE_LABEL_UNARCHIVED = 39;
+  // The Policy enforcement ignores of a Label of a Module were changed.
   ACTION_MODULE_LABEL_ENFORCEMENT_IGNORES_CHANGED = 79;
+  // The instance-wide breaking change policy was enabled.
   ACTION_SERVER_BREAKING_CHANGE_POLICY_ENABLED = 32;
+  // The instance-wide breaking change policy was disabled.
   ACTION_SERVER_BREAKING_CHANGE_POLICY_DISABLED = 33;
+  // The default branch of a Module was changed.
+  //
+  // Superseded by ACTION_MODULE_DEFAULT_LABEL_NAME_CHANGED. Only present on historical
+  // Events.
   ACTION_MODULE_DEFAULT_BRANCH_CHANGED = 34 [deprecated = true];
+  // The instance-wide uniqueness policy was enabled.
   ACTION_SERVER_UNIQUENESS_POLICY_ENABLED = 35;
+  // The instance-wide uniqueness policy was disabled.
   ACTION_SERVER_UNIQUENESS_POLICY_DISABLED = 36;
+  // The instance-wide resource visibility control setting was changed.
   ACTION_SERVER_RESOURCE_VISIBILITY_CONTROL_CHANGED = 80;
+  // A User was automatically merged with an account from a new identity provider.
   ACTION_USER_AUTO_MERGED_FROM_NEW_IDP = 37;
+  // A device authorization grant was approved.
   ACTION_DEVICE_AUTHORIZATION_GRANT_APPROVED = 41;
+  // A device authorization grant was denied.
   ACTION_DEVICE_AUTHORIZATION_GRANT_DENIED = 42;
+  // A Label was created on a Plugin.
   ACTION_PLUGIN_LABEL_CREATED = 44;
+  // A Label of a Plugin was moved to a different Commit.
   ACTION_PLUGIN_LABEL_MOVED = 45;
+  // A Label of a Plugin was archived.
   ACTION_PLUGIN_LABEL_ARCHIVED = 46;
+  // A Label of a Plugin was unarchived.
   ACTION_PLUGIN_LABEL_UNARCHIVED = 47;
+  // The instance-wide review flow was enabled.
   ACTION_SERVER_REVIEW_FLOW_ENABLED = 69;
+  // The instance-wide review flow was disabled.
   ACTION_SERVER_REVIEW_FLOW_DISABLED = 70;
+  // An SDK Plugin version constraint was created.
   ACTION_SDK_PLUGIN_CONSTRAINT_CREATED = 71;
+  // An SDK Plugin version constraint was updated.
   ACTION_SDK_PLUGIN_CONSTRAINT_UPDATED = 72;
+  // An SDK Plugin version constraint was deleted.
   ACTION_SDK_PLUGIN_CONSTRAINT_DELETED = 73;
+  // A Policy enforcement was created.
   ACTION_POLICY_ENFORCEMENT_CREATED = 74;
+  // A Policy enforcement was deleted.
   ACTION_POLICY_ENFORCEMENT_DELETED = 75;
+  // The Policy of a Policy enforcement was changed.
   ACTION_POLICY_ENFORCEMENT_POLICY_CHANGED = 76;
+  // The targets of a Policy enforcement were changed.
   ACTION_POLICY_ENFORCEMENT_TARGETS_CHANGED = 77;
+  // An authorization request was approved.
   ACTION_AUTHORIZATION_REQUEST_APPROVED = 84;
+  // An authorization request was denied.
   ACTION_AUTHORIZATION_REQUEST_DENIED = 85;
 }
