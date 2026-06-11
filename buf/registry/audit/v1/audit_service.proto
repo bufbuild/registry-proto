@@ -31,6 +31,9 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // The audit log is an immutable, append-only record of actions taken within the BSR.
 service AuditService {
   // Get Events by id.
+  //
+  // If any of the requested Events are not found, an error is returned rather than a
+  // partial response.
   rpc GetEvents(GetEventsRequest) returns (GetEventsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }

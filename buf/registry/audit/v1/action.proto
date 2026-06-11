@@ -108,21 +108,16 @@ enum Action {
   ACTION_PLUGIN_VISIBILITY_CHANGED = 53;
   // A Commit was pushed to a Plugin.
   ACTION_PLUGIN_COMMIT_PUSHED = 43;
-  // A curated Plugin was created.
+  // A version of a generation Plugin was published.
   //
-  // Curated Plugins are a legacy concept that no longer exists. Only present on
-  // historical Events.
-  ACTION_CURATED_PLUGIN_CREATED = 20;
-  // A curated Plugin was deleted.
-  //
-  // Curated Plugins are a legacy concept that no longer exists. Only present on
-  // historical Events.
-  ACTION_CURATED_PLUGIN_DELETED = 31;
-  // The status of a curated Plugin was updated.
-  //
-  // Curated Plugins are a legacy concept that no longer exists. Only present on
-  // historical Events.
-  ACTION_CURATED_PLUGIN_STATUS_UPDATED = 78;
+  // Generation Plugin versions are addressed by semver version and revision rather than by
+  // Commit; this Action is recorded per published build, while ACTION_PLUGIN_CREATED is
+  // recorded once for the Plugin itself.
+  ACTION_GENERATION_PLUGIN_VERSION_CREATED = 20;
+  // A version of a generation Plugin was deleted.
+  ACTION_GENERATION_PLUGIN_VERSION_DELETED = 31;
+  // The status of a generation Plugin version was updated.
+  ACTION_GENERATION_PLUGIN_VERSION_STATUS_UPDATED = 78;
   // A User was created.
   ACTION_USER_CREATED = 15;
   // A User was deleted.

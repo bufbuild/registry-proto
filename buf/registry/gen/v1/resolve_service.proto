@@ -51,6 +51,11 @@ message ResolveSDKVersionsRequest {
     //
     // The resolved Plugin's PackageRegistry determines the registry the SDK version is
     // resolved for, and the format of the returned version string.
+    //
+    // If plugin_ref does not specify a version, the latest version is resolved, excluding any
+    // versions blocked by an SDK Plugin constraint configured for the Module. An explicitly
+    // specified version is resolved even if a constraint blocks it: constraints guide
+    // selection, they do not gate access.
     buf.registry.plugin.v1.GenerationPluginRef plugin_ref = 2 [(buf.validate.field).required = true];
   }
   // The SDK versions to resolve.
@@ -83,6 +88,11 @@ message GetSDKInfosRequest {
     //
     // The resolved Plugin's PackageRegistry determines the registry the install metadata is
     // resolved for.
+    //
+    // If plugin_ref does not specify a version (and the version field below is unset), the
+    // latest version is resolved, excluding any versions blocked by an SDK Plugin constraint
+    // configured for the Module. An explicitly specified version is resolved even if a
+    // constraint blocks it: constraints guide selection, they do not gate access.
     buf.registry.plugin.v1.GenerationPluginRef plugin_ref = 2 [(buf.validate.field).required = true];
     // An optional SDK version string, used to resolve and validate the SDK.
     //

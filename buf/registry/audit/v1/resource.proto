@@ -85,11 +85,11 @@ enum ResourceType {
   RESOURCE_TYPE_PLUGIN = 7;
   // A Commit of a Plugin.
   RESOURCE_TYPE_PLUGIN_COMMIT = 15;
-  // A curated Plugin.
+  // A version of a generation Plugin.
   //
-  // Curated Plugins are a legacy concept that no longer exists. Only present on
-  // historical Events.
-  RESOURCE_TYPE_CURATED_PLUGIN = 8;
+  // Generation Plugin versions are addressed by semver version and revision rather than by
+  // Commit.
+  RESOURCE_TYPE_GENERATION_PLUGIN_VERSION = 8;
   // A Token.
   RESOURCE_TYPE_TOKEN = 10;
   // A SCIM token.

@@ -36,9 +36,12 @@ service GenerationService {
   // This operation is atomic. Either code is generated for all Plugins or an error is returned;
   // a failure of any single Plugin fails the entire request.
   //
-  // The returned files are final and standalone. The BSR is the generation driver: it runs each
-  // Plugin and resolves any insertion points server-side, so a client can write the returned files
-  // to disk as-is, with no protoc-style post-processing required.
+  // Each Plugin runs independently against the same input schema: Plugins cannot observe or
+  // modify each other's output, and the order of plugins carries no meaning beyond matching
+  // outputs to requests. protoc insertion points are not supported; a Plugin that emits a file
+  // naming an insertion point fails the request. The returned files are therefore final and
+  // standalone, and a client can write them to disk as-is, with no protoc-style post-processing
+  // required.
   rpc GenerateCode(GenerateCodeRequest) returns (GenerateCodeResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
