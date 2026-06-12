@@ -135,17 +135,6 @@ message CreateWebhooksRequest {
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 1024
     ];
-    // The secret used to sign deliveries to the Webhook.
-    //
-    // The secret is write-only and is never returned. If empty, deliveries are not
-    // signed.
-    string secret = 4 [
-      (buf.validate.field).string.min_len = 16,
-      (buf.validate.field).string.max_len = 256,
-      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
-    ];
-    // The configurable description of the Webhook.
-    string description = 5 [(buf.validate.field).string.max_len = 350];
   }
   // The Webhooks to create.
   repeated Value values = 1 [
@@ -184,29 +173,6 @@ message UpdateWebhooksRequest {
     optional string url = 3 [
       (buf.validate.field).string.uri = true,
       (buf.validate.field).string.max_len = 1024
-    ];
-    // The secret used to sign deliveries to the Webhook.
-    //
-    // The secret is write-only and is never returned. If set to a non-empty value, the
-    // secret is replaced. If set to an empty value, the secret is removed and deliveries
-    // are no longer signed. If not set, the secret is not modified.
-    optional string secret = 4 [
-      (buf.validate.field).cel = {
-        id: "secret_empty_or_valid_length"
-        message: "secret must be empty or between 16 and 256 characters"
-        expression: "this == '' || (this.size() >= 16 && this.size() <= 256)"
-      },
-      (buf.validate.field).string.max_len = 256
-    ];
-    // The configurable description of the Webhook.
-    optional string description = 5 [(buf.validate.field).string.max_len = 350];
-    // The state of the Webhook.
-    //
-    // Set to STATE_DISABLED to pause deliveries without deleting the Webhook, and to
-    // STATE_ENABLED to resume them.
-    optional Webhook.State state = 6 [
-      (buf.validate.field).enum.defined_only = true,
-      (buf.validate.field).enum.not_in = 0
     ];
   }
   // The Webhooks to update.
