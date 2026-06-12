@@ -118,7 +118,7 @@ message OrganizationSettings {
 // A base role that members of an Organization receive on the resources the Organization owns.
 //
 // Base roles apply to members with the member role. Members with the admin or owner role receive
-// at least admin access to owned resources, and machine accounts always receive write access,
+// at least admin access to owned resources, and bot users always receive write access,
 // regardless of base roles.
 //
 // An owner base role is intentionally not representable: it would allow Organization admins to

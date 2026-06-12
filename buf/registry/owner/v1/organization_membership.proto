@@ -95,11 +95,11 @@ enum OrganizationRole {
   // Members receive the Organization's base resource roles on the resources the Organization
   // owns, as configured in OrganizationSettings.
   ORGANIZATION_ROLE_MEMBER = 3;
-  // The User is a machine account used for automation.
+  // The User is a bot user used for automation.
   //
-  // Machine accounts always receive write access to the resources the Organization owns,
+  // Bot users always receive write access to the resources the Organization owns,
   // regardless of the Organization's base resource roles.
-  ORGANIZATION_ROLE_MACHINE = 4;
+  ORGANIZATION_ROLE_BOT = 4;
 }
 
 // The source of a role assignment within an OrganizationMembership.
