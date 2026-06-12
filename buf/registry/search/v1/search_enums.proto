@@ -1,0 +1,96 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.search.v1;
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/search/v1";
+
+enum BaseRepositoryRole {
+  BASE_REPOSITORY_ROLE_UNSPECIFIED = 0;
+  BASE_REPOSITORY_ROLE_OWNER = 1;
+  BASE_REPOSITORY_ROLE_ADMIN = 2;
+  BASE_REPOSITORY_ROLE_WRITE = 3;
+  BASE_REPOSITORY_ROLE_READ = 4;
+  BASE_REPOSITORY_ROLE_LIMITED_WRITE = 5;
+  BASE_REPOSITORY_ROLE_NONE = 6;
+}
+
+enum UserState {
+  USER_STATE_UNSPECIFIED = 0;
+  USER_STATE_ACTIVE = 1;
+  USER_STATE_DEACTIVATED = 2;
+}
+
+enum UserType {
+  USER_TYPE_UNSPECIFIED = 0;
+  USER_TYPE_PERSONAL = 1;
+  USER_TYPE_MACHINE = 2;
+  USER_TYPE_SYSTEM = 3;
+}
+
+enum VerificationStatus {
+  VERIFICATION_STATUS_UNSPECIFIED = 0;
+  VERIFICATION_STATUS_OFFICIAL = 1;
+  VERIFICATION_STATUS_VERIFIED_PUBLISHER = 2;
+}
+
+enum Visibility {
+  VISIBILITY_UNSPECIFIED = 0;
+  VISIBILITY_PUBLIC = 1;
+  VISIBILITY_PRIVATE = 2;
+}
+
+enum ElementType {
+  ELEMENT_TYPE_UNSPECIFIED = 0;
+  ELEMENT_TYPE_NONE = 1;
+  ELEMENT_TYPE_SERVICE = 2;
+  ELEMENT_TYPE_METHOD = 3;
+  ELEMENT_TYPE_MESSAGE = 4;
+  ELEMENT_TYPE_EXTENSION = 5;
+  ELEMENT_TYPE_FIELD = 6;
+  ELEMENT_TYPE_ONEOF = 7;
+  ELEMENT_TYPE_ENUM = 8;
+  ELEMENT_TYPE_ENUM_VALUE = 9;
+}
+
+enum RegistryType {
+  REGISTRY_TYPE_UNSPECIFIED = 0;
+  REGISTRY_TYPE_ARCHIVE = 1;
+  REGISTRY_TYPE_GO = 2;
+  REGISTRY_TYPE_NPM = 3;
+  REGISTRY_TYPE_NONE = 4;
+  REGISTRY_TYPE_MAVEN = 5;
+  REGISTRY_TYPE_SWIFT = 6;
+}
+
+enum OutputLanguage {
+  OUTPUT_LANGUAGE_UNSPECIFIED = 0;
+  OUTPUT_LANGUAGE_GO = 1;
+  OUTPUT_LANGUAGE_JAVASCRIPT = 2;
+  OUTPUT_LANGUAGE_TYPESCRIPT = 3;
+  OUTPUT_LANGUAGE_SWIFT = 4;
+  OUTPUT_LANGUAGE_CPP = 5;
+  OUTPUT_LANGUAGE_JAVA = 6;
+  OUTPUT_LANGUAGE_DART = 7;
+  OUTPUT_LANGUAGE_RUST = 8;
+  OUTPUT_LANGUAGE_PYTHON = 9;
+  OUTPUT_LANGUAGE_RUBY = 10;
+  OUTPUT_LANGUAGE_KOTLIN = 11;
+  OUTPUT_LANGUAGE_OBJECTIVE_C = 12;
+  OUTPUT_LANGUAGE_PHP = 13;
+  OUTPUT_LANGUAGE_CSHARP = 14;
+  OUTPUT_LANGUAGE_SCALA = 15;
+}

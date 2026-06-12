@@ -16,9 +16,8 @@ syntax = "proto3";
 
 package buf.registry.search.v1;
 
-import "buf/registry/module/v1/module.proto";
-import "buf/registry/owner/v1/owner.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/search/v1/search_request.proto";
 import "buf/registry/search/v1/search_result.proto";
 import "buf/validate/validate.proto";
 
@@ -26,45 +25,29 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // Search the BSR.
 service SearchService {
-  // Search for Owners and resources by name and metadata.
-  //
-  // Results only include Owners and resources that the caller is authorized to see.
-  // Results are ordered by relevance, which is determined by the server and may change
-  // over time.
   rpc Search(SearchRequest) returns (SearchResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.search.resource";
-  }
-  // Search the content of Modules for named elements of the Protobuf schema, such as
-  // messages and services, and for files.
-  //
-  // The content searched for each Module is the content of the head Commit of the
-  // Module's default Label. Results only include Modules that the caller is authorized
-  // to see. Results are ordered by relevance, which is determined by the server and may
-  // change over time.
-  rpc SearchContent(SearchContentRequest) returns (SearchContentResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.search.content";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.search";
   }
 }
 
-enum SortOrder {
-  SORT_ORDER_UNSPECIFIED = 0;
-  SORT_ORDER_NAME_ASC = 1;
-  SORT_ORDER_NAME_DESC = 2;
-  SORT_ORDER_CREATE_DATE_ASC = 3;
-  SORT_ORDER_CREATE_DATE_DESC = 4;
-  SORT_ORDER_MOD_DATE_ASC = 5;
-  SORT_ORDER_MOD_DATE_DESC = 6;
+enum OrderBy {
+  ORDER_BY_UNSPECIFIED = 0;
+  ORDER_BY_CREATE_TIME = 1;
+  ORDER_BY_UPDATE_TIME = 2;
+  ORDER_BY_NAME = 3;
+  ORDER_BY_RELEVANCE = 4;
 }
 
 message SearchRequest {
-  // The search query.
+  // The search query. This consists of search terms against the name field for the entity.
+  // Filters are specified in fields in the per-entity filters
   string query = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.max_len = 256
   ];
-  // The maximum number of items to return.
+  // The maximum number of items to return. The page size applies across all entities;
+  // the maximum total returned values is page_size, not page_size * number of entity filters
   //
   // The default value is 10.
   uint32 page_size = 2 [(buf.validate.field).uint32.lte = 250];
@@ -72,83 +55,43 @@ message SearchRequest {
   //
   // If empty, the first page is returned.
   string page_token = 3 [(buf.validate.field).string.max_len = 4096];
-  // The specific Owners to limit matched resources to.
-  //
-  // If empty, resources are not filtered by Owner. Owners themselves are only matched
-  // when this is empty.
-  repeated buf.registry.owner.v1.OwnerRef owner_refs = 5;
+
   // Sort order for results
   //
-  // If unspecified, use SORT_ORDER_NAME_ASC
-  optional SortOrder sort_order = 6 [
+  // If unspecified, use SORT_ORDER_RELEVANCE
+  optional OrderBy order_by = 4 [
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).enum.not_in = 0
   ];
+
+  // if not specified or false, sort ascending
+  bool descending = 5;
+
+  // The kind of entities to return and any associated search filters. must specify at least 1.
+  // even if no filter values are used, if you want results for an entity type, you must include
+  // an empty filter.
+  UserFilter user_filter = 6;
+  OrgFilter org_filter = 7;
+  ModuleFilter module_filter = 8;
+  PluginFilter plugin_filter = 9;
+  ElementFilter element_filter = 10;
+  FileFilter file_filter = 11;
+  TeamFilter team_filter = 12;
 }
 
 message SearchResponse {
   // The next page token.
   //
-  // If empty, there are no more pages.
+  // If empty, there are no more pages in any entity type
+  // The token is opaque and contains offset and done information for each entity type in the search request
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
-  // The search results.
-  repeated SearchResult search_results = 2;
-}
-
-message SearchContentRequest {
-  // The kind of a match that can be returned by a content search.
-  enum Kind {
-    KIND_UNSPECIFIED = 0;
-    // Match named elements of the Protobuf schema, such as messages and services.
-    KIND_ELEMENT = 1;
-    // Match files.
-    KIND_FILE = 2;
-  }
-  // The search query.
-  string query = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 256
-  ];
-  // The maximum number of items to return.
-  //
-  // The default value is 10.
-  uint32 page_size = 2 [(buf.validate.field).uint32.lte = 250];
-  // The page to start from.
-  //
-  // If empty, the first page is returned.
-  string page_token = 3 [(buf.validate.field).string.max_len = 4096];
-  // The kinds of matches to return.
-  //
-  // If empty, matches of all kinds are returned.
-  repeated Kind kinds = 4 [
-    // only two kinds of item, expand if we add more
-    (buf.validate.field).repeated.max_items = 2,
-    (buf.validate.field).repeated.unique = true,
-    (buf.validate.field).repeated.items.enum.defined_only = true,
-    (buf.validate.field).repeated.items.enum.not_in = 0
-  ];
-  // The specific Owners to limit the search to.
-  //
-  // If empty, content is not filtered by Owner.
-  repeated buf.registry.owner.v1.OwnerRef owner_refs = 5;
-  // The specific Modules to limit the search to.
-  //
-  // If empty, content is not filtered by Module.
-  repeated buf.registry.module.v1.ModuleRef module_refs = 6;
-  // Sort order for results
-  //
-  // If unspecified, use SORT_ORDER_NAME_ASC
-  optional SortOrder sort_order = 7 [
-    (buf.validate.field).enum.defined_only = true,
-    (buf.validate.field).enum.not_in = 0
-  ];
-}
-
-message SearchContentResponse {
-  // The next page token.
-  //
-  // If empty, there are no more pages.
-  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
-  // The content search results.
-  repeated ContentSearchResult content_search_results = 2;
+  // The search results. for each Entity Filter in the request, there will be a corresponding search result, even
+  // if there are no remaining results for that type.
+  repeated UserResult user_results = 2;
+  repeated OrgResult org_results = 3;
+  repeated ModuleResult module_results = 4;
+  repeated PluginResult plugin_results = 5;
+  repeated ElementResult element_results = 6;
+  repeated FileResult file_results = 7;
+  repeated TeamResult team_results = 8;
 }
