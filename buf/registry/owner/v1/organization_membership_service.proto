@@ -1,0 +1,207 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.owner.v1;
+
+import "buf/registry/owner/v1/organization.proto";
+import "buf/registry/owner/v1/organization_membership.proto";
+import "buf/registry/owner/v1/user.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
+
+// Operate on OrganizationMemberships.
+//
+// Memberships grant Users a role within an Organization. The write RPCs operate only on direct
+// role assignments; assignments managed by JIT provisioning or IdP group mappings cannot be
+// modified via this service.
+service OrganizationMembershipService {
+  // Get OrganizationMemberships by Organization and User.
+  rpc GetOrganizationMemberships(GetOrganizationMembershipsRequest) returns (GetOrganizationMembershipsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-membership.get";
+  }
+  // List OrganizationMemberships, usually for an Organization or a User.
+  rpc ListOrganizationMemberships(ListOrganizationMembershipsRequest) returns (ListOrganizationMembershipsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-membership.list";
+  }
+  // Create new OrganizationMemberships, adding Users to Organizations.
+  //
+  // This creates a direct role assignment. It is an error to create a membership for a User that
+  // already has a direct role assignment in the Organization.
+  //
+  // This operation is atomic. Either all OrganizationMemberships are created or an error is
+  // returned.
+  rpc CreateOrganizationMemberships(CreateOrganizationMembershipsRequest) returns (CreateOrganizationMembershipsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-membership.create";
+  }
+  // Update the role of existing OrganizationMemberships.
+  //
+  // This sets the role of the User's direct role assignment, creating a direct role assignment if
+  // the User's membership is currently managed only by JIT provisioning or IdP group mappings.
+  //
+  // An Organization must always have at least one owner whose role is directly assigned, rather
+  // than managed by JIT provisioning or an IdP group mapping. It is an error to change the role
+  // of a User who is the only such owner.
+  //
+  // This operation is atomic. Either all OrganizationMemberships are updated or an error is
+  // returned.
+  rpc UpdateOrganizationMemberships(UpdateOrganizationMembershipsRequest) returns (UpdateOrganizationMembershipsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-membership.update";
+  }
+  // Delete existing OrganizationMemberships, removing Users from Organizations.
+  //
+  // This deletes the User's direct role assignment. Role assignments managed by JIT provisioning
+  // or IdP group mappings are unaffected: if the User also has a JIT- or IdP-managed assignment,
+  // they remain a member via that assignment, and if the User's membership consists only of JIT-
+  // or IdP-managed assignments, there is no direct assignment to delete and an error is returned.
+  //
+  // An Organization must always have at least one owner whose role is directly assigned, rather
+  // than managed by JIT provisioning or an IdP group mapping. It is an error to remove a User who
+  // is the only such owner.
+  //
+  // TODO(pkw): The BSR allows any member to remove themselves from an Organization. Decide
+  // whether self-removal needs to be carved out of the required Permission.
+  //
+  // This operation is atomic. Either all OrganizationMemberships are deleted or an error is
+  // returned.
+  rpc DeleteOrganizationMemberships(DeleteOrganizationMembershipsRequest) returns (DeleteOrganizationMembershipsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-membership.delete";
+  }
+}
+
+message GetOrganizationMembershipsRequest {
+  // The references to the OrganizationMemberships to retrieve.
+  repeated OrganizationMembershipRef organization_membership_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetOrganizationMembershipsResponse {
+  // The retrieved OrganizationMemberships in the same order as requested.
+  repeated OrganizationMembership organization_memberships = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// The organization_refs and user_refs filters are combined with AND: an OrganizationMembership is
+// returned only if it matches at least one entry within each filter that is set. Within a single
+// filter, entries are combined with OR.
+message ListOrganizationMembershipsRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The order to return the OrganizationMemberships.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 3 [(buf.validate.field).enum.defined_only = true];
+  // Only return OrganizationMemberships within one of these Organizations.
+  //
+  // If empty, OrganizationMemberships are not filtered by Organization.
+  repeated OrganizationRef organization_refs = 4 [(buf.validate.field).repeated.max_items = 250];
+  // Only return OrganizationMemberships for one of these Users.
+  //
+  // If empty, OrganizationMemberships are not filtered by User.
+  repeated UserRef user_refs = 5 [(buf.validate.field).repeated.max_items = 250];
+}
+
+message ListOrganizationMembershipsResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed OrganizationMemberships.
+  repeated OrganizationMembership organization_memberships = 2;
+}
+
+message CreateOrganizationMembershipsRequest {
+  // An individual request to create an OrganizationMembership.
+  message Value {
+    // The Organization to add the User to.
+    OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
+    // The User to add to the Organization.
+    UserRef user_ref = 2 [(buf.validate.field).required = true];
+    // The role to assign to the User.
+    OrganizationRole role = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+  }
+  // The OrganizationMemberships to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreateOrganizationMembershipsResponse {
+  // The created OrganizationMemberships in the same order as given on the request.
+  repeated OrganizationMembership organization_memberships = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdateOrganizationMembershipsRequest {
+  // An individual request to update an OrganizationMembership.
+  message Value {
+    // The Organization that the User is a member of.
+    OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
+    // The User whose role to update.
+    UserRef user_ref = 2 [(buf.validate.field).required = true];
+    // The role to assign to the User.
+    OrganizationRole role = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+  }
+  // The OrganizationMemberships to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdateOrganizationMembershipsResponse {
+  // The updated OrganizationMemberships in the same order as given on the request.
+  repeated OrganizationMembership organization_memberships = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeleteOrganizationMembershipsRequest {
+  // The references to the OrganizationMemberships to delete.
+  repeated OrganizationMembershipRef organization_membership_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeleteOrganizationMembershipsResponse {}

@@ -16,29 +16,15 @@ syntax = "proto3";
 
 package buf.registry.iam.v1;
 
+import "buf/registry/iam/v1/resource_type.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
 
-// The scope that a grant or restriction applies to.
+// The scope that a restriction applies to.
 //
-// A Scope is either the entire instance or a single resource. It is shared by RoleBindings and
-// ScopedPermissions so that both use the same scoping semantics.
+// A Scope is either the entire instance or a single resource.
 message Scope {
-  // The type of a resource in the BSR.
-  enum ResourceType {
-    RESOURCE_TYPE_UNSPECIFIED = 0;
-    // The resource is a User.
-    RESOURCE_TYPE_USER = 1;
-    // The resource is an Organization.
-    RESOURCE_TYPE_ORGANIZATION = 2;
-    // The resource is a Module.
-    RESOURCE_TYPE_MODULE = 3;
-    // The resource is a Plugin.
-    RESOURCE_TYPE_PLUGIN = 4;
-    // The resource is a Policy.
-    RESOURCE_TYPE_POLICY = 5;
-  }
   // Instance scopes to the entire instance.
   message Instance {}
   // Resource scopes to a single resource.

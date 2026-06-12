@@ -31,6 +31,8 @@ service UploadService {
   //
   // Content consists of the Files: .proto files, license files, and documentation files.
   rpc Upload(UploadRequest) returns (UploadResponse) {
+    // TODO(pkw): Need to differentiate uploading to the default or a non-default label.
+    // Required for Limited Write (https://buf.build/docs/bsr/admin/roles/#base-resource-roles).
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.upload";
   }
 }

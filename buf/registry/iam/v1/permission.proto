@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.iam.v1;
 
+import "buf/registry/iam/v1/resource_type.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/validate/validate.proto";
@@ -25,8 +26,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // A Permission on the BSR.
 //
 // A Permission is an atomic capability that gates access to one or more RPCs. Permissions are
-// registered by the system and granted to Users via Roles, and may be further restricted on a
-// Token via ScopedPermissions.
+// registered by the system and granted to Users, and may be further restricted on a Token via
+// ScopedPermissions.
 //
 // A Permission is identified by its name; it does not have a separate id.
 message Permission {
@@ -42,4 +43,13 @@ message Permission {
   ];
   // A human-readable description of what the Permission allows.
   string description = 2 [(buf.validate.field).string.max_len = 512];
+  // The types of resources that the Permission can be bound to.
+  //
+  // A Permission can always be bound on the entire instance.
+  // If empty, the Permission can only be bound on the entire instance.
+  repeated ResourceType bindable_resource_types = 3 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
 }

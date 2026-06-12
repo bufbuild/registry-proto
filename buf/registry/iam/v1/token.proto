@@ -30,8 +30,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // A Token is a bearer credential that authenticates RPCs as its owning User. A Token may be
 // restricted to a subset of the User's permissions via ScopedPermissions.
 //
-// Tokens are immutable once created. To change a Token's properties, delete it and create a new
-// one.
+// A Token's name and ScopedPermissions may be updated after creation. All other properties are
+// immutable.
 //
 // The secret value of a Token is returned only when the Token is created, via CreateTokensResponse.
 // It cannot be retrieved afterwards.
@@ -45,18 +45,22 @@ message Token {
   ];
   // The time the Token was created.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The last time the Token was updated.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The time the Token expires.
   //
   // If not set, the Token does not expire.
-  google.protobuf.Timestamp expire_time = 3;
+  google.protobuf.Timestamp expire_time = 4;
   // The name of the Token.
-  string name = 4 [
+  //
+  // Names are not guaranteed to be unique among the Tokens owned by a User.
+  string name = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 3,
     (buf.validate.field).string.max_len = 256
   ];
   // The id of the User that owns the Token.
-  string user_id = 5 [
+  string user_id = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
@@ -70,34 +74,44 @@ message Token {
   //
   // In other words, ScopedPermissions can restrict the permissions of a Token,
   // but cannot add any permissions that the User does not already have.
-  repeated ScopedPermissions scoped_permissions = 6 [(buf.validate.field).repeated.max_items = 250];
-}
-
-// A set of permissions that apply within a specific Scope.
-//
-// ScopedPermissions restrict a Token to a subset of its owning User's permissions.
-message ScopedPermissions {
-  // The Scope that the permissions apply to.
-  Scope scope = 1 [(buf.validate.field).required = true];
-  // The permissions allowed within the Scope.
-  //
-  // Each entry is either a Permission name (e.g. "bsr.module.delete") or
-  // a wildcard pattern ending in ".*" that matches all Permissions sharing a
-  // prefix (e.g. "bsr.module.*").
-  repeated string permissions = 2 [
-    (buf.validate.field).repeated.min_items = 1,
+  repeated ScopedPermission scoped_permissions = 7 [
     (buf.validate.field).repeated.max_items = 250,
-    (buf.validate.field).repeated.unique = true,
-    (buf.validate.field).repeated.items.string.(buf.registry.priv.validate.v1beta1.permission_pattern) = true
+    (buf.validate.field).cel = {
+      id: "scoped_permissions.unique"
+      message: "scoped permissions must have unique scope and permission pairs"
+      expression: "this.map(sp, (has(sp.scope.instance) ? 'instance' : string(sp.scope.resource.resource_type) + '/' + sp.scope.resource.resource_id) + '|' + sp.permission).unique()"
+    }
   ];
 }
 
-// TokenRef is a reference to a Token, currently only an id.
+// A permission that applies within a specific Scope.
+//
+// ScopedPermissions restrict a Token to a subset of its owning User's permissions.
+message ScopedPermission {
+  // The Scope that the permission applies to.
+  Scope scope = 1 [(buf.validate.field).required = true];
+  // The permission allowed within the Scope.
+  //
+  // This is either a Permission name (e.g. "bsr.module.delete") or a wildcard
+  // pattern ending in ".*" that matches all Permissions sharing a prefix
+  // (e.g. "bsr.module.*").
+  string permission = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.permission_pattern) = true
+  ];
+}
+
+// TokenRef is a reference to a Token, either an id or a name.
 //
 // This is used in requests.
 message TokenRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
+  // The name of a Token owned by a User.
+  //
+  // Token names are not guaranteed to be unique among the Tokens owned by a User. If the name
+  // matches more than one of the User's Tokens, an error is returned; reference the Token by id
+  // instead.
   message Name {
     // The reference to the user which owns the token.
     // TODO(pkw): Should this default to the user calling the TokenService?
@@ -114,7 +128,7 @@ message TokenRef {
     option (buf.validate.oneof).required = true;
     // The id of the Token.
     string id = 1 [(buf.validate.field).string.tuuid = true];
-    // The unique name of the user's token.
+    // The name of the user's token.
     Name name = 2;
   }
 }
