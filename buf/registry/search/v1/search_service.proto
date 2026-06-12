@@ -67,16 +67,17 @@ message SearchRequest {
   // if not specified or false, sort ascending
   bool descending = 5;
 
-  // The kind of entities to return and any associated search filters. must specify at least 1.
-  // even if no filter values are used, if you want results for an entity type, you must include
-  // an empty filter.
-  UserFilter user_filter = 6;
-  OrgFilter org_filter = 7;
-  ModuleFilter module_filter = 8;
-  PluginFilter plugin_filter = 9;
-  ElementFilter element_filter = 10;
-  FileFilter file_filter = 11;
-  TeamFilter team_filter = 12;
+  // The kind of entities to return and any associated search filters.
+  // If none are specified, no search results are returned.
+  // If you want results for an entity type, even if no filter values are used,
+  // you must include an empty filter.
+  optional UserFilter user_filter = 6;
+  optional OrgFilter org_filter = 7;
+  optional ModuleFilter module_filter = 8;
+  optional PluginFilter plugin_filter = 9;
+  optional ElementFilter element_filter = 10;
+  optional FileFilter file_filter = 11;
+  optional TeamFilter team_filter = 12;
 }
 
 message SearchResponse {
@@ -87,11 +88,39 @@ message SearchResponse {
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The search results. for each Entity Filter in the request, there will be a corresponding search result, even
   // if there are no remaining results for that type.
-  repeated UserResult user_results = 2;
-  repeated OrgResult org_results = 3;
-  repeated ModuleResult module_results = 4;
-  repeated PluginResult plugin_results = 5;
-  repeated ElementResult element_results = 6;
-  repeated FileResult file_results = 7;
-  repeated TeamResult team_results = 8;
+  optional UserResults user_results = 2;
+  optional OrgResults org_results = 3;
+  optional ModuleResults module_results = 4;
+  optional PluginResults plugin_results = 5;
+  optional ElementResults element_results = 6;
+  optional FileResults file_results = 7;
+  optional TeamResults team_results = 8;
+}
+
+message UserResults {
+  repeated UserResult results = 1;
+}
+
+message OrgResults {
+  repeated OrgResult results = 1;
+}
+
+message ModuleResults {
+  repeated ModuleResult results = 1;
+}
+
+message PluginResults {
+  repeated PluginResult results = 1;
+}
+
+message ElementResults {
+  repeated ElementResult results = 1;
+}
+
+message FileResults {
+  repeated FileResult results = 1;
+}
+
+message TeamResults {
+  repeated TeamResult results = 1;
 }
