@@ -71,13 +71,13 @@ message SearchRequest {
   // If none are specified, no search results are returned.
   // If you want results for an entity type, even if no filter values are used,
   // you must include an empty filter.
-  optional UserFilter user_filter = 6;
-  optional OrgFilter org_filter = 7;
-  optional ModuleFilter module_filter = 8;
-  optional PluginFilter plugin_filter = 9;
-  optional ElementFilter element_filter = 10;
-  optional FileFilter file_filter = 11;
-  optional TeamFilter team_filter = 12;
+  UserFilter user_filter = 6;
+  OrgFilter org_filter = 7;
+  ModuleFilter module_filter = 8;
+  PluginFilter plugin_filter = 9;
+  ElementFilter element_filter = 10;
+  FileFilter file_filter = 11;
+  TeamFilter team_filter = 12;
 }
 
 message SearchResponse {
