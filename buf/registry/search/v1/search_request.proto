@@ -57,9 +57,7 @@ message PluginFilter {
   // if more than one value specified, they are ORed together
   repeated OutputLanguage output_languages = 5 [
     (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.items = {
-      enum: {defined_only: true}
-    }
+    (buf.validate.field).repeated.items = {enum: {defined_only: true}}
   ];
 }
 

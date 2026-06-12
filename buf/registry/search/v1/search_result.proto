@@ -58,9 +58,7 @@ message PluginResult {
   Visibility visibility = 3 [(buf.validate.field).enum.defined_only = true];
   bool verified = 4;
   RegistryType registry_type = 5 [(buf.validate.field).enum.defined_only = true];
-  repeated OutputLanguage output_languages = 6 [(buf.validate.field).repeated.items = {
-    enum: {defined_only: true}
-  }];
+  repeated OutputLanguage output_languages = 6 [(buf.validate.field).repeated.items = {enum: {defined_only: true}}];
   string spdx_license_id = 7;
 }
 
