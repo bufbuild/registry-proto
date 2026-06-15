@@ -69,8 +69,10 @@ The Instance Scope is always valid, so the field enumerates only the valid resou
 | `bsr.user.create` | Instance |
 | `bsr.user.delete` | Instance, User |
 | `bsr.user.get` | Instance, User |
+| `bsr.user.get-instance-role` | Instance |
 | `bsr.user.list` | Instance |
 | `bsr.user.update` | Instance, User |
+| `bsr.user.update-instance-role` | Instance |
 
 ## RPCs with dynamic Permissions
 
