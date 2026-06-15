@@ -48,32 +48,4 @@ extend buf.validate.StringRules {
       expression: "this != ''"
     }
   ];
-
-  // A validation rule for Permission patterns.
-  //
-  // A Permission pattern is either a concrete Permission name or a Permission
-  // name followed by ".*" to match all Permissions sharing the preceding
-  // prefix, for example "bsr.module.*".
-  //
-  // Patterns are used when granting Permissions (for example in ScopedPermissions),
-  // not when naming a concrete Permission.
-  //
-  // Use (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE for optional fields.
-  optional bool permission_pattern = 12002 [
-    (buf.validate.predefined).cel = {
-      id: "string.permission_pattern.len"
-      message: "permission pattern must be between 2 and 255 characters"
-      expression: "this == '' || (this.size() >= 2 && this.size() <= 255)"
-    },
-    (buf.validate.predefined).cel = {
-      id: "string.permission_pattern.pattern"
-      message: "permission pattern must be a permission name, optionally ending with \".*\" to match all permissions sharing a prefix, where each component starts with a lowercase letter, contains lowercase letters, digits, and internal hyphens, and ends with a lowercase alphanumeric character (e.g. \"bsr.module.delete\" or \"bsr.module.*\")"
-      expression: "this == '' || this.matches('^[a-z][a-z0-9]*(-[a-z0-9]+)*([.][a-z][a-z0-9]*(-[a-z0-9]+)*)*([.][*])?$')"
-    },
-    (buf.validate.predefined).cel = {
-      id: "string.permission_pattern.empty"
-      message: "permission pattern must not be empty"
-      expression: "this != ''"
-    }
-  ];
 }

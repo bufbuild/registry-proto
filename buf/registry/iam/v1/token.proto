@@ -90,14 +90,10 @@ message Token {
 message ScopedPermission {
   // The Scope that the permission applies to.
   Scope scope = 1 [(buf.validate.field).required = true];
-  // The permission allowed within the Scope.
-  //
-  // This is either a Permission name (e.g. "bsr.module.delete") or a wildcard
-  // pattern ending in ".*" that matches all Permissions sharing a prefix
-  // (e.g. "bsr.module.*").
+  // The permission allowed within the Scope (e.g. "bsr.module.delete").
   string permission = 2 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.permission_pattern) = true
+    (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.permission_name) = true
   ];
 }
 
