@@ -27,7 +27,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // An Event delivered to a Webhook.
 //
-// An Event is delivered as the body of an HTTP POST request to the Webhook's url. If the
+// An Event is delivered by invoking EventService.Event on the Webhook's url. If the
 // Webhook has a signing secret, the delivery is signed with an HMAC over the request body,
 // sent in a request header. Delivery is at-least-once: a delivery may be retried, and
 // every delivery of the same Event carries the same id, which receivers can use to
