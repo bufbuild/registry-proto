@@ -26,21 +26,18 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // There is exactly one InstanceSettings per BSR instance. It is administered by Users
 // with instance-level administrative permissions, but is readable by any authenticated
 // User, as the settings affect how every Module on the instance behaves.
+//
+// The uniqueness policy is intentionally not part of this message. Because enabling it
+// triggers a potentially long-running, instance-wide backfill and collision scan, it is
+// managed through the dedicated GetUniquenessPolicy and UpdateUniquenessPolicy RPCs
+// rather than folded into the batched settings.
 message InstanceSettings {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
   // The policy controlling whether breaking changes are enforced when Commits are pushed.
   BreakingChangePolicy breaking_change_policy = 1 [(buf.validate.field).required = true];
-  // The policy controlling whether fully-qualified names and file paths must be unique
-  // across the instance.
-  UniquenessPolicy uniqueness_policy = 2 [(buf.validate.field).required = true];
   // The settings controlling whether Commits with breaking changes are held for review.
-  ReviewFlowSettings review_flow_settings = 3 [(buf.validate.field).required = true];
-  // Whether the uniqueness backfill task has completed.
-  //
-  // This is computed by the server and is read-only; it is ignored on update. The
-  // uniqueness policy cannot be enforced until the backfill task has completed.
-  bool uniqueness_backfill_task_complete = 4;
+  ReviewFlowSettings review_flow_settings = 2 [(buf.validate.field).required = true];
 }
 
 // The policy controlling enforcement of breaking changes when Commits are pushed to the

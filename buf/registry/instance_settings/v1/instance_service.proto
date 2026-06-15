@@ -33,8 +33,22 @@ service InstanceService {
   // Update the instance-wide settings.
   //
   // Only the settings present on the request are updated; settings that are not set are
-  // left unchanged.
+  // left unchanged. This operation is atomic: either all of the present settings are
+  // updated or an error is returned and none are.
   rpc UpdateInstanceSettings(UpdateInstanceSettingsRequest) returns (UpdateInstanceSettingsResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Get the instance-wide uniqueness policy.
+  rpc GetUniquenessPolicy(GetUniquenessPolicyRequest) returns (GetUniquenessPolicyResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Update the instance-wide uniqueness policy.
+  //
+  // Enabling the uniqueness policy triggers a backfill that indexes every Module on the
+  // instance and scans for collisions; this may take a significant amount of time and
+  // briefly blocks pushes across the instance. If existing collisions are found, the
+  // policy is not enabled and a failed-precondition error is returned.
+  rpc UpdateUniquenessPolicy(UpdateUniquenessPolicyRequest) returns (UpdateUniquenessPolicyResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Add an SDK to the list of recommended SDKs at a given level.
@@ -69,19 +83,40 @@ message UpdateInstanceSettingsRequest {
   //
   // If unset, the breaking change policy is left unchanged.
   BreakingChangePolicy breaking_change_policy = 1;
-  // The uniqueness policy to set.
-  //
-  // If unset, the uniqueness policy is left unchanged.
-  UniquenessPolicy uniqueness_policy = 2;
   // The review flow settings to set.
   //
   // If unset, the review flow settings are left unchanged.
-  ReviewFlowSettings review_flow_settings = 3;
+  ReviewFlowSettings review_flow_settings = 2;
 }
 
 message UpdateInstanceSettingsResponse {
   // The full instance-wide settings after the update was applied.
   InstanceSettings instance_settings = 1 [(buf.validate.field).required = true];
+}
+
+message GetUniquenessPolicyRequest {}
+
+message GetUniquenessPolicyResponse {
+  // The uniqueness policy.
+  UniquenessPolicy uniqueness_policy = 1 [(buf.validate.field).required = true];
+  // Whether the uniqueness backfill task has completed.
+  //
+  // The uniqueness policy cannot be enforced until the backfill task has completed.
+  bool backfill_task_complete = 2;
+}
+
+message UpdateUniquenessPolicyRequest {
+  // The uniqueness policy to set.
+  UniquenessPolicy uniqueness_policy = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateUniquenessPolicyResponse {
+  // The uniqueness policy after the update was applied.
+  UniquenessPolicy uniqueness_policy = 1 [(buf.validate.field).required = true];
+  // Whether the uniqueness backfill task has completed.
+  //
+  // The uniqueness policy cannot be enforced until the backfill task has completed.
+  bool backfill_task_complete = 2;
 }
 
 message AddRecommendedSDKRequest {
