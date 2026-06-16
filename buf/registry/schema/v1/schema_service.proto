@@ -71,6 +71,8 @@ message ConvertRequest {
   // If true, fields in payload that cannot be resolved against the schema are
   // discarded. If false (the default), an unresolvable field causes the
   // conversion to fail.
+  //
+  // Only used when input_format is JSON.
   bool discard_unknown = 6;
 }
 
