@@ -14,12 +14,11 @@
 
 syntax = "proto3";
 
-package buf.registry.instance_settings.v1;
+package buf.registry.admin.v1;
 
-import "buf/registry/instance_settings/v1/instance_settings.proto";
-import "buf/registry/instance_settings/v1/recommended_sdk.proto";
+import "buf/registry/admin/v1/instance_settings.proto";
+import "buf/registry/admin/v1/recommended_sdk.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
-import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/instance_settings/v1";

@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-package buf.registry.instance_settings.v1;
+package buf.registry.admin.v1;
 
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
