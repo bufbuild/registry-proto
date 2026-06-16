@@ -52,14 +52,14 @@ extend buf.validate.StringRules {
   // A validation rule for IdP group names.
   //
   // An IdP group name is the name of a group as it appears in the identity provider. It is between
-  // 1 and 256 characters and may contain only letters, digits, hyphens, and underscores.
+  // 2 and 255 characters and may contain only letters, digits, hyphens, and underscores.
   //
   // Use (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE for optional fields.
   optional bool idp_group_name = 12003 [
     (buf.validate.predefined).cel = {
       id: "string.idp_group_name.len"
-      message: "IdP group name must be between 1 and 256 characters"
-      expression: "this == '' || this.size() <= 256"
+      message: "IdP group name must be between 2 and 255 characters"
+      expression: "this == '' || (this.size() >= 2 && this.size() <= 255)"
     },
     (buf.validate.predefined).cel = {
       id: "string.idp_group_name.pattern"
