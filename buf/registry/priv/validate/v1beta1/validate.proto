@@ -1,0 +1,51 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto2";
+
+package buf.registry.priv.validate.v1beta1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/priv/validate/v1beta1";
+
+extend buf.validate.StringRules {
+  // A validation rule for concrete Permission names.
+  //
+  // A Permission name is a dotted identifier of 2 to 255 characters. Each
+  // dot-separated component starts with a lowercase letter, contains lowercase
+  // letters, digits, and internal hyphens, and ends with a lowercase
+  // alphanumeric character. Components may not contain consecutive hyphens.
+  //
+  // For example, "bsr.module.delete".
+  //
+  // Use (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE for optional fields.
+  optional bool permission_name = 12001 [
+    (buf.validate.predefined).cel = {
+      id: "string.permission_name.len"
+      message: "permission name must be between 2 and 255 characters"
+      expression: "this == '' || (this.size() >= 2 && this.size() <= 255)"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.permission_name.pattern"
+      message: "permission name must be a dotted identifier where each component starts with a lowercase letter, contains lowercase letters, digits, and internal hyphens, and ends with a lowercase alphanumeric character (e.g. \"bsr.module.delete\")"
+      expression: "this == '' || this.matches('^[a-z][a-z0-9]*(-[a-z0-9]+)*([.][a-z][a-z0-9]*(-[a-z0-9]+)*)*$')"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.permission_name.empty"
+      message: "permission name must not be empty"
+      expression: "this != ''"
+    }
+  ];
+}

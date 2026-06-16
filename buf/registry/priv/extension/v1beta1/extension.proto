@@ -16,6 +16,8 @@ syntax = "proto3";
 
 package buf.registry.priv.extension.v1beta1;
 
+import "buf/registry/priv/validate/v1beta1/validate.proto";
+import "buf/validate/validate.proto";
 import "google/protobuf/descriptor.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/priv/extension/v1beta1";
@@ -65,4 +67,36 @@ message MessageConstraints {
   // This is not just for request/response messages, this is also for any message that
   // is part of an RPC.
   bool no_side_effects_only = 3;
+}
+
+
+extend google.protobuf.MethodOptions {
+  // IAM constraints on a method.
+  //
+  // Prototyping for now - we will want to change this to a number in Buf's
+  // reserved range if this goes further.
+  MethodConstraints method = 89182;
+}
+
+// IAM constraints on a method.
+message MethodConstraints {
+  // The permission requirement for invoking the RPC.
+  oneof permission {
+    option (buf.validate.oneof).required = true;
+    // The name of the Permission required to invoke this RPC.
+    //
+    // The value is the name of a Permission registered on the BSR (e.g.
+    // "bsr.module.delete").
+    string required_permission = 1 [(buf.validate.field).string.(buf.registry.priv.validate.v1beta1.permission_name) = true];
+    // Explicitly declares that invoking this RPC requires no Permission.
+    //
+    // This declares only that no Permission check applies. Whether the RPC
+    // requires authentication is a separate concern.
+    bool no_required_permission = 2 [(buf.validate.field).bool.const = true];
+    // Explicitly declares that the Permissions required to invoke this RPC
+    // are determined dynamically from the contents of the request.
+    //
+    // A documentation comment on the method or option should describe the Permissions required.
+    bool dynamic_permission = 3 [(buf.validate.field).bool.const = true];
+  }
 }

@@ -33,10 +33,12 @@ service OrganizationMembershipService {
   // Get OrganizationMemberships by Organization and User.
   rpc GetOrganizationMemberships(GetOrganizationMembershipsRequest) returns (GetOrganizationMembershipsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-membership.get";
   }
   // List OrganizationMemberships, usually for an Organization or a User.
   rpc ListOrganizationMemberships(ListOrganizationMembershipsRequest) returns (ListOrganizationMembershipsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-membership.list";
   }
   // Create new OrganizationMemberships, adding Users to Organizations.
   //
@@ -47,6 +49,7 @@ service OrganizationMembershipService {
   // returned.
   rpc CreateOrganizationMemberships(CreateOrganizationMembershipsRequest) returns (CreateOrganizationMembershipsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-membership.create";
   }
   // Update the role of existing OrganizationMemberships.
   //
@@ -61,6 +64,7 @@ service OrganizationMembershipService {
   // returned.
   rpc UpdateOrganizationMemberships(UpdateOrganizationMembershipsRequest) returns (UpdateOrganizationMembershipsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-membership.update";
   }
   // Delete existing OrganizationMemberships, removing Users from Organizations.
   //
@@ -80,6 +84,7 @@ service OrganizationMembershipService {
   // returned.
   rpc DeleteOrganizationMemberships(DeleteOrganizationMembershipsRequest) returns (DeleteOrganizationMembershipsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-membership.delete";
   }
 }
 
