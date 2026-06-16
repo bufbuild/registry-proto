@@ -17,7 +17,6 @@ syntax = "proto3";
 package buf.registry.webhook.v1;
 
 import "buf/registry/module/v1/commit.proto";
-import "buf/registry/module/v1/label.proto";
 import "buf/registry/module/v1/module.proto";
 import "buf/registry/webhook/v1/webhook.proto";
 import "buf/validate/validate.proto";
@@ -54,10 +53,6 @@ message Event {
     option (buf.validate.oneof).required = true;
     // The payload for EVENT_TYPE_MODULE_COMMIT_PUSHED.
     ModuleCommitPushedPayload module_commit_pushed = 4;
-    // The payload for EVENT_TYPE_MODULE_LABEL_MOVED.
-    ModuleLabelMovedPayload module_label_moved = 5;
-    // The payload for EVENT_TYPE_MODULE_DELETED.
-    ModuleDeletedPayload module_deleted = 6;
   }
 }
 
@@ -67,25 +62,4 @@ message ModuleCommitPushedPayload {
   buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
   // The Commit that was pushed.
   buf.registry.module.v1.Commit commit = 2 [(buf.validate.field).required = true];
-}
-
-// The payload of an Event of type EVENT_TYPE_MODULE_LABEL_MOVED.
-message ModuleLabelMovedPayload {
-  // The Module that the Label belongs to.
-  buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
-  // The Label after it was created or moved, including the Commit it now points to.
-  buf.registry.module.v1.Label label = 2 [(buf.validate.field).required = true];
-  // The id of the Commit that the Label pointed to before it was moved.
-  //
-  // This is empty if the Label was created rather than moved.
-  string from_commit_id = 3 [
-    (buf.validate.field).string.tuuid = true,
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
-  ];
-}
-
-// The payload of an Event of type EVENT_TYPE_MODULE_DELETED.
-message ModuleDeletedPayload {
-  // The Module that was deleted, as it was at the time of deletion.
-  buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
 }
