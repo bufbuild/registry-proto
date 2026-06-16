@@ -1,0 +1,65 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.webhook.v1;
+
+import "buf/registry/module/v1/commit.proto";
+import "buf/registry/module/v1/module.proto";
+import "buf/registry/webhook/v1/webhook.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/webhook/v1";
+
+// An Event delivered to a Webhook.
+//
+// An Event is delivered by invoking EventService.Event on the Webhook's url. If the
+// Webhook has a signing secret, the delivery is signed with an HMAC over the request body,
+// sent in a request header. Delivery is at-least-once: a delivery may be retried, and
+// every delivery of the same Event carries the same id, which receivers can use to
+// deduplicate.
+message Event {
+  // The id of the Event.
+  //
+  // The id is unique for an Event occurrence and is reused for every delivery and retry
+  // of that occurrence.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The type of the Event.
+  EventType type = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The time the Event occurred.
+  google.protobuf.Timestamp event_time = 3 [(buf.validate.field).required = true];
+  // The payload of the Event, matching its type.
+  oneof payload {
+    option (buf.validate.oneof).required = true;
+    // The payload for EVENT_TYPE_MODULE_COMMIT_PUSHED.
+    ModuleCommitPushedPayload module_commit_pushed = 4;
+  }
+}
+
+// The payload of an Event of type EVENT_TYPE_MODULE_COMMIT_PUSHED.
+message ModuleCommitPushedPayload {
+  // The Module that the Commit was pushed to.
+  buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
+  // The Commit that was pushed.
+  buf.registry.module.v1.Commit commit = 2 [(buf.validate.field).required = true];
+}
