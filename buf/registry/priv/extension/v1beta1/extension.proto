@@ -69,7 +69,6 @@ message MessageConstraints {
   bool no_side_effects_only = 3;
 }
 
-
 extend google.protobuf.MethodOptions {
   // IAM constraints on a method.
   //
