@@ -28,10 +28,12 @@ service PermissionService {
   // Get Permissions by name.
   rpc GetPermissions(GetPermissionsRequest) returns (GetPermissionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).no_required_permission = true;
   }
   // List Permissions.
   rpc ListPermissions(ListPermissionsRequest) returns (ListPermissionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).no_required_permission = true;
   }
 }
 
