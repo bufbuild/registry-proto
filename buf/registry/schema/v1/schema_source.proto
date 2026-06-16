@@ -1,0 +1,61 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.schema.v1;
+
+import "buf/registry/module/v1/resource.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/descriptor.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/schema/v1";
+
+// A source of a Protobuf schema to operate on.
+//
+// A SchemaSource is either a reference to schema already stored in the BSR, or a
+// self-contained schema provided inline by the caller.
+//
+// SchemaSources can only be used in requests, and only for read-only RPCs.
+message SchemaSource {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+  option (buf.registry.priv.extension.v1beta1.message).no_side_effects_only = true;
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+
+    // A reference to a Module, Label, or Commit stored in the BSR.
+    //
+    // The referenced schema is resolved and compiled on the server, and the
+    // caller must have read permission on the referenced Module.
+    //
+    // See the documentation on ResourceRef for resource resolution details.
+    buf.registry.module.v1.ResourceRef resource_ref = 1;
+    // A self-contained, pre-compiled schema provided by the caller.
+    //
+    // This must include all transitive dependencies (including any Well-Known
+    // Types) required to resolve the requested type; imports are not resolved
+    // against the BSR for this case.
+    //
+    // This is the standard google.protobuf.FileDescriptorSet, as produced by
+    // `buf build -o` or `protoc --descriptor_set_out`, so callers do not need
+    // Buf-specific tooling to construct it.
+    google.protobuf.FileDescriptorSet file_descriptor_set = 2 [(buf.validate.field).cel = {
+      id: "file_descriptor_set_not_empty"
+      message: "file_descriptor_set must contain at least one file"
+      expression: "size(this.file) > 0"
+    }];
+  }
+}
