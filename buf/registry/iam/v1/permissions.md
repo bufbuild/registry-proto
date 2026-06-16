@@ -30,6 +30,10 @@ The Instance Scope is always valid, so the field enumerates only the valid resou
 | `bsr.commit.list` | Instance, Organization, User, Module |
 | `bsr.file-descriptor-set.get` | Instance, Organization, User, Module |
 | `bsr.graph.get` | Instance, Organization, User, Module |
+| `bsr.idp-group-mapping.create` | Instance, Organization, Module |
+| `bsr.idp-group-mapping.delete` | Instance, Organization, Module |
+| `bsr.idp-group-mapping.list` | Instance, Organization, Module |
+| `bsr.idp-group-mapping.update` | Instance, Organization, Module |
 | `bsr.label.archive` | Instance, Organization, User, Module |
 | `bsr.label.create` | Instance, Organization, User, Module |
 | `bsr.label.get` | Instance, Organization, User, Module |
