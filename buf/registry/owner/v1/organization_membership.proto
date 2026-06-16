@@ -1,0 +1,127 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.owner.v1;
+
+import "buf/registry/owner/v1/organization.proto";
+import "buf/registry/owner/v1/user.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
+
+// An OrganizationMembership on the BSR.
+//
+// An OrganizationMembership makes a User a member of an Organization with an
+// OrganizationRole. A User has at most one OrganizationMembership per Organization.
+//
+// A membership is composed of one or more role assignments, at most one per
+// OrganizationRoleSource. For example, a User may have a role assigned directly via the API and
+// another assigned via an IdP group mapping. Only direct role assignments can be modified via the
+// API; assignments managed by JIT provisioning or IdP group mappings are managed by the identity
+// provider integration.
+message OrganizationMembership {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Organization that the User is a member of.
+  string organization_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The id of the User that is a member of the Organization.
+  string user_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the User became a member of the Organization.
+  google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
+  // The last time any role assignment of the membership was updated.
+  google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
+  // The effective role of the User within the Organization.
+  //
+  // This is the highest-ranked role across all role assignments.
+  OrganizationRole role = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The individual role assignments that make up the membership, at most one per
+  // OrganizationRoleSource.
+  repeated OrganizationRoleAssignment role_assignments = 6 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// An individual role assignment within an OrganizationMembership.
+message OrganizationRoleAssignment {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The assigned role.
+  OrganizationRole role = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The source of the assignment.
+  OrganizationRoleSource source = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+}
+
+// The role of a User within an Organization.
+enum OrganizationRole {
+  ORGANIZATION_ROLE_UNSPECIFIED = 0;
+  // The User has full control over the Organization, including managing members of every role
+  // and deleting the Organization.
+  ORGANIZATION_ROLE_OWNER = 1;
+  // The User can manage the Organization and its members, except for members with the owner role.
+  ORGANIZATION_ROLE_ADMIN = 2;
+  // The User is a regular member of the Organization.
+  //
+  // Members receive the Organization's base resource roles on the resources the Organization
+  // owns, as configured in OrganizationSettings.
+  ORGANIZATION_ROLE_MEMBER = 3;
+  // The User is a bot user used for automation.
+  //
+  // Bot users always receive write access to the resources the Organization owns,
+  // regardless of the Organization's base resource roles.
+  ORGANIZATION_ROLE_BOT = 4;
+}
+
+// The source of a role assignment within an OrganizationMembership.
+enum OrganizationRoleSource {
+  ORGANIZATION_ROLE_SOURCE_UNSPECIFIED = 0;
+  // The role was assigned directly, either via the API or the web interface.
+  ORGANIZATION_ROLE_SOURCE_DIRECT = 1;
+  // The role was assigned by just-in-time provisioning when the User logged in.
+  ORGANIZATION_ROLE_SOURCE_JIT = 2;
+  // The role was assigned via an IdP group mapping.
+  ORGANIZATION_ROLE_SOURCE_IDP_GROUP = 3;
+}
+
+// OrganizationMembershipRef is a reference to an OrganizationMembership, which is uniquely
+// identified by its Organization and User.
+//
+// This is used in requests.
+message OrganizationMembershipRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The Organization that the User is a member of.
+  OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
+  // The User that is a member of the Organization.
+  UserRef user_ref = 2 [(buf.validate.field).required = true];
+}
