@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package buf.registry.policy.v1;
 
-import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/policy/v1/policy.proto";
 import "buf/validate/validate.proto";
 
@@ -88,9 +88,9 @@ message ListPoliciesRequest {
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
   // The specific Organizations to list Policies for.
   //
-  // If empty, all Policies for all owners are listed, but this functionality
+  // If empty, all Policies for all Organizations are listed, but this functionality
   // is limited to Users with the necessary permissions.
-  repeated buf.registry.owner.v1.OwnerRef owner_refs = 3;
+  repeated buf.registry.owner.v1.OrganizationRef organization_refs = 3;
   // The order to return the Policies.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
@@ -110,7 +110,7 @@ message CreatePoliciesRequest {
   // An individual request to create a Policy.
   message Value {
     // The Organization to create the Policy under.
-    buf.registry.owner.v1.OwnerRef owner_ref = 1 [(buf.validate.field).required = true];
+    buf.registry.owner.v1.OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
     // The name of the Policy.
     string name = 2 [(buf.validate.field).string = {
       min_len: 2
