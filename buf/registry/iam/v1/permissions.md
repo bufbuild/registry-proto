@@ -61,6 +61,9 @@ The Instance Scope is always valid, so the field enumerates only the valid resou
 | `bsr.organization.get` | Instance, Organization |
 | `bsr.organization.list` | Instance |
 | `bsr.organization.update` | Instance, Organization |
+| `bsr.scim-token.create` | Instance |
+| `bsr.scim-token.delete` | Instance |
+| `bsr.scim-token.list` | Instance |
 | `bsr.token.create` | Instance, User |
 | `bsr.token.delete` | Instance, User |
 | `bsr.token.get` | Instance, User |
