@@ -25,6 +25,4 @@ enum Format {
   FORMAT_BINARY = 1;
   // The Protobuf JSON format.
   FORMAT_JSON = 2;
-  // The Protobuf text format (prototext).
-  FORMAT_TEXT = 3;
 }
