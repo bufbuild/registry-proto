@@ -68,6 +68,7 @@ enum ResourceType {
   RESOURCE_TYPE_DEVICE_AUTHORIZATION_GRANT = 14;
   RESOURCE_TYPE_PLUGIN_LABEL = 16;
   RESOURCE_TYPE_SDK_PLUGIN_CONSTRAINT = 21;
+  RESOURCE_TYPE_AUTHORIZATION_REQUEST = 23;
 }
 
 // Resource is the affected resource by the audited event.
@@ -82,7 +83,7 @@ message Resource {
 
 // EventType is the type of audited event.
 //
-// [#next-free-field: 79]
+// [#next-free-field: 86]
 enum EventType {
   EVENT_TYPE_UNSPECIFIED = 0;
   EVENT_TYPE_ORGANIZATION_CREATED = 1;
@@ -94,6 +95,9 @@ enum EventType {
   EVENT_TYPE_ORGANIZATION_IDP_GROUP_ADDED = 21;
   EVENT_TYPE_ORGANIZATION_IDP_GROUP_UPDATED = 59;
   EVENT_TYPE_ORGANIZATION_IDP_GROUP_REMOVED = 22;
+  EVENT_TYPE_ORGANIZATION_RESOURCE_VISIBILITY_CONTROL_CHANGED = 81;
+  EVENT_TYPE_ORGANIZATION_UNIQUENESS_POLICY_ENABLED = 82;
+  EVENT_TYPE_ORGANIZATION_UNIQUENESS_POLICY_DISABLED = 83;
   EVENT_TYPE_MODULE_CREATED = 6;
   EVENT_TYPE_MODULE_DEPRECATED = 48;
   EVENT_TYPE_MODULE_UNDEPRECATED = 49;
@@ -142,11 +146,13 @@ enum EventType {
   EVENT_TYPE_MODULE_LABEL_MOVED = 30;
   EVENT_TYPE_MODULE_LABEL_ARCHIVED = 38;
   EVENT_TYPE_MODULE_LABEL_UNARCHIVED = 39;
+  EVENT_TYPE_MODULE_LABEL_ENFORCEMENT_IGNORES_CHANGED = 79;
   EVENT_TYPE_SERVER_BREAKING_CHANGE_POLICY_ENABLED = 32;
   EVENT_TYPE_SERVER_BREAKING_CHANGE_POLICY_DISABLED = 33;
   reserved 34;
   EVENT_TYPE_SERVER_UNIQUENESS_POLICY_ENABLED = 35;
   EVENT_TYPE_SERVER_UNIQUENESS_POLICY_DISABLED = 36;
+  EVENT_TYPE_SERVER_RESOURCE_VISIBILITY_CONTROL_CHANGED = 80;
   EVENT_TYPE_USER_AUTO_MERGED_FROM_NEW_IDP = 37;
   EVENT_TYPE_DEVICE_AUTHORIZATION_GRANT_APPROVED = 41;
   EVENT_TYPE_DEVICE_AUTHORIZATION_GRANT_DENIED = 42;
@@ -163,6 +169,8 @@ enum EventType {
   EVENT_TYPE_POLICY_ENFORCEMENT_DELETED = 75;
   EVENT_TYPE_POLICY_ENFORCEMENT_POLICY_CHANGED = 76;
   EVENT_TYPE_POLICY_ENFORCEMENT_TARGETS_CHANGED = 77;
+  EVENT_TYPE_AUTHORIZATION_REQUEST_APPROVED = 84;
+  EVENT_TYPE_AUTHORIZATION_REQUEST_DENIED = 85;
 }
 
 // EventMetadata provides additional details about the audited event.
@@ -178,7 +186,7 @@ message EventMetadata {
 // it happened, who did it, which resource was affected, and more contextual information on the
 // event.
 //
-// [#next-free-field: 85]
+// [#next-free-field: 92]
 message Event {
   // Unique id of the audited event.
   string event_id = 1;
@@ -204,6 +212,9 @@ message Event {
     PayloadOrganizationMemberAdded organization_member_added = 9;
     PayloadOrganizationMemberRolesChanged organization_member_roles_changed = 56;
     PayloadOrganizationMemberRemoved organization_member_removed = 11;
+    PayloadOrganizationResourceVisibilityControlChanged organization_resource_visibility_control_changed = 87;
+    PayloadOrganizationUniquenessPolicyEnabled organization_uniqueness_policy_enabled = 88;
+    PayloadOrganizationUniquenessPolicyDisabled organization_uniqueness_policy_disabled = 89;
     PayloadModuleCreated module_created = 12;
     PayloadModuleDeprecated module_deprecated = 54;
     PayloadModuleUndeprecated module_undeprecated = 55;
@@ -252,12 +263,14 @@ message Event {
     PayloadModuleLabelMoved module_label_moved = 36;
     PayloadModuleLabelArchived module_label_archived = 44;
     PayloadModuleLabelUnarchived module_label_unarchived = 45;
+    PayloadModuleLabelEnforcementIgnoresChanged module_label_enforcement_ignores_changed = 85;
     PayloadGenerationPluginDeleted generation_plugin_deleted = 37;
     PayloadGenerationPluginStatusUpdated generation_plugin_status_updated = 84;
     PayloadServerBreakingChangePolicyEnabled payload_server_breaking_change_policy_enabled = 38;
     PayloadServerBreakingChangePolicyDisabled payload_server_breaking_change_policy_disabled = 39;
     PayloadServerUniquenessPolicyEnabled payload_server_uniqueness_policy_enabled = 41;
     PayloadServerUniquenessPolicyDisabled payload_server_uniqueness_policy_disabled = 42;
+    PayloadServerResourceVisibilityControlChanged server_resource_visibility_control_changed = 86;
     PayloadUserAutoMergedFromNewIdP user_auto_merged_from_new_idp = 43;
     PayloadDeviceAuthorizationGrantApproved device_authorization_grant_approved = 47;
     PayloadDeviceAuthorizationGrantDenied device_authorization_grant_denied = 48;
@@ -274,6 +287,8 @@ message Event {
     PayloadPolicyEnforcementDeleted policy_enforcement_deleted = 81;
     PayloadPolicyEnforcementPolicyChanged policy_enforcement_policy_changed = 82;
     PayloadPolicyEnforcementTargetsChanged policy_enforcement_targets_changed = 83;
+    PayloadAuthorizationRequestApproved authorization_request_approved = 90;
+    PayloadAuthorizationRequestDenied authorization_request_denied = 91;
   }
 }
 
@@ -766,6 +781,33 @@ message PayloadModuleLabelUnarchived {
   string module_name = 4;
 }
 
+message PayloadModuleLabelEnforcementIgnoresChanged {
+  // IgnoreEntry is an entry of the ignore configuration applied to the module label, for a
+  // specific enforcement id.
+  message IgnoreEntry {
+    // The ignored rule or category id.
+    //
+    // If empty, this is an `ignore` entry. If populated, this is an `ignore_only` entry.
+    string rule_or_category_id = 1;
+    // The ignored file or directory paths.
+    repeated string paths = 2;
+  }
+  // owner_id is the id of the module owner.
+  string owner_id = 1;
+  // owner_name is the name of the module owner.
+  string owner_name = 2;
+  // module_id is the id of the module.
+  string module_id = 3;
+  // module_name is the name of the module.
+  string module_name = 4;
+  // enforcement_id is the id of the enforcement.
+  string enforcement_id = 5;
+  // old ignore entries configured for the module label and the enforcement.
+  repeated IgnoreEntry old_ignore_entries = 6;
+  // new ignore entries configured for the module label and the enforcement.
+  repeated IgnoreEntry new_ignore_entries = 7;
+}
+
 message PayloadServerBreakingChangePolicyEnabled {
   // category is the category of breaking changes.
   buf.registry.admin.v1.BreakingChangeCategory category = 1;
@@ -789,6 +831,14 @@ message PayloadDeviceAuthorizationGrantApproved {
 }
 message PayloadDeviceAuthorizationGrantDenied {
   // client_id is the id of the registered oauth2 client of the grant.
+  string client_id = 1;
+}
+message PayloadAuthorizationRequestApproved {
+  // client_id is the id of the registered oauth2 client of the request.
+  string client_id = 1;
+}
+message PayloadAuthorizationRequestDenied {
+  // client_id is the id of the registered oauth2 client of the request.
   string client_id = 1;
 }
 
@@ -1018,3 +1068,42 @@ message PayloadPolicyEnforcementTargetsChanged {
   // new_include_targets are the new include targets of the policy enforcement.
   repeated string new_include_targets = 3;
 }
+
+message ResourceVisibilityControl {
+  // Possible visibility that a resource can have.
+  enum Visibility {
+    VISIBILITY_UNSPECIFIED = 0;
+    VISIBILITY_PUBLIC = 1;
+    VISIBILITY_PRIVATE = 2;
+  }
+  // The visibility that is being controlled.
+  Visibility visibility = 1;
+  // Strict defines if the controlled visibility behaves like a restriction or a default value.
+  bool strict = 2;
+}
+
+message PayloadServerResourceVisibilityControlChanged {
+  // The resource type that had its visibility control changed.
+  ResourceType resource_type = 1;
+  // The old visibility control for resources of that type under the server instance. If not
+  // present, then this visibility control was just created.
+  optional ResourceVisibilityControl old_visibility_control = 2;
+  // The new visibility control for resources of that type under the server instance. If not
+  // present, then this visibility control was just deleted.
+  optional ResourceVisibilityControl new_visibility_control = 3;
+}
+
+message PayloadOrganizationResourceVisibilityControlChanged {
+  // The resource type that had its visibility control changed.
+  ResourceType resource_type = 1;
+  // The old visibility control for resources of that type under the organization. If not present,
+  // then this visibility control was just created.
+  optional ResourceVisibilityControl old_visibility_control = 2;
+  // The new visibility control for resources of that type under the organization. If not present,
+  // then this visibility control was just deleted.
+  optional ResourceVisibilityControl new_visibility_control = 3;
+}
+
+message PayloadOrganizationUniquenessPolicyEnabled {}
+
+message PayloadOrganizationUniquenessPolicyDisabled {}
