@@ -130,9 +130,7 @@ message PolicyConfig {
     // The arguments to invoke the Plugin with.
     repeated string args = 4 [
       (buf.validate.field).repeated.max_items = 250,
-      (buf.validate.field).repeated.items = {
-        string: {max_len: 250}
-      }
+      (buf.validate.field).repeated.items = {string: {max_len: 250}}
     ];
   }
   // The lint config.
