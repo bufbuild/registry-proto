@@ -51,8 +51,8 @@ service IdpGroupMappingService {
   }
   // Update existing IdP group mappings.
   //
-  // Only the role override may be updated. To change the resource or IdP group name, delete the
-  // mapping and create a new one.
+  // Only the role may be updated. To change the resource or IdP group name, delete the mapping and
+  // create a new one.
   //
   // This operation is atomic. Either all mappings are updated or an error is returned.
   rpc UpdateIdpGroupMappings(UpdateIdpGroupMappingsRequest) returns (UpdateIdpGroupMappingsResponse) {
@@ -112,11 +112,9 @@ message CreateIdpGroupMappingsRequest {
     message Organization {
       // The Organization to create the mapping on.
       buf.registry.owner.v1.OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
-      // The role override.
-      //
-      // If set, mapped Users receive this role. If unset, mapped Users receive
-      // ORGANIZATION_ROLE_MEMBER.
-      optional buf.registry.owner.v1.OrganizationRole role_override = 2 [
+      // The role mapped Users receive within the Organization.
+      buf.registry.owner.v1.OrganizationRole role = 2 [
+        (buf.validate.field).required = true,
         (buf.validate.field).enum.defined_only = true,
         (buf.validate.field).enum.not_in = 0
       ];
@@ -163,19 +161,18 @@ message CreateIdpGroupMappingsResponse {
 message UpdateIdpGroupMappingsRequest {
   // An individual request to update an IdP group mapping.
   //
-  // The mapping is identified by its resource and IdP group name. The role override replaces the
-  // mapping's current override; if unset, the override is removed and mapped Users receive the
-  // resource's default role.
+  // The mapping is identified by its resource and IdP group name. For Organizations, the role
+  // replaces the mapping's current role. For Modules, the role override replaces the mapping's
+  // current override; if unset, the override is removed and mapped Users receive the Module's
+  // default role.
   message Value {
     // The mapping to update on an Organization.
     message Organization {
       // The Organization that the mapping applies to.
       buf.registry.owner.v1.OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
-      // The role override.
-      //
-      // If set, mapped Users receive this role. If unset, mapped Users receive
-      // ORGANIZATION_ROLE_MEMBER.
-      optional buf.registry.owner.v1.OrganizationRole role_override = 2 [
+      // The role mapped Users receive within the Organization.
+      buf.registry.owner.v1.OrganizationRole role = 2 [
+        (buf.validate.field).required = true,
         (buf.validate.field).enum.defined_only = true,
         (buf.validate.field).enum.not_in = 0
       ];

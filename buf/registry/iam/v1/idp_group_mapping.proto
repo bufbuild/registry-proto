@@ -51,11 +51,9 @@ message OrganizationIdpGroupMapping {
   google.protobuf.Timestamp create_time = 3 [(buf.validate.field).required = true];
   // The last time the mapping was updated.
   google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
-  // The role override.
-  //
-  // If set, mapped Users receive this role within the Organization. If unset, mapped Users
-  // receive ORGANIZATION_ROLE_MEMBER, the role an Organization mapping grants by default.
-  optional buf.registry.owner.v1.OrganizationRole role_override = 5 [
+  // The role mapped Users receive within the Organization.
+  buf.registry.owner.v1.OrganizationRole role = 5 [
+    (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).enum.not_in = 0
   ];
