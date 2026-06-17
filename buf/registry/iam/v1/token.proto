@@ -110,7 +110,6 @@ message TokenRef {
   // instead.
   message Name {
     // The reference to the user which owns the token.
-    // TODO(pkw): Should this default to the user calling the TokenService?
     buf.registry.owner.v1.UserRef user_ref = 1;
     // The name of the token.
     string name = 2 [

@@ -77,9 +77,6 @@ service OrganizationMembershipService {
   // than managed by JIT provisioning or an IdP group mapping. It is an error to remove a User who
   // is the only such owner.
   //
-  // TODO(pkw): The BSR allows any member to remove themselves from an Organization. Decide
-  // whether self-removal needs to be carved out of the required Permission.
-  //
   // This operation is atomic. Either all OrganizationMemberships are deleted or an error is
   // returned.
   rpc DeleteOrganizationMemberships(DeleteOrganizationMembershipsRequest) returns (DeleteOrganizationMembershipsResponse) {
