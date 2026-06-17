@@ -158,7 +158,7 @@ message UpdatePluginsRequest {
       (buf.validate.field).enum.not_in = 0
     ];
     // The deprecation status of the Plugin.
-    optional PluginState state = 3 [
+    optional PluginStatus status = 3 [
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
     ];

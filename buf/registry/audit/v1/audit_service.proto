@@ -21,13 +21,13 @@ import "google/protobuf/timestamp.proto";
 
 // AuditService is the Audit service.
 service AuditService {
-  // ListAuditedEvents lists audited events recorded in the BSR instance.
-  rpc ListAuditedEvents(ListAuditedEventsRequest) returns (ListAuditedEventsResponse) {
+  // ListEvents lists audited events recorded in the BSR instance.
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
-message ListAuditedEventsRequest {
+message ListEventsRequest {
   // The page size for listing audited events, values between 1-250.
   uint32 page_size = 1;
   // The page token for paginating. The first page is returned if this is empty.
@@ -38,7 +38,7 @@ message ListAuditedEventsRequest {
   google.protobuf.Timestamp end = 4;
 }
 
-message ListAuditedEventsResponse {
+message ListEventsResponse {
   // The list of audited events in the current page.
   repeated buf.registry.audit.v1.Event events = 1;
   // The token for the next page of audited events. There are no more pages if

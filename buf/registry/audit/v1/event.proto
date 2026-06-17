@@ -100,7 +100,7 @@ enum EventType {
   EVENT_TYPE_MODULE_DELETED = 7;
   EVENT_TYPE_MODULE_COMMIT_PUSHED = 8;
   EVENT_TYPE_MODULE_CONTRIBUTOR_ADDED = 9;
-  EVENT_TYPE_MODULE_CONTRIBUTOR_ROLE_CHANGED = 10;
+  reserved 10;
   EVENT_TYPE_MODULE_CONTRIBUTOR_ROLES_CHANGED = 63;
   EVENT_TYPE_MODULE_CONTRIBUTOR_REMOVED = 11;
   EVENT_TYPE_MODULE_VISIBILITY_CHANGED = 12;
@@ -299,9 +299,9 @@ message PayloadOrganizationMemberRolesChanged {
     // source is the source of the role granted to the member.
     buf.registry.owner.v1.OrganizationRoleSource source = 2;
   }
-  // organization_id is the id of the organization within which the roles was changed.
+  // organization_id is the id of the organization within which the roles were changed.
   string organization_id = 1;
-  // organization_name is the name of the organization within which the roles was changed.
+  // organization_name is the name of the organization within which the roles were changed.
   string organization_name = 2;
   // old_roles are the old roles of the member.
   repeated OrganizationRole old_roles = 3;
@@ -424,18 +424,18 @@ message PayloadModuleContributorAdded {
 
 message PayloadModuleContributorRolesChanged {
   message ModuleRole {
-    // role is the role of the member.
+    // role is the role of the contributor.
     buf.registry.module.v1.ModuleContributorRole role = 1;
-    // source is the source of the role granted to the member.
+    // source is the source of the role granted to the contributor.
     buf.registry.module.v1.ModuleContributorRoleSource source = 2;
   }
   // owner_id is the id of the owner of the module.
   string owner_id = 1;
   // owner_name is the name of the owner of the module.
   string owner_name = 2;
-  // module_id is the id of the module within which the role was changed.
+  // module_id is the id of the module within which the roles were changed.
   string module_id = 3;
-  // module_name is the name of the module within which the role was changed.
+  // module_name is the name of the module within which the roles were changed.
   string module_name = 4;
   // old_roles are the old roles of the contributor.
   repeated ModuleRole old_roles = 5;
@@ -575,51 +575,51 @@ message PayloadPluginCreated {
   // owner_name is the name of the owner of the plugin.
   string owner_name = 2;
   // plugin_type is the type of the plugin.
-  string plugin_type = 3;
+  buf.registry.plugin.v1.PluginType plugin_type = 3;
   // visibility is the visibility of the plugin.
   buf.registry.plugin.v1.PluginVisibility visibility = 4;
 }
 
 message PayloadPluginDeleted {
-  // owner_id is the id of the owner of the check plugin.
+  // owner_id is the id of the owner of the plugin.
   string owner_id = 1;
-  // owner_name is the name of the owner of the check plugin.
+  // owner_name is the name of the owner of the plugin.
   string owner_name = 2;
   // plugin_type is the type of the plugin.
-  string plugin_type = 3;
+  buf.registry.plugin.v1.PluginType plugin_type = 3;
   // visibility is the visibility of the plugin.
   buf.registry.plugin.v1.PluginVisibility visibility = 4;
 }
 
 message PayloadPluginDeprecated {
-  // owner_id is the id of the owner of the check plugin.
+  // owner_id is the id of the owner of the plugin.
   string owner_id = 1;
-  // owner_name is the name of the owner of the check plugin.
+  // owner_name is the name of the owner of the plugin.
   string owner_name = 2;
   // plugin_type is the type of the plugin.
-  string plugin_type = 3;
+  buf.registry.plugin.v1.PluginType plugin_type = 3;
   // visibility is the visibility of the plugin.
   buf.registry.plugin.v1.PluginVisibility visibility = 4;
 }
 
 message PayloadPluginUndeprecated {
-  // owner_id is the id of the owner of the check plugin.
+  // owner_id is the id of the owner of the plugin.
   string owner_id = 1;
-  // owner_name is the name of the owner of the check plugin.
+  // owner_name is the name of the owner of the plugin.
   string owner_name = 2;
   // plugin_type is the type of the plugin.
-  string plugin_type = 3;
+  buf.registry.plugin.v1.PluginType plugin_type = 3;
   // visibility is the visibility of the plugin.
   buf.registry.plugin.v1.PluginVisibility visibility = 4;
 }
 
 message PayloadPluginVisibilityChanged {
-  // owner_id is the id of the owner of the check plugin.
+  // owner_id is the id of the owner of the plugin.
   string owner_id = 1;
-  // owner_name is the name of the owner of the check plugin.
+  // owner_name is the name of the owner of the plugin.
   string owner_name = 2;
   // plugin_type is the type of the plugin.
-  string plugin_type = 3;
+  buf.registry.plugin.v1.PluginType plugin_type = 3;
   // old_visibility is the old visibility of the plugin.
   buf.registry.plugin.v1.PluginVisibility old_visibility = 4;
   // new_visibility is the new visibility of the plugin.
@@ -677,7 +677,7 @@ message PayloadGenerationPluginStatusUpdated {
   // owner_name is the name of the owner of the plugin.
   string owner_name = 2;
   // new_status is the new status of the plugin.
-  string new_status = 3;
+  buf.registry.plugin.v1.GenerationPluginStatus new_status = 3;
 }
 
 message PayloadTokenCreated {
@@ -721,10 +721,9 @@ message PayloadModuleLabelCreated {
   string owner_name = 2;
   // module_id is the id of the module on which the label was created.
   string module_id = 3;
-  // module_name is the name of the module from which the label was created.
+  // module_name is the name of the module on which the label was created.
   string module_name = 4;
-  // label_namespace is the namespace of the label that was created.
-  string label_namespace = 5 [deprecated = true];
+  reserved 5;
   // commit_id is the id of the commit on which the label was created.
   string commit_id = 6;
 }
@@ -736,10 +735,9 @@ message PayloadModuleLabelMoved {
   string owner_name = 2;
   // module_id is the id of the module on which the label was moved.
   string module_id = 3;
-  // module_name is the name of the module from which the label was moved.
+  // module_name is the name of the module on which the label was moved.
   string module_name = 4;
-  // label_namespace is the namespace of the label that was moved.
-  string label_namespace = 5 [deprecated = true];
+  reserved 5;
   // to_commit_id is the id of the commit on which the label was moved to.
   string to_commit_id = 6;
   // from_commit_id is the id of the commit on which the label was moved from.
@@ -753,7 +751,7 @@ message PayloadModuleLabelArchived {
   string owner_name = 2;
   // module_id is the id of the module on which the label was archived.
   string module_id = 3;
-  // module_name is the name of the module from which the label was archived.
+  // module_name is the name of the module on which the label was archived.
   string module_name = 4;
 }
 
@@ -764,7 +762,7 @@ message PayloadModuleLabelUnarchived {
   string owner_name = 2;
   // module_id is the id of the module on which the label was unarchived.
   string module_id = 3;
-  // module_name is the name of the module from which the label was unarchived.
+  // module_name is the name of the module on which the label was unarchived.
   string module_name = 4;
 }
 
@@ -801,7 +799,7 @@ message PayloadPluginLabelCreated {
   string owner_name = 2;
   // plugin_id is the id of the plugin on which the label was created.
   string plugin_id = 3;
-  // plugin_name is the name of the plugin from which the label was created.
+  // plugin_name is the name of the plugin on which the label was created.
   string plugin_name = 4;
   // commit_id is the id of the commit on which the label was created.
   string commit_id = 6;
@@ -814,7 +812,7 @@ message PayloadPluginLabelMoved {
   string owner_name = 2;
   // plugin_id is the id of the plugin on which the label was moved.
   string plugin_id = 3;
-  // plugin_name is the name of the plugin from which the label was moved.
+  // plugin_name is the name of the plugin on which the label was moved.
   string plugin_name = 4;
   // to_commit_id is the id of the commit on which the label was moved to.
   string to_commit_id = 6;
@@ -829,7 +827,7 @@ message PayloadPluginLabelArchived {
   string owner_name = 2;
   // plugin_id is the id of the plugin on which the label was archived.
   string plugin_id = 3;
-  // plugin_name is the name of the plugin from which the label was archived.
+  // plugin_name is the name of the plugin on which the label was archived.
   string plugin_name = 4;
 }
 
@@ -840,7 +838,7 @@ message PayloadPluginLabelUnarchived {
   string owner_name = 2;
   // plugin_id is the id of the plugin on which the label was unarchived.
   string plugin_id = 3;
-  // plugin_name is the name of the plugin from which the label was unarchived.
+  // plugin_name is the name of the plugin on which the label was unarchived.
   string plugin_name = 4;
 }
 
@@ -851,7 +849,7 @@ message PayloadPolicyLabelCreated {
   string owner_name = 2;
   // policy_id is the id of the policy on which the label was created.
   string policy_id = 3;
-  // policy_name is the name of the policy from which the label was created.
+  // policy_name is the name of the policy on which the label was created.
   string policy_name = 4;
   // commit_id is the id of the commit on which the label was created.
   string commit_id = 6;
@@ -864,7 +862,7 @@ message PayloadPolicyLabelMoved {
   string owner_name = 2;
   // policy_id is the id of the policy on which the label was moved.
   string policy_id = 3;
-  // policy_name is the name of the policy from which the label was moved.
+  // policy_name is the name of the policy on which the label was moved.
   string policy_name = 4;
   // to_commit_id is the id of the commit on which the label was moved to.
   string to_commit_id = 6;
@@ -879,7 +877,7 @@ message PayloadPolicyLabelArchived {
   string owner_name = 2;
   // policy_id is the id of the policy on which the label was archived.
   string policy_id = 3;
-  // policy_name is the name of the policy from which the label was archived.
+  // policy_name is the name of the policy on which the label was archived.
   string policy_name = 4;
 }
 
@@ -890,7 +888,7 @@ message PayloadPolicyLabelUnarchived {
   string owner_name = 2;
   // policy_id is the id of the policy on which the label was unarchived.
   string policy_id = 3;
-  // policy_name is the name of the policy from which the label was unarchived.
+  // policy_name is the name of the policy on which the label was unarchived.
   string policy_name = 4;
 }
 
