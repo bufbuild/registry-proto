@@ -266,10 +266,10 @@ message Event {
     PayloadModuleLabelEnforcementIgnoresChanged module_label_enforcement_ignores_changed = 85;
     PayloadGenerationPluginDeleted generation_plugin_deleted = 37;
     PayloadGenerationPluginStatusUpdated generation_plugin_status_updated = 84;
-    PayloadServerBreakingChangePolicyEnabled payload_server_breaking_change_policy_enabled = 38;
-    PayloadServerBreakingChangePolicyDisabled payload_server_breaking_change_policy_disabled = 39;
-    PayloadServerUniquenessPolicyEnabled payload_server_uniqueness_policy_enabled = 41;
-    PayloadServerUniquenessPolicyDisabled payload_server_uniqueness_policy_disabled = 42;
+    PayloadServerBreakingChangePolicyEnabled server_breaking_change_policy_enabled = 38;
+    PayloadServerBreakingChangePolicyDisabled server_breaking_change_policy_disabled = 39;
+    PayloadServerUniquenessPolicyEnabled server_uniqueness_policy_enabled = 41;
+    PayloadServerUniquenessPolicyDisabled server_uniqueness_policy_disabled = 42;
     PayloadServerResourceVisibilityControlChanged server_resource_visibility_control_changed = 86;
     PayloadUserAutoMergedFromNewIdP user_auto_merged_from_new_idp = 43;
     PayloadDeviceAuthorizationGrantApproved device_authorization_grant_approved = 47;
