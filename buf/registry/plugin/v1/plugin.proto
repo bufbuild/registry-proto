@@ -92,9 +92,9 @@ enum PluginStatus {
 // The type of the Plugin.
 enum PluginType {
   PLUGIN_TYPE_UNSPECIFIED = 0;
-  // PLUGIN_TYPE_CHECK says that the Plugin is a check plugin.
+  // PLUGIN_TYPE_CHECK is a Plugin that provides lint and breaking-change rules.
   PLUGIN_TYPE_CHECK = 1;
-  // PLUGIN_TYPE_GENERATION says that the Plugin is a code generation plugin.
+  // PLUGIN_TYPE_GENERATION is a Plugin that generates code from Protobuf.
   PLUGIN_TYPE_GENERATION = 2;
 }
 
