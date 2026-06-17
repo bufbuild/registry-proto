@@ -68,12 +68,6 @@ message ConvertRequest {
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).enum.not_in = 0
   ];
-  // If true, fields in payload that cannot be resolved against the schema are
-  // discarded. If false (the default), an unresolvable field causes the
-  // conversion to fail.
-  //
-  // Only used when input_format is JSON.
-  bool discard_unknown = 6;
 }
 
 message ConvertResponse {
@@ -101,8 +95,8 @@ message GetJSONSchemaRequest {
 message GetJSONSchemaResponse {
   // An approximate JSON Schema for the JSON encoding of type_name.
   //
-  // This is a JSON document (UTF-8 text), suitable for writing to a file or
-  // handing to JSON Schema tooling. It is intended for editor validation and
+  // This is a JSON document, suitable for writing to a file or handing to
+  // JSON Schema tooling. It is intended for editor validation and
   // autocompletion, not a lossless representation of the type's descriptor.
   string json_schema = 1 [(buf.validate.field).required = true];
 }
