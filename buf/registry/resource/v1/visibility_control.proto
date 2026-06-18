@@ -1,0 +1,55 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.resource.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/resource/v1";
+
+// The visibility of a resource, currently either public or private.
+//
+// This is the control-layer visibility enum used by VisibilityControl. It is intentionally
+// distinct from the per-resource ModuleVisibility, PluginVisibility, and PolicyVisibility enums
+// that remain on those resources.
+enum ResourceVisibility {
+  RESOURCE_VISIBILITY_UNSPECIFIED = 0;
+  // The resource is publicly available.
+  RESOURCE_VISIBILITY_PUBLIC = 1;
+  // The resource is private.
+  RESOURCE_VISIBILITY_PRIVATE = 2;
+}
+
+// A control over the visibility of a type of resource, set by an instance or Organization
+// administrator and embedded in instance or Organization settings.
+//
+// The type of resource a control governs is implied by the settings field it occupies, for
+// example the module_visibility_control field governs Modules.
+message VisibilityControl {
+  // The visibility assigned to resources of the governed type.
+  ResourceVisibility resource_visibility = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // Whether resource_visibility is enforced or is a fallback default.
+  //
+  // If strict, resources of the governed type must use resource_visibility and a lower layer
+  // cannot override it; only an administrator at the control's layer may deviate. If not strict,
+  // resource_visibility is used when no explicit visibility is given when a resource is created or
+  // updated, but it may be overridden.
+  bool strict = 2;
+}

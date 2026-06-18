@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.admin.v1;
 
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/resource/v1/visibility_control.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/instance_settings/v1";
@@ -38,6 +39,21 @@ message InstanceSettings {
   BreakingChangePolicy breaking_change_policy = 1 [(buf.validate.field).required = true];
   // The settings controlling whether Commits with breaking changes are held for review.
   ReviewFlowSettings review_flow_settings = 2 [(buf.validate.field).required = true];
+  // The instance-wide visibility control for Modules.
+  //
+  // If unset, new Modules fall through to the owning Organization's control, and default to
+  // private if no control applies at any level.
+  buf.registry.resource.v1.VisibilityControl module_visibility_control = 3;
+  // The instance-wide visibility control for Plugins.
+  //
+  // If unset, new Plugins fall through to the owning Organization's control, and default to
+  // private if no control applies at any level.
+  buf.registry.resource.v1.VisibilityControl plugin_visibility_control = 4;
+  // The instance-wide visibility control for Policies.
+  //
+  // If unset, new Policies fall through to the owning Organization's control, and default to
+  // private if no control applies at any level.
+  buf.registry.resource.v1.VisibilityControl policy_visibility_control = 5;
 }
 
 // The policy controlling enforcement of breaking changes when Commits are pushed to the

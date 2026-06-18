@@ -17,9 +17,9 @@ syntax = "proto3";
 package buf.registry.iam.v1;
 
 import "buf/registry/iam/v1/permission.proto";
-import "buf/registry/iam/v1/resource_type.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/priv/validate/v1beta1/validate.proto";
+import "buf/registry/resource/v1/resource_type.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
@@ -66,7 +66,7 @@ message ListPermissionsRequest {
   // If specified, only return Permissions with a bindable_resource_type that match
   // any of the bindable_resource_types, i.e. if a permission has bindable types
   // [1, 2] and the request specifies [2, 3], it's a match because of 2.
-  repeated ResourceType bindable_resource_types = 4 [
+  repeated buf.registry.resource.v1.ResourceType bindable_resource_types = 4 [
     (buf.validate.field).repeated.unique = true,
     (buf.validate.field).repeated.items.enum.defined_only = true,
     (buf.validate.field).repeated.items.enum.not_in = 0

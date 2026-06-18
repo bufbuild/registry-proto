@@ -14,9 +14,9 @@
 
 syntax = "proto3";
 
-package buf.registry.iam.v1;
+package buf.registry.resource.v1;
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/resource/v1";
 
 // The type of a resource in the BSR.
 enum ResourceType {
