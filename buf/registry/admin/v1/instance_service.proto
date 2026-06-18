@@ -19,7 +19,7 @@ package buf.registry.admin.v1;
 import "buf/registry/admin/v1/instance_settings.proto";
 import "buf/registry/admin/v1/recommended_sdk.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
-import "buf/registry/resource/v1/visibility_control.proto";
+import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/instance_settings/v1";
@@ -90,15 +90,15 @@ message UpdateInstanceSettingsRequest {
   // The instance-wide visibility control for Modules to set.
   //
   // If unset, the Module visibility control is left unchanged.
-  buf.registry.resource.v1.VisibilityControl module_visibility_control = 3;
+  buf.registry.resource.v1.ResourceVisibilityControl module_visibility_control = 3;
   // The instance-wide visibility control for Plugins to set.
   //
   // If unset, the Plugin visibility control is left unchanged.
-  buf.registry.resource.v1.VisibilityControl plugin_visibility_control = 4;
+  buf.registry.resource.v1.ResourceVisibilityControl plugin_visibility_control = 4;
   // The instance-wide visibility control for Policies to set.
   //
   // If unset, the Policy visibility control is left unchanged.
-  buf.registry.resource.v1.VisibilityControl policy_visibility_control = 5;
+  buf.registry.resource.v1.ResourceVisibilityControl policy_visibility_control = 5;
 }
 
 message UpdateInstanceSettingsResponse {

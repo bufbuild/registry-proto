@@ -22,7 +22,7 @@ import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/module/v1/module.proto";
 import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/policy/v1/policy.proto";
-import "buf/registry/resource/v1/visibility_control.proto";
+import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "google/protobuf/timestamp.proto";
 
 // ActorType is the type of actor that caused the audited event.
@@ -1075,10 +1075,10 @@ message PayloadServerResourceVisibilityControlChanged {
   ResourceType resource_type = 1;
   // The old visibility control for resources of that type under the server instance. If not
   // present, then this visibility control was just created.
-  optional buf.registry.resource.v1.VisibilityControl old_visibility_control = 2;
+  optional buf.registry.resource.v1.ResourceVisibilityControl old_visibility_control = 2;
   // The new visibility control for resources of that type under the server instance. If not
   // present, then this visibility control was just deleted.
-  optional buf.registry.resource.v1.VisibilityControl new_visibility_control = 3;
+  optional buf.registry.resource.v1.ResourceVisibilityControl new_visibility_control = 3;
 }
 
 message PayloadOrganizationResourceVisibilityControlChanged {
@@ -1086,10 +1086,10 @@ message PayloadOrganizationResourceVisibilityControlChanged {
   ResourceType resource_type = 1;
   // The old visibility control for resources of that type under the organization. If not present,
   // then this visibility control was just created.
-  optional buf.registry.resource.v1.VisibilityControl old_visibility_control = 2;
+  optional buf.registry.resource.v1.ResourceVisibilityControl old_visibility_control = 2;
   // The new visibility control for resources of that type under the organization. If not present,
   // then this visibility control was just deleted.
-  optional buf.registry.resource.v1.VisibilityControl new_visibility_control = 3;
+  optional buf.registry.resource.v1.ResourceVisibilityControl new_visibility_control = 3;
 }
 
 message PayloadOrganizationUniquenessPolicyEnabled {}

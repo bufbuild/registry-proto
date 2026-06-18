@@ -22,7 +22,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // The visibility of a resource, currently either public or private.
 //
-// This is the control-layer visibility enum used by VisibilityControl. It is intentionally
+// This is the control-layer visibility enum used by ResourceVisibilityControl. It is intentionally
 // distinct from the per-resource ModuleVisibility, PluginVisibility, and PolicyVisibility enums
 // that remain on those resources.
 enum ResourceVisibility {
@@ -38,7 +38,7 @@ enum ResourceVisibility {
 //
 // The type of resource a control governs is implied by the settings field it occupies, for
 // example the module_visibility_control field governs Modules.
-message VisibilityControl {
+message ResourceVisibilityControl {
   // The visibility assigned to resources of the governed type.
   ResourceVisibility resource_visibility = 1 [
     (buf.validate.field).required = true,
