@@ -89,13 +89,12 @@ message SDKRecommendationLevel {
 //
 // An SDK can be recommended at more than one level at once; for example, an SDK
 // recommended at the instance level may also be recommended for a specific Module.
-message SDKRecommendationLevelRequest {
+message SDKRecommendationLevelRef {
   // The SDK is recommended across the entire instance.
   //
   // Eager generation is enqueued for the SDK across all Modules on the instance.
   message Instance {}
-  // The SDK is recommended across a single Organization.
-  //
+
   oneof level {
     option (buf.validate.oneof).required = true;
     // The SDK is recommended across the entire instance.
