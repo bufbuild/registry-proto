@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.owner.v1;
 
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -113,6 +114,24 @@ message OrganizationSettings {
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).enum.not_in = 0
   ];
+  // The Organization's visibility control for the Modules it owns.
+  //
+  // This control is ignored when a strict instance-level control is set. If unset, new Modules
+  // fall through to the instance-level control, and default to private if no control applies at
+  // any level.
+  buf.registry.resource.v1.ResourceVisibilityControl module_visibility_control = 5;
+  // The Organization's visibility control for the Plugins it owns.
+  //
+  // This control is ignored when a strict instance-level control is set. If unset, new Plugins
+  // fall through to the instance-level control, and default to private if no control applies at
+  // any level.
+  buf.registry.resource.v1.ResourceVisibilityControl plugin_visibility_control = 6;
+  // The Organization's visibility control for the Policies it owns.
+  //
+  // This control is ignored when a strict instance-level control is set. If unset, new Policies
+  // fall through to the instance-level control, and default to private if no control applies at
+  // any level.
+  buf.registry.resource.v1.ResourceVisibilityControl policy_visibility_control = 7;
 }
 
 // A base role that members of an Organization receive on the resources the Organization owns.

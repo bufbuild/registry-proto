@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package buf.registry.iam.v1;
 
-import "buf/registry/iam/v1/resource_type.proto";
+import "buf/registry/resource/v1/resource_type.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
@@ -38,7 +38,7 @@ message Scope {
       (buf.validate.field).string.tuuid = true
     ];
     // The type of the resource that resource_id refers to.
-    ResourceType resource_type = 2 [
+    buf.registry.resource.v1.ResourceType resource_type = 2 [
       (buf.validate.field).required = true,
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
