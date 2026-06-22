@@ -30,19 +30,14 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 message RecommendedSDK {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The recommended SDK.
-  SDK sdk = 1 [(buf.validate.field).required = true];
-  // The level at which the SDK is recommended.
-  SDKRecommendationLevel recommendation_level = 2 [(buf.validate.field).required = true];
-}
-
-// An SDK, identified by the Plugin used to generate it.
-message SDK {
-  // The id of the Plugin that generates the SDK.
-  string plugin_id = 1 [
+  // The id of the Plugin that generates the recommended SDK.
+  string sdk_plugin_id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
+
+  // The level at which the SDK is recommended.
+  SDKRecommendationLevel recommendation_level = 2 [(buf.validate.field).required = true];
 }
 
 // The level at which an SDK is recommended.
@@ -54,34 +49,15 @@ message SDKRecommendationLevel {
   //
   // Eager generation is enqueued for the SDK across all Modules on the instance.
   message Instance {}
-  // The SDK is recommended across a single Organization.
-  //
-  // Eager generation is enqueued for the SDK across all Modules owned by the Organization.
-  message Organization {
-    // The id of the Organization the SDK is recommended for.
-    string organization_id = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.tuuid = true
-    ];
-  }
-  // The SDK is recommended for a single Module.
-  //
-  // Eager generation is enqueued for the SDK within the Module.
-  message Module {
-    // The id of the Module the SDK is recommended for.
-    string module_id = 1 [
-      (buf.validate.field).required = true,
-      (buf.validate.field).string.tuuid = true
-    ];
-  }
+
   oneof level {
     option (buf.validate.oneof).required = true;
     // The SDK is recommended across the entire instance.
     Instance instance = 1;
     // The SDK is recommended across a single Organization.
-    Organization organization = 2;
+    string organization_id = 2 [(buf.validate.field).string.tuuid = true];
     // The SDK is recommended for a single Module.
-    Module module = 3;
+    string module_id = 3 [(buf.validate.field).string.tuuid = true];
   }
 }
 
