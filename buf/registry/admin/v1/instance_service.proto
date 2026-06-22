@@ -122,7 +122,7 @@ message AddRecommendedSDKRequest {
   // The Plugin that generates the SDK to recommend.
   buf.registry.plugin.v1beta1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
   // The level at which to recommend the SDK.
-  SDKRecommendationLevel recommendation_level = 2 [(buf.validate.field).required = true];
+  SDKRecommendationLevelRequest recommendation_level = 2 [(buf.validate.field).required = true];
 }
 
 message AddRecommendedSDKResponse {}
@@ -131,7 +131,7 @@ message RemoveRecommendedSDKRequest {
   // The Plugin that generates the SDK to stop recommending.
   buf.registry.plugin.v1beta1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
   // The level at which to stop recommending the SDK.
-  SDKRecommendationLevel recommendation_level = 2 [(buf.validate.field).required = true];
+  SDKRecommendationLevelRequest recommendation_level = 2 [(buf.validate.field).required = true];
 }
 
 message RemoveRecommendedSDKResponse {}
@@ -148,7 +148,7 @@ message ListRecommendedSDKsRequest {
   // The level at which to list recommended SDKs.
   //
   // Only SDKs recommended at this level are included in the response.
-  SDKRecommendationLevel recommendation_level = 3 [(buf.validate.field).required = true];
+  SDKRecommendationLevelRequest recommendation_level = 3 [(buf.validate.field).required = true];
 }
 
 message ListRecommendedSDKsResponse {
