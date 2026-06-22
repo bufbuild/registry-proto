@@ -16,10 +16,10 @@ syntax = "proto3";
 
 package buf.registry.iam.v1;
 
+import "buf/registry/iam/v1/module_contributor.proto";
+import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/module/v1/module.proto";
-import "buf/registry/module/v1/module_contributor.proto";
 import "buf/registry/owner/v1/organization.proto";
-import "buf/registry/owner/v1/organization_membership.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/validate/validate.proto";
@@ -52,7 +52,7 @@ message OrganizationIdpGroupMapping {
   // The last time the mapping was updated.
   google.protobuf.Timestamp update_time = 4 [(buf.validate.field).required = true];
   // The role mapped Users receive within the Organization.
-  buf.registry.owner.v1.OrganizationRole role = 5 [
+  OrganizationRole role = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).enum.not_in = 0
@@ -87,7 +87,7 @@ message ModuleIdpGroupMapping {
   //
   // This is the base Module role of the Organization that owns the Module, as configured in its
   // OrganizationSettings.
-  buf.registry.module.v1.ModuleContributorRole default_role = 5 [
+  ModuleContributorRole default_role = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).enum.not_in = 0
@@ -96,7 +96,7 @@ message ModuleIdpGroupMapping {
   //
   // If set, mapped Users receive this role on the Module instead of default_role. If unset,
   // mapped Users receive default_role.
-  optional buf.registry.module.v1.ModuleContributorRole role_override = 6 [
+  optional ModuleContributorRole role_override = 6 [
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).enum.not_in = 0
   ];

@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-package buf.registry.owner.v1;
+package buf.registry.iam.v1;
 
 import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/owner/v1/user.proto";
@@ -22,7 +22,7 @@ import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
 
 // An OrganizationMembership on the BSR.
 //
@@ -121,7 +121,7 @@ message OrganizationMembershipRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   // The Organization that the User is a member of.
-  OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
+  buf.registry.owner.v1.OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
   // The User that is a member of the Organization.
-  UserRef user_ref = 2 [(buf.validate.field).required = true];
+  buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
 }

@@ -17,9 +17,9 @@ syntax = "proto3";
 package buf.registry.audit.v1;
 
 import "buf/registry/admin/v1/instance_settings.proto";
+import "buf/registry/iam/v1/module_contributor.proto";
+import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/module/v1/module.proto";
-import "buf/registry/module/v1/module_contributor.proto";
-import "buf/registry/owner/v1/organization_membership.proto";
 import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/policy/v1/policy.proto";
 import "google/protobuf/timestamp.proto";
@@ -302,17 +302,17 @@ message PayloadOrganizationMemberAdded {
   // organization_name is the name of the organization with the new member.
   string organization_name = 2;
   // member_role is the role granted to the member added to the organization.
-  buf.registry.owner.v1.OrganizationRole member_role = 3;
+  buf.registry.iam.v1.OrganizationRole member_role = 3;
   // member_role_source is the source of the role granted to the member.
-  buf.registry.owner.v1.OrganizationRoleSource member_role_source = 4;
+  buf.registry.iam.v1.OrganizationRoleSource member_role_source = 4;
 }
 
 message PayloadOrganizationMemberRolesChanged {
   message OrganizationRole {
     // role is the role of the member.
-    buf.registry.owner.v1.OrganizationRole role = 1;
+    buf.registry.iam.v1.OrganizationRole role = 1;
     // source is the source of the role granted to the member.
-    buf.registry.owner.v1.OrganizationRoleSource source = 2;
+    buf.registry.iam.v1.OrganizationRoleSource source = 2;
   }
   // organization_id is the id of the organization within which the roles were changed.
   string organization_id = 1;
@@ -330,9 +330,9 @@ message PayloadOrganizationMemberRemoved {
   // organization_name is the name of the organization that the member was removed from.
   string organization_name = 2;
   // member_role is the role that the member had when removed from the organization.
-  buf.registry.owner.v1.OrganizationRole member_role = 3;
+  buf.registry.iam.v1.OrganizationRole member_role = 3;
   // member_role_source is the source of the role granted to the member.
-  buf.registry.owner.v1.OrganizationRoleSource member_role_source = 4;
+  buf.registry.iam.v1.OrganizationRoleSource member_role_source = 4;
 }
 
 message PayloadOrganizationIDPGroupAdded {
@@ -341,7 +341,7 @@ message PayloadOrganizationIDPGroupAdded {
   // organization_name is the name of the organization with the new IDP group.
   string organization_name = 2;
   // role_override is the role override associated with the new IDP group.
-  buf.registry.owner.v1.OrganizationRole role_override = 3;
+  buf.registry.iam.v1.OrganizationRole role_override = 3;
 }
 
 message PayloadOrganizationIDPGroupUpdated {
@@ -351,10 +351,10 @@ message PayloadOrganizationIDPGroupUpdated {
   string organization_name = 2;
   // old_role_override is the role override associated with the IDP updated group. Only set if the
   // role override was changed.
-  buf.registry.owner.v1.OrganizationRole old_role_override = 3;
+  buf.registry.iam.v1.OrganizationRole old_role_override = 3;
   // new_role_override is the role override associated with the IDP updated group. Only set if the
   // role override was changed.
-  buf.registry.owner.v1.OrganizationRole new_role_override = 4;
+  buf.registry.iam.v1.OrganizationRole new_role_override = 4;
 }
 
 message PayloadOrganizationIDPGroupRemoved {
@@ -363,7 +363,7 @@ message PayloadOrganizationIDPGroupRemoved {
   // organization_name is the name of the organization with the removed IDP group.
   string organization_name = 2;
   // role_override is the role override associated with the removed IDP group.
-  buf.registry.owner.v1.OrganizationRole role_override = 3;
+  buf.registry.iam.v1.OrganizationRole role_override = 3;
 }
 
 message PayloadModuleCreated {
@@ -434,15 +434,15 @@ message PayloadModuleContributorAdded {
   // module_name is the name of the module with the new contributor.
   string module_name = 4;
   // contributor_role is the role granted to the contributor added to the module.
-  buf.registry.module.v1.ModuleContributorRole contributor_role = 5;
+  buf.registry.iam.v1.ModuleContributorRole contributor_role = 5;
 }
 
 message PayloadModuleContributorRolesChanged {
   message ModuleRole {
     // role is the role of the contributor.
-    buf.registry.module.v1.ModuleContributorRole role = 1;
+    buf.registry.iam.v1.ModuleContributorRole role = 1;
     // source is the source of the role granted to the contributor.
-    buf.registry.module.v1.ModuleContributorRoleSource source = 2;
+    buf.registry.iam.v1.ModuleContributorRoleSource source = 2;
   }
   // owner_id is the id of the owner of the module.
   string owner_id = 1;
@@ -468,7 +468,7 @@ message PayloadModuleContributorRemoved {
   // module_name is the name of the module that the contributor was removed from.
   string module_name = 4;
   // contributor_role is the role that the contributor had when removed from the module.
-  buf.registry.module.v1.ModuleContributorRole contributor_role = 5;
+  buf.registry.iam.v1.ModuleContributorRole contributor_role = 5;
 }
 
 message PayloadModuleVisibilityChanged {
@@ -499,7 +499,7 @@ message PayloadModuleIDPGroupAdded {
   // module_name is the name of the module with the new IDP group.
   string module_name = 2;
   // role_override is the role override associated with the new IDP group.
-  buf.registry.module.v1.ModuleContributorRole role_override = 3;
+  buf.registry.iam.v1.ModuleContributorRole role_override = 3;
 }
 
 message PayloadModuleIDPGroupUpdated {
@@ -509,10 +509,10 @@ message PayloadModuleIDPGroupUpdated {
   string module_name = 2;
   // old_role_override is the role override associated with the IDP updated group. Only set if the
   // role override was changed.
-  buf.registry.module.v1.ModuleContributorRole old_role_override = 3;
+  buf.registry.iam.v1.ModuleContributorRole old_role_override = 3;
   // new_role_override is the role override associated with the IDP updated group. Only set if the
   // role override was changed.
-  buf.registry.module.v1.ModuleContributorRole new_role_override = 4;
+  buf.registry.iam.v1.ModuleContributorRole new_role_override = 4;
 }
 
 message PayloadModuleIDPGroupRemoved {
@@ -521,7 +521,7 @@ message PayloadModuleIDPGroupRemoved {
   // module_name is the name of the module with the removed IDP group.
   string module_name = 2;
   // role_override is the role override associated with the removed IDP group.
-  buf.registry.module.v1.ModuleContributorRole role_override = 3;
+  buf.registry.iam.v1.ModuleContributorRole role_override = 3;
 }
 
 message PayloadPolicyCreated {

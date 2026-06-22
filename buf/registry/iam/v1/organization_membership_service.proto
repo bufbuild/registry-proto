@@ -14,15 +14,15 @@
 
 syntax = "proto3";
 
-package buf.registry.owner.v1;
+package buf.registry.iam.v1;
 
+import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/owner/v1/organization.proto";
-import "buf/registry/owner/v1/organization_membership.proto";
 import "buf/registry/owner/v1/user.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
 
 // Operate on OrganizationMemberships.
 //
@@ -125,11 +125,11 @@ message ListOrganizationMembershipsRequest {
   // Only return OrganizationMemberships within one of these Organizations.
   //
   // If empty, OrganizationMemberships are not filtered by Organization.
-  repeated OrganizationRef organization_refs = 4 [(buf.validate.field).repeated.max_items = 250];
+  repeated buf.registry.owner.v1.OrganizationRef organization_refs = 4 [(buf.validate.field).repeated.max_items = 250];
   // Only return OrganizationMemberships for one of these Users.
   //
   // If empty, OrganizationMemberships are not filtered by User.
-  repeated UserRef user_refs = 5 [(buf.validate.field).repeated.max_items = 250];
+  repeated buf.registry.owner.v1.UserRef user_refs = 5 [(buf.validate.field).repeated.max_items = 250];
 }
 
 message ListOrganizationMembershipsResponse {
@@ -145,9 +145,9 @@ message CreateOrganizationMembershipsRequest {
   // An individual request to create an OrganizationMembership.
   message Value {
     // The Organization to add the User to.
-    OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
+    buf.registry.owner.v1.OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
     // The User to add to the Organization.
-    UserRef user_ref = 2 [(buf.validate.field).required = true];
+    buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
     // The role to assign to the User.
     OrganizationRole role = 3 [
       (buf.validate.field).required = true,
@@ -171,9 +171,9 @@ message UpdateOrganizationMembershipsRequest {
   // An individual request to update an OrganizationMembership.
   message Value {
     // The Organization that the User is a member of.
-    OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
+    buf.registry.owner.v1.OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
     // The User whose role to update.
-    UserRef user_ref = 2 [(buf.validate.field).required = true];
+    buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
     // The role to assign to the User.
     OrganizationRole role = 3 [
       (buf.validate.field).required = true,

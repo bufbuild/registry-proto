@@ -14,15 +14,15 @@
 
 syntax = "proto3";
 
-package buf.registry.module.v1;
+package buf.registry.iam.v1;
 
+import "buf/registry/iam/v1/module_contributor.proto";
 import "buf/registry/module/v1/module.proto";
-import "buf/registry/module/v1/module_contributor.proto";
 import "buf/registry/owner/v1/user.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
 
 // Operate on ModuleContributors.
 //
@@ -31,7 +31,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // service.
 //
 // This is the API for managing per-Module grants. Grants within an Organization are managed via
-// the buf.registry.owner.v1.OrganizationMembershipService.
+// the buf.registry.iam.v1.OrganizationMembershipService.
 service ModuleContributorService {
   // Get ModuleContributors by Module and User.
   rpc GetModuleContributors(GetModuleContributorsRequest) returns (GetModuleContributorsResponse) {
@@ -117,7 +117,7 @@ message ListModuleContributorsRequest {
   // Only return ModuleContributors on one of these Modules.
   //
   // If empty, ModuleContributors are not filtered by Module.
-  repeated ModuleRef module_refs = 4 [(buf.validate.field).repeated.max_items = 250];
+  repeated buf.registry.module.v1.ModuleRef module_refs = 4 [(buf.validate.field).repeated.max_items = 250];
   // Only return ModuleContributors for one of these Users.
   //
   // If empty, ModuleContributors are not filtered by User.
@@ -137,7 +137,7 @@ message CreateModuleContributorsRequest {
   // An individual request to create a ModuleContributor.
   message Value {
     // The Module to grant the role on.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    buf.registry.module.v1.ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The User to grant the role to.
     buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
     // The role to grant to the User.
@@ -163,7 +163,7 @@ message UpdateModuleContributorsRequest {
   // An individual request to update a ModuleContributor.
   message Value {
     // The Module that the role is granted on.
-    ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+    buf.registry.module.v1.ModuleRef module_ref = 1 [(buf.validate.field).required = true];
     // The User whose role to update.
     buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
     // The role to grant to the User.

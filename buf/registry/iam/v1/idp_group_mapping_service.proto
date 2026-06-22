@@ -17,10 +17,10 @@ syntax = "proto3";
 package buf.registry.iam.v1;
 
 import "buf/registry/iam/v1/idp_group_mapping.proto";
+import "buf/registry/iam/v1/module_contributor.proto";
+import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/module/v1/module.proto";
-import "buf/registry/module/v1/module_contributor.proto";
 import "buf/registry/owner/v1/organization.proto";
-import "buf/registry/owner/v1/organization_membership.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/validate/validate.proto";
@@ -113,7 +113,7 @@ message CreateIdpGroupMappingsRequest {
       // The Organization to create the mapping on.
       buf.registry.owner.v1.OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
       // The role mapped Users receive within the Organization.
-      buf.registry.owner.v1.OrganizationRole role = 2 [
+      OrganizationRole role = 2 [
         (buf.validate.field).required = true,
         (buf.validate.field).enum.defined_only = true,
         (buf.validate.field).enum.not_in = 0
@@ -127,7 +127,7 @@ message CreateIdpGroupMappingsRequest {
       //
       // If set, mapped Users receive this role. If unset, mapped Users receive the owning
       // Organization's base Module role.
-      optional buf.registry.module.v1.ModuleContributorRole role_override = 2 [
+      optional ModuleContributorRole role_override = 2 [
         (buf.validate.field).enum.defined_only = true,
         (buf.validate.field).enum.not_in = 0
       ];
@@ -171,7 +171,7 @@ message UpdateIdpGroupMappingsRequest {
       // The Organization that the mapping applies to.
       buf.registry.owner.v1.OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
       // The role mapped Users receive within the Organization.
-      buf.registry.owner.v1.OrganizationRole role = 2 [
+      OrganizationRole role = 2 [
         (buf.validate.field).required = true,
         (buf.validate.field).enum.defined_only = true,
         (buf.validate.field).enum.not_in = 0
@@ -185,7 +185,7 @@ message UpdateIdpGroupMappingsRequest {
       //
       // If set, mapped Users receive this role. If unset, mapped Users receive the owning
       // Organization's base Module role.
-      optional buf.registry.module.v1.ModuleContributorRole role_override = 2 [
+      optional ModuleContributorRole role_override = 2 [
         (buf.validate.field).enum.defined_only = true,
         (buf.validate.field).enum.not_in = 0
       ];

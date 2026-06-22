@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-package buf.registry.module.v1;
+package buf.registry.iam.v1;
 
 import "buf/registry/module/v1/module.proto";
 import "buf/registry/owner/v1/user.proto";
@@ -22,7 +22,7 @@ import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
 
 // A ModuleContributor on the BSR.
 //
@@ -118,7 +118,7 @@ message ModuleContributorRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   // The Module that the role is granted on.
-  ModuleRef module_ref = 1 [(buf.validate.field).required = true];
+  buf.registry.module.v1.ModuleRef module_ref = 1 [(buf.validate.field).required = true];
   // The User that the role is granted to.
   buf.registry.owner.v1.UserRef user_ref = 2 [(buf.validate.field).required = true];
 }
