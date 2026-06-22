@@ -16,6 +16,8 @@ syntax = "proto3";
 
 package buf.registry.admin.v1;
 
+import "buf/registry/module/v1/module.proto";
+import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
@@ -80,5 +82,26 @@ message SDKRecommendationLevel {
     Organization organization = 2;
     // The SDK is recommended for a single Module.
     Module module = 3;
+  }
+}
+
+// The level at which an SDK is recommended.
+//
+// An SDK can be recommended at more than one level at once; for example, an SDK
+// recommended at the instance level may also be recommended for a specific Module.
+message SDKRecommendationLevelRef {
+  // The SDK is recommended across the entire instance.
+  //
+  // Eager generation is enqueued for the SDK across all Modules on the instance.
+  message Instance {}
+
+  oneof level {
+    option (buf.validate.oneof).required = true;
+    // The SDK is recommended across the entire instance.
+    Instance instance = 1;
+    // The SDK is recommended across a single Organization.
+    buf.registry.owner.v1.OrganizationRef organization_ref = 2;
+    // The SDK is recommended for a single Module.
+    buf.registry.module.v1.ModuleRef module_ref = 3;
   }
 }
