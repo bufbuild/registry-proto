@@ -68,7 +68,7 @@ message BreakingChangePolicy {
   bool ignore_unstable_packages = 2;
   // The category of breaking change detection to enforce.
   //
-  // If unset, the server defaults to BREAKING_CHANGE_CATEGORY_FILE.
+  // If unset, the instance defaults to BREAKING_CHANGE_CATEGORY_FILE.
   BreakingChangeCategory category = 3 [(buf.validate.field).enum.defined_only = true];
 }
 
