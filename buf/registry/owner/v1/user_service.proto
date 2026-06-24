@@ -70,7 +70,7 @@ service UserService {
   // User read RPCs.
   rpc GetUserInstanceRoles(GetUserInstanceRolesRequest) returns (GetUserInstanceRolesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.get-instance-role";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user-instance-role.get";
   }
   // Update the instance roles of existing Users.
   //
@@ -80,7 +80,7 @@ service UserService {
   // This operation is atomic. Either all Users are updated or an error is returned.
   rpc UpdateUserInstanceRoles(UpdateUserInstanceRolesRequest) returns (UpdateUserInstanceRolesResponse) {
     option idempotency_level = IDEMPOTENT;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.update-instance-role";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user-instance-role.update";
   }
 }
 

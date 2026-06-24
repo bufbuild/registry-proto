@@ -39,7 +39,7 @@ service LabelService {
   // List the history of a Label.
   rpc ListLabelHistory(ListLabelHistoryRequest) returns (ListLabelHistoryResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.list-history";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label-history.list";
   }
   // Create or update Labels on a Module.
   //
