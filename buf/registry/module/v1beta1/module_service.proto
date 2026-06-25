@@ -18,6 +18,7 @@ package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/module.proto";
 import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
@@ -27,10 +28,12 @@ service ModuleService {
   // Get Modules by id or name.
   rpc GetModules(GetModulesRequest) returns (GetModulesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.get";
   }
   // List Modules, usually for a specific User or Organization.
   rpc ListModules(ListModulesRequest) returns (ListModulesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.list";
   }
   // Create new Modules.
   //
@@ -39,18 +42,21 @@ service ModuleService {
   // This operation is atomic. Either all Modules are created or an error is returned.
   rpc CreateModules(CreateModulesRequest) returns (CreateModulesResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.create";
   }
   // Update existing Modules.
   //
   // This operation is atomic. Either all Modules are updated or an error is returned.
   rpc UpdateModules(UpdateModulesRequest) returns (UpdateModulesResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.update";
   }
   // Delete existing Modules.
   //
   // This operation is atomic. Either all Modules are deleted or an error is returned.
   rpc DeleteModules(DeleteModulesRequest) returns (DeleteModulesResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.delete";
   }
 }
 

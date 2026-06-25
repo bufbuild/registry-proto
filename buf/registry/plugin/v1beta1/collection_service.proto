@@ -18,6 +18,7 @@ package buf.registry.plugin.v1beta1;
 
 import "buf/registry/plugin/v1beta1/collection.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
@@ -27,14 +28,17 @@ service CollectionService {
   // Get Collections.
   rpc GetCollections(GetCollectionsRequest) returns (GetCollectionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.plugin-collection.get";
   }
   // List Collections for a given Plugin.
   rpc ListCollections(ListCollectionsRequest) returns (ListCollectionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.plugin-collection.list";
   }
   // Get the Collections for the given Plugins.
   rpc GetPluginCollectionAssociations(GetPluginCollectionAssociationsRequest) returns (GetPluginCollectionAssociationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.plugin.get";
   }
 }
 

@@ -30,7 +30,12 @@ service UploadService {
   // Upload contents for given set of Plugins.
   //
   // Contents are expected to be WASM modules.
-  rpc Upload(UploadRequest) returns (UploadResponse) {}
+  rpc Upload(UploadRequest) returns (UploadResponse) {
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.create";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.create";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.default-label.update";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
+  }
 }
 
 message UploadRequest {

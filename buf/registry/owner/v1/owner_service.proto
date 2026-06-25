@@ -32,7 +32,8 @@ service OwnerService {
     // The Permission required for each OwnerRef depends on the type of the
     // owner it references: a User requires the bsr.user.get Permission, and an
     // Organization requires the bsr.organization.get Permission.
-    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.get";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.get";
   }
 }
 

@@ -7,7 +7,15 @@ lint:
   use:
     - STANDARD
     - UNARY_RPC
+    - RPC_PERMISSION_SET
+  ignore_only:
+    # EventService is implemented by webhook receivers, not hosted by the BSR,
+    # so IAM permissions do not apply.
+    RPC_PERMISSION_SET:
+      - buf/registry/webhook/v1/event_service.proto
   disallow_comment_ignores: true
+plugins:
+  - plugin: buf-plugin-iam
 breaking:
   use:
     - WIRE_JSON

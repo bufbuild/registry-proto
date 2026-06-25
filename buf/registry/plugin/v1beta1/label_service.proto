@@ -20,6 +20,7 @@ import "buf/registry/plugin/v1beta1/commit.proto";
 import "buf/registry/plugin/v1beta1/digest.proto";
 import "buf/registry/plugin/v1beta1/label.proto";
 import "buf/registry/plugin/v1beta1/resource.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
@@ -29,14 +30,17 @@ service LabelService {
   // Get Labels by id or name.
   rpc GetLabels(GetLabelsRequest) returns (GetLabelsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.get";
   }
   // List Labels for a given Plugin, Commit or Label.
   rpc ListLabels(ListLabelsRequest) returns (ListLabelsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.list";
   }
   // List the history of a Label.
   rpc ListLabelHistory(ListLabelHistoryRequest) returns (ListLabelHistoryResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label-history.list";
   }
   // Create or update Labels on a Plugin.
   //
@@ -47,6 +51,9 @@ service LabelService {
   // This operation is atomic. Either all Labels are created/updated or an error is returned.
   rpc CreateOrUpdateLabels(CreateOrUpdateLabelsRequest) returns (CreateOrUpdateLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.create";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.default-label.update";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
   }
   // Archive existing Labels.
   //
@@ -55,12 +62,14 @@ service LabelService {
   // It is an error to archive the default Label.
   rpc ArchiveLabels(ArchiveLabelsRequest) returns (ArchiveLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
   }
   // Unarchive existing Labels.
   //
   // This operation is atomic. Either all Labels are unarchived or an error is returned.
   rpc UnarchiveLabels(UnarchiveLabelsRequest) returns (UnarchiveLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
   }
 }
 

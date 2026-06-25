@@ -31,7 +31,9 @@ service ResourceService {
     // resource it references: a Module requires the bsr.module.get Permission,
     // a Label requires the bsr.label.get Permission, and a Commit requires the
     // bsr.commit.get Permission.
-    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.get";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.get";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.get";
   }
 }
 

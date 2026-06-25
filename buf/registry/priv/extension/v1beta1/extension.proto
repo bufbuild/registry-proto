@@ -78,24 +78,22 @@ extend google.protobuf.MethodOptions {
 }
 
 // IAM constraints on a method.
+//
+// Exactly one of required_permission or no_required_permission is expected to be
+// set on every method.
 message MethodConstraints {
-  // The permission requirement for invoking the RPC.
-  oneof permission {
-    option (buf.validate.oneof).required = true;
-    // The name of the Permission required to invoke this RPC.
-    //
-    // The value is the name of a Permission registered on the BSR (e.g.
-    // "bsr.module.delete").
-    string required_permission = 1 [(buf.validate.field).string.(buf.registry.priv.validate.v1beta1.permission_name) = true];
-    // Explicitly declares that invoking this RPC requires no Permission.
-    //
-    // This declares only that no Permission check applies. Whether the RPC
-    // requires authentication is a separate concern.
-    bool no_required_permission = 2 [(buf.validate.field).bool.const = true];
-    // Explicitly declares that the Permissions required to invoke this RPC
-    // are determined dynamically from the contents of the request.
-    //
-    // A documentation comment on the method or option should describe the Permissions required.
-    bool dynamic_permission = 3 [(buf.validate.field).bool.const = true];
-  }
+  reserved 3;
+  reserved "dynamic_permission";
+  // The names of the Permissions required to invoke this RPC.
+  //
+  // Each value is the name of a Permission registered on the BSR (e.g.
+  // "bsr.module.delete"). When more than one is listed, the Permission that
+  // actually applies is selected from the request; a documentation comment on
+  // the method should describe how.
+  repeated string required_permission = 1 [(buf.validate.field).repeated.items.string.(buf.registry.priv.validate.v1beta1.permission_name) = true];
+  // Explicitly declares that invoking this RPC requires no Permission.
+  //
+  // This declares only that no Permission check applies. Whether the RPC
+  // requires authentication is a separate concern.
+  bool no_required_permission = 2;
 }

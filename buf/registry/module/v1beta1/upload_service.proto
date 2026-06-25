@@ -20,6 +20,7 @@ import "buf/registry/module/v1beta1/commit.proto";
 import "buf/registry/module/v1beta1/file.proto";
 import "buf/registry/module/v1beta1/label.proto";
 import "buf/registry/module/v1beta1/module.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
@@ -29,7 +30,12 @@ service UploadService {
   // Upload contents for given set of Modules.
   //
   // Content consists of the Files: .proto files, license files, and documentation files.
-  rpc Upload(UploadRequest) returns (UploadResponse) {}
+  rpc Upload(UploadRequest) returns (UploadResponse) {
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.create";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.create";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.default-label.update";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
+  }
 }
 
 message UploadRequest {

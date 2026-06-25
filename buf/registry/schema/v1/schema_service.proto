@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.schema.v1;
 
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/schema/v1/format.proto";
 import "buf/registry/schema/v1/schema_source.proto";
 import "buf/validate/validate.proto";
@@ -29,12 +30,24 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // buf.registry.module.v1.FileDescriptorSetService.
 service SchemaService {
   // Convert a serialized message between formats using a schema.
+  //
+  // When schema_source is a resource_ref, the caller must have read permission
+  // on the referenced resource; an inline file_descriptor_set requires none.
   rpc Convert(ConvertRequest) returns (ConvertResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.get";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.get";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.get";
   }
   // Get an approximate JSON Schema for a message type within a schema.
+  //
+  // When schema_source is a resource_ref, the caller must have read permission
+  // on the referenced resource; an inline file_descriptor_set requires none.
   rpc GetJSONSchema(GetJSONSchemaRequest) returns (GetJSONSchemaResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.get";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.get";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.get";
   }
 }
 

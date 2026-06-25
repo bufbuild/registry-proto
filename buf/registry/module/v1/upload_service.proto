@@ -32,7 +32,10 @@ service UploadService {
   // Content consists of the Files: .proto files, license files, and documentation files.
   rpc Upload(UploadRequest) returns (UploadResponse) {
     // Required for Limited Write (https://buf.build/docs/bsr/admin/roles/#base-resource-roles).
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.upload";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.create";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.create";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.default-label.update";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
   }
 }
 

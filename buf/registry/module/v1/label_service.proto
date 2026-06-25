@@ -53,9 +53,11 @@ service LabelService {
     option idempotency_level = IDEMPOTENT;
     // The Permission required for each Label depends on whether the Label
     // exists: a Label that does not exist requires the bsr.label.create
-    // Permission, and a Label that exists requires the bsr.label.update
+    // Permission, and a Label that exists requires the bsr.default-label.update
     // Permission.
-    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.create";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.default-label.update";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
   }
   // Archive existing Labels.
   //
@@ -64,14 +66,14 @@ service LabelService {
   // It is an error to archive the default Label.
   rpc ArchiveLabels(ArchiveLabelsRequest) returns (ArchiveLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.archive";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
   }
   // Unarchive existing Labels.
   //
   // This operation is atomic. Either all Labels are unarchived or an error is returned.
   rpc UnarchiveLabels(UnarchiveLabelsRequest) returns (UnarchiveLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.unarchive";
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
   }
 }
 

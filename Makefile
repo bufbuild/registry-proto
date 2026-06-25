@@ -7,7 +7,7 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --no-print-directory
 BIN := .tmp/bin
-export PATH := $(BIN):$(PATH)
+export PATH := $(abspath $(BIN)):$(PATH)
 export GOBIN := $(abspath $(BIN))
 
 BUF_VERSION := v1.70.0
@@ -34,7 +34,7 @@ build: $(BIN)/buf ## Build all APIs
 	buf build
 
 .PHONY: lint
-lint: $(BIN)/buf ## Lint all APIs
+lint: $(BIN)/buf $(BIN)/buf-plugin-iam ## Lint all APIs
 	buf lint
 	buf format -d --exit-code
 
@@ -63,3 +63,7 @@ $(BIN)/buf: Makefile
 $(BIN)/license-header: Makefile
 	@mkdir -p $(@D)
 	go install github.com/bufbuild/buf/private/pkg/licenseheader/cmd/license-header@$(BUF_VERSION)
+
+$(BIN)/buf-plugin-iam: $(wildcard internal/buf-plugin-iam/*.go) internal/buf-plugin-iam/go.mod
+	@mkdir -p $(@D)
+	cd internal/buf-plugin-iam && go build -o $(abspath $(BIN))/buf-plugin-iam .
