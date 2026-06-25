@@ -33,7 +33,7 @@ service DownloadService {
     option idempotency_level = NO_SIDE_EFFECTS;
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.policy.get";
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.get";
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.get";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.label.get";
   }
 }
 

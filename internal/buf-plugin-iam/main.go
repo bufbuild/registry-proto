@@ -38,7 +38,7 @@ func main() {
 			{
 				ID:      rpcPermissionSetRuleID,
 				Default: true,
-				Purpose: "Checks that every RPC declares exactly one permission requirement via the (" + methodOptionFullName + ") option.",
+				Purpose: "Checks that every RPC either lists at least one Permission (required_permission and/or conditional_permission) or sets no_required_permission, but not both, via the (" + methodOptionFullName + ") option.",
 				Type:    check.RuleTypeLint,
 				Handler: check.RuleHandlerFunc(checkRPCPermissionSet),
 			},
@@ -63,18 +63,17 @@ func checkRPCPermissionSet(_ context.Context, responseWriter check.ResponseWrite
 			methods := services.Get(i).Methods()
 			for j := 0; j < methods.Len(); j++ {
 				method := methods.Get(j)
-				got, err := permissionFieldsSet(method, resolver)
+				hasPermissions, noRequiredPermission, err := permissionState(method, resolver)
 				if err != nil {
 					return err
 				}
-				if got != 1 {
+				if hasPermissions == noRequiredPermission {
 					responseWriter.AddAnnotation(
 						check.WithDescriptor(method),
 						check.WithMessagef(
-							"RPC %q must set exactly one of required_permission or no_required_permission via (%s); found %d.",
+							"RPC %q must either list at least one Permission (required_permission and/or conditional_permission) or set no_required_permission=true via (%s) — not both, and not neither.",
 							method.Name(),
 							methodOptionFullName,
-							got,
 						),
 					)
 				}
@@ -99,23 +98,23 @@ func extensionResolver(request check.Request) (*protoregistry.Types, error) {
 	return types, nil
 }
 
-// permissionFieldsSet reports how many of the three permission fields are set on
-// the method's (buf.registry.priv.extension.v1beta1.method) option. It returns 0
-// when the option is absent, so a missing option and an empty option both fail.
-func permissionFieldsSet(method protoreflect.MethodDescriptor, resolver *protoregistry.Types) (int, error) {
+// permissionState reports whether the method's
+// (buf.registry.priv.extension.v1beta1.method) option lists any Permission (in
+// required_permission or conditional_permission) and whether no_required_permission
+// is set. A missing option yields (false, false), which fails the rule.
+func permissionState(method protoreflect.MethodDescriptor, resolver *protoregistry.Types) (hasPermissions bool, noRequiredPermission bool, _ error) {
 	options := method.Options()
 	if options == nil {
-		return 0, nil
+		return false, false, nil
 	}
 	optionBytes, err := proto.Marshal(options)
 	if err != nil {
-		return 0, err
+		return false, false, err
 	}
 	resolved := &descriptorpb.MethodOptions{}
 	if err := (proto.UnmarshalOptions{Resolver: resolver}).Unmarshal(optionBytes, resolved); err != nil {
-		return 0, err
+		return false, false, err
 	}
-	count := 0
 	resolved.ProtoReflect().Range(func(fieldDescriptor protoreflect.FieldDescriptor, value protoreflect.Value) bool {
 		if !fieldDescriptor.IsExtension() || string(fieldDescriptor.FullName()) != methodOptionFullName {
 			return true
@@ -123,12 +122,15 @@ func permissionFieldsSet(method protoreflect.MethodDescriptor, resolver *protore
 		constraints := value.Message()
 		fields := constraints.Descriptor().Fields()
 		if field := fields.ByName("required_permission"); field != nil && constraints.Get(field).List().Len() > 0 {
-			count++
+			hasPermissions = true
+		}
+		if field := fields.ByName("conditional_permission"); field != nil && constraints.Get(field).List().Len() > 0 {
+			hasPermissions = true
 		}
 		if field := fields.ByName("no_required_permission"); field != nil && constraints.Get(field).Bool() {
-			count++
+			noRequiredPermission = true
 		}
 		return false
 	})
-	return count, nil
+	return hasPermissions, noRequiredPermission, nil
 }

@@ -55,9 +55,9 @@ service LabelService {
     // exists: a Label that does not exist requires the bsr.label.create
     // Permission, and a Label that exists requires the bsr.default-label.update
     // Permission.
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.create";
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.default-label.update";
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.label.create";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.default-label.update";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.non-default-label.update";
   }
   // Archive existing Labels.
   //

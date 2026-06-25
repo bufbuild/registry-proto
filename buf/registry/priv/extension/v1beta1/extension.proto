@@ -79,21 +79,22 @@ extend google.protobuf.MethodOptions {
 
 // IAM constraints on a method.
 //
-// Exactly one of required_permission or no_required_permission is expected to be
-// set on every method.
+// Every method either lists at least one Permission (in required_permission
+// and/or conditional_permission) or sets no_required_permission to true.
+// no_required_permission must be true if and only if both Permission lists are
+// empty.
 message MethodConstraints {
-  reserved 3;
-  reserved "dynamic_permission";
-  // The names of the Permissions required to invoke this RPC.
+  // The names of the Permissions that are always checked when invoking this RPC.
   //
   // Each value is the name of a Permission registered on the BSR (e.g.
-  // "bsr.module.delete"). When more than one is listed, the Permission that
-  // actually applies is selected from the request; a documentation comment on
-  // the method should describe how.
+  // "bsr.module.delete"). Every listed Permission is checked on every call.
   repeated string required_permission = 1 [(buf.validate.field).repeated.items.string.(buf.registry.priv.validate.v1beta1.permission_name) = true];
+  // The names of the Permissions that are checked only for some calls, depending
+  // on the contents of the request.
+  repeated string conditional_permission = 2 [(buf.validate.field).repeated.items.string.(buf.registry.priv.validate.v1beta1.permission_name) = true];
   // Explicitly declares that invoking this RPC requires no Permission.
   //
-  // This declares only that no Permission check applies. Whether the RPC
-  // requires authentication is a separate concern.
-  bool no_required_permission = 2;
+  // Must be true if and only if required_permission and conditional_permission
+  // are both empty. Whether the RPC requires authentication is a separate concern.
+  bool no_required_permission = 3;
 }

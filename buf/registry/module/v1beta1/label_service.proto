@@ -52,9 +52,9 @@ service LabelService {
   // This operation is atomic. Either all Labels are created/updated or an error is returned.
   rpc CreateOrUpdateLabels(CreateOrUpdateLabelsRequest) returns (CreateOrUpdateLabelsResponse) {
     option idempotency_level = IDEMPOTENT;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.create";
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.default-label.update";
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.non-default-label.update";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.label.create";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.default-label.update";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.non-default-label.update";
   }
   // Archive existing Labels.
   //

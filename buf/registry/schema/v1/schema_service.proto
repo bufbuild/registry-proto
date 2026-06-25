@@ -35,9 +35,9 @@ service SchemaService {
   // on the referenced resource; an inline file_descriptor_set requires none.
   rpc Convert(ConvertRequest) returns (ConvertResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.get";
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.get";
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.get";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.module.get";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.commit.get";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.label.get";
   }
   // Get an approximate JSON Schema for a message type within a schema.
   //
@@ -45,9 +45,9 @@ service SchemaService {
   // on the referenced resource; an inline file_descriptor_set requires none.
   rpc GetJSONSchema(GetJSONSchemaRequest) returns (GetJSONSchemaResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.get";
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.commit.get";
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.label.get";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.module.get";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.commit.get";
+    option (buf.registry.priv.extension.v1beta1.method).conditional_permission = "bsr.label.get";
   }
 }
 
