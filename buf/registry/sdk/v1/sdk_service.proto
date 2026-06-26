@@ -1,0 +1,87 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.sdk.v1;
+
+import "buf/registry/plugin/v1/plugin.proto";
+import "buf/registry/sdk/v1/sdk.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/sdk/v1";
+
+// SDK management
+service SDKService {
+  // Add an SDK to the list of recommended SDKs at a given level.
+  //
+  // Returns an error with code ALREADY_EXISTS if the SDK is already recommended at the
+  // same level.
+  rpc AddRecommendedSDK(AddRecommendedSDKRequest) returns (AddRecommendedSDKResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // Remove an SDK from the list of recommended SDKs at a given level.
+  rpc RemoveRecommendedSDK(RemoveRecommendedSDKRequest) returns (RemoveRecommendedSDKResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  // List the recommended SDKs at a given level.
+  //
+  // Because the same SDK can be recommended at more than one level at once, callers can
+  // make a request per level to determine whether an SDK is recommended at a higher level.
+  rpc ListRecommendedSDKs(ListRecommendedSDKsRequest) returns (ListRecommendedSDKsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message AddRecommendedSDKRequest {
+  // The Plugin that generates the SDK to recommend.
+  buf.registry.plugin.v1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+  // The level at which to recommend the SDK.
+  SDKRecommendationLevelRef recommendation_level = 2 [(buf.validate.field).required = true];
+}
+
+message AddRecommendedSDKResponse {}
+
+message RemoveRecommendedSDKRequest {
+  // The Plugin that generates the SDK to stop recommending.
+  buf.registry.plugin.v1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+  // The level at which to stop recommending the SDK.
+  SDKRecommendationLevelRef recommendation_level = 2 [(buf.validate.field).required = true];
+}
+
+message RemoveRecommendedSDKResponse {}
+
+message ListRecommendedSDKsRequest {
+  // The maximum number of items to return on a page.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The level at which to list recommended SDKs.
+  //
+  // Only SDKs recommended at this level are included in the response.
+  SDKRecommendationLevelRef recommendation_level = 3 [(buf.validate.field).required = true];
+}
+
+message ListRecommendedSDKsResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed recommended SDKs, all at the level given on the request.
+  repeated RecommendedSDK recommended_sdks = 2;
+}
