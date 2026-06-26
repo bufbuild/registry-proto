@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package buf.registry.gensdk.v1;
 
-import "buf/registry/gensdk/v1/gensdk.proto";
+import "buf/registry/gensdk/v1/recommended_sdk.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
 import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";

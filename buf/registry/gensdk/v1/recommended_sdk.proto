@@ -23,61 +23,61 @@ import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/gensdk/v1";
 
-// An plugin that generates an SDK at a given SDKGenerationLevel.
+// An SDK that is recommended at a given SDKRecommendationLevel.
 //
-// This causes eager SDK generation to be enqueued for the plugin at the specified level.
-// The plugin is also recommended to users.
-message GenSDK {
+// A recommended SDK signals to Users that a particular Plugin should be used to generate
+// code, and causes eager generation to be enqueued for the SDK at the recommended level.
+message RecommendedSDK {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
-  // The id of the Plugin that auto-generates the SDK.
+  // The id of the Plugin that generates the recommended SDK.
   string sdk_plugin_id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true
   ];
+
+  // The level at which the SDK is recommended.
+  SDKRecommendationLevel recommendation_level = 2 [(buf.validate.field).required = true];
 }
 
-// The level at which a plugin auto-generates an SDK.
+// The level at which an SDK is recommended.
 //
-// An plugin can auto-generate SDKs at more than one level at once; for example, a plugin
-// configured to auto-generate an SDK at the instance level may also be configured to
-// auto-generate an SDK for a specific Module.
-message SDKGenerationLevel {
-  // The plugin generates SDKs across the entire instance.
+// An SDK can be recommended at more than one level at once; for example, an SDK
+// recommended at the instance level may also be recommended for a specific Module.
+message SDKRecommendationLevel {
+  // The SDK is recommended across the entire instance.
   //
   // Eager generation is enqueued for the SDK across all Modules on the instance.
-  // The plugin also appears in the recommended SDK list across all Modules on the instance.
   message Instance {}
 
   oneof level {
     option (buf.validate.oneof).required = true;
-    // The plugin generates an SDK automatically across the entire instance.
+    // The SDK is recommended across the entire instance.
     Instance instance = 1;
-    // The plugin generates an SDK automatically across a single Organization.
+    // The SDK is recommended across a single Organization.
     string organization_id = 2 [(buf.validate.field).string.tuuid = true];
-    // The plugin generates an SDK automatically for a single Module.
+    // The SDK is recommended for a single Module.
     string module_id = 3 [(buf.validate.field).string.tuuid = true];
   }
 }
 
-// The level at which a plugin auto-generates an SDK when the default label is updated.
+// The level at which an SDK is recommended.
 //
-// An plugin can be configured to auto-generate an SDK at more than one level at once;
-// for example, a plugin configured to auto-generate an SDK at the instance level may
-// also be configured to auto-generate an SDK for a specific Module.
-message SDKGenerationLevelRef {
-  // The plugin auto-generates the SDK across the entire instance.
+// An SDK can be recommended at more than one level at once; for example, an SDK
+// recommended at the instance level may also be recommended for a specific Module.
+message SDKRecommendationLevelRef {
+  // The SDK is recommended across the entire instance.
   //
   // Eager generation is enqueued for the SDK across all Modules on the instance.
   message Instance {}
 
   oneof level {
     option (buf.validate.oneof).required = true;
-    // The plugin auto-generates the SDK across the entire instance.
+    // The SDK is recommended across the entire instance.
     Instance instance = 1;
-    // The plugin auto-generates the SDK across a single Organization.
+    // The SDK is recommended across a single Organization.
     buf.registry.owner.v1.OrganizationRef organization_ref = 2;
-    // The plugin auto-generates the SDK for a single Module.
+    // The SDK is recommended for a single Module.
     buf.registry.module.v1.ModuleRef module_ref = 3;
   }
 }
