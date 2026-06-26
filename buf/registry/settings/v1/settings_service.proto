@@ -14,18 +14,18 @@
 
 syntax = "proto3";
 
-package buf.registry.admin.v1;
+package buf.registry.settings.v1;
 
-import "buf/registry/admin/v1/instance_settings.proto";
-import "buf/registry/admin/v1/recommended_sdk.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
 import "buf/registry/resource/v1/resource_visibility_control.proto";
+import "buf/registry/settings/v1/instance_settings.proto";
+import "buf/registry/settings/v1/recommended_sdk.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/instance_settings/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/settings/v1";
 
 // Operate on the instance-wide settings of a BSR instance.
-service InstanceService {
+service SettingsService {
   // Get the instance-wide settings.
   rpc GetInstanceSettings(GetInstanceSettingsRequest) returns (GetInstanceSettingsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;

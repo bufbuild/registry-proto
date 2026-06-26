@@ -16,13 +16,13 @@ syntax = "proto3";
 
 package buf.registry.audit.v1;
 
-import "buf/registry/admin/v1/instance_settings.proto";
 import "buf/registry/iam/v1/module_contributor.proto";
 import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/module/v1/module.proto";
 import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/policy/v1/policy.proto";
 import "buf/registry/resource/v1/resource_visibility_control.proto";
+import "buf/registry/settings/v1/instance_settings.proto";
 import "google/protobuf/timestamp.proto";
 
 // ActorType is the type of actor that caused the audited event.
@@ -811,7 +811,7 @@ message PayloadModuleLabelEnforcementIgnoresChanged {
 
 message PayloadInstanceBreakingChangePolicyEnabled {
   // category is the category of breaking changes.
-  buf.registry.admin.v1.BreakingChangeCategory category = 1;
+  buf.registry.settings.v1.BreakingChangeCategory category = 1;
   // ignore_unstable_packages tracks breaking change enforcement for unstable packages.
   optional bool ignore_unstable_packages = 2;
 }

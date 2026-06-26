@@ -14,13 +14,13 @@
 
 syntax = "proto3";
 
-package buf.registry.admin.v1;
+package buf.registry.settings.v1;
 
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/instance_settings/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/settings/v1";
 
 // The instance-wide settings for a BSR instance.
 //
