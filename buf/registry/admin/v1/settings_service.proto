@@ -16,18 +16,17 @@ syntax = "proto3";
 
 package buf.registry.admin.v1;
 
-import "buf/registry/admin/v1/instance_settings.proto";
-import "buf/registry/admin/v1/recommended_sdk.proto";
+import "buf/registry/admin/v1/settings.proto";
 import "buf/registry/plugin/v1beta1/plugin.proto";
 import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/instance_settings/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/admin/v1";
 
 // Operate on the instance-wide settings of a BSR instance.
-service InstanceService {
+service SettingsService {
   // Get the instance-wide settings.
-  rpc GetInstanceSettings(GetInstanceSettingsRequest) returns (GetInstanceSettingsResponse) {
+  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
   // Update the instance-wide settings.
@@ -35,7 +34,7 @@ service InstanceService {
   // Only the settings present on the request are updated; settings that are not set are
   // left unchanged. This operation is atomic: either all of the present settings are
   // updated or an error is returned and none are.
-  rpc UpdateInstanceSettings(UpdateInstanceSettingsRequest) returns (UpdateInstanceSettingsResponse) {
+  rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse) {
     option idempotency_level = IDEMPOTENT;
   }
   // Get the instance-wide uniqueness policy.
@@ -51,34 +50,16 @@ service InstanceService {
   rpc UpdateUniquenessPolicy(UpdateUniquenessPolicyRequest) returns (UpdateUniquenessPolicyResponse) {
     option idempotency_level = IDEMPOTENT;
   }
-  // Add an SDK to the list of recommended SDKs at a given level.
-  //
-  // Returns an error with code ALREADY_EXISTS if the SDK is already recommended at the
-  // same level.
-  rpc AddRecommendedSDK(AddRecommendedSDKRequest) returns (AddRecommendedSDKResponse) {
-    option idempotency_level = IDEMPOTENT;
-  }
-  // Remove an SDK from the list of recommended SDKs at a given level.
-  rpc RemoveRecommendedSDK(RemoveRecommendedSDKRequest) returns (RemoveRecommendedSDKResponse) {
-    option idempotency_level = IDEMPOTENT;
-  }
-  // List the recommended SDKs at a given level.
-  //
-  // Because the same SDK can be recommended at more than one level at once, callers can
-  // make a request per level to determine whether an SDK is recommended at a higher level.
-  rpc ListRecommendedSDKs(ListRecommendedSDKsRequest) returns (ListRecommendedSDKsResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
 }
 
-message GetInstanceSettingsRequest {}
+message GetSettingsRequest {}
 
-message GetInstanceSettingsResponse {
+message GetSettingsResponse {
   // The instance-wide settings.
-  InstanceSettings instance_settings = 1 [(buf.validate.field).required = true];
+  Settings instance_settings = 1 [(buf.validate.field).required = true];
 }
 
-message UpdateInstanceSettingsRequest {
+message UpdateSettingsRequest {
   // The breaking change policy to set.
   //
   // If unset, the breaking change policy is left unchanged.
@@ -101,9 +82,9 @@ message UpdateInstanceSettingsRequest {
   buf.registry.resource.v1.ResourceVisibilityControl policy_visibility_control = 5;
 }
 
-message UpdateInstanceSettingsResponse {
+message UpdateSettingsResponse {
   // The full instance-wide settings after the update was applied.
-  InstanceSettings instance_settings = 1 [(buf.validate.field).required = true];
+  Settings instance_settings = 1 [(buf.validate.field).required = true];
 }
 
 message GetUniquenessPolicyRequest {}
@@ -129,46 +110,4 @@ message UpdateUniquenessPolicyResponse {
   //
   // The uniqueness policy cannot be enforced until the backfill task has completed.
   bool backfill_task_complete = 2;
-}
-
-message AddRecommendedSDKRequest {
-  // The Plugin that generates the SDK to recommend.
-  buf.registry.plugin.v1beta1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
-  // The level at which to recommend the SDK.
-  SDKRecommendationLevelRef recommendation_level = 2 [(buf.validate.field).required = true];
-}
-
-message AddRecommendedSDKResponse {}
-
-message RemoveRecommendedSDKRequest {
-  // The Plugin that generates the SDK to stop recommending.
-  buf.registry.plugin.v1beta1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
-  // The level at which to stop recommending the SDK.
-  SDKRecommendationLevelRef recommendation_level = 2 [(buf.validate.field).required = true];
-}
-
-message RemoveRecommendedSDKResponse {}
-
-message ListRecommendedSDKsRequest {
-  // The maximum number of items to return on a page.
-  //
-  // The default value is 10.
-  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
-  // The page to start from.
-  //
-  // If empty, the first page is returned.
-  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
-  // The level at which to list recommended SDKs.
-  //
-  // Only SDKs recommended at this level are included in the response.
-  SDKRecommendationLevelRef recommendation_level = 3 [(buf.validate.field).required = true];
-}
-
-message ListRecommendedSDKsResponse {
-  // The next page token.
-  //
-  // If empty, there are no more pages.
-  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
-  // The listed recommended SDKs, all at the level given on the request.
-  repeated RecommendedSDK recommended_sdks = 2;
 }
