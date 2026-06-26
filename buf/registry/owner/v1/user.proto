@@ -102,35 +102,6 @@ enum UserVerificationStatus {
   USER_VERIFICATION_STATUS_OFFICIAL = 3;
 }
 
-// The instance-wide role of a User.
-//
-// An instance admin is authorized for all instance-scoped operations. All other Users are
-// members, whose access derives solely from Organization and resource grants.
-enum InstanceRole {
-  INSTANCE_ROLE_UNSPECIFIED = 0;
-  // The User is an administrator of the entire instance.
-  INSTANCE_ROLE_ADMIN = 1;
-  // The User is a regular member of the instance with no instance-wide authority.
-  INSTANCE_ROLE_MEMBER = 2;
-}
-
-// The instance role of a User.
-message UserInstanceRole {
-  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
-
-  // The id of the User.
-  string user_id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.tuuid = true
-  ];
-  // The instance role of the User.
-  InstanceRole instance_role = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).enum.defined_only = true,
-    (buf.validate.field).enum.not_in = 0
-  ];
-}
-
 // UserRef is a reference to a User, either an id or a name.
 //
 // This is used in requests.
