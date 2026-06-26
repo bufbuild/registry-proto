@@ -24,7 +24,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // The instance-wide settings for a BSR instance.
 //
-// There is exactly one InstanceSettings per BSR instance. It is administered by Users
+// There is exactly one Settings per BSR instance. It is administered by Users
 // with instance-level administrative permissions, but is readable by any authenticated
 // User, as the settings affect how every Module on the instance behaves.
 //

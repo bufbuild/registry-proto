@@ -56,7 +56,7 @@ message GetSettingsRequest {}
 
 message GetSettingsResponse {
   // The instance-wide settings.
-  Settings instance_settings = 1 [(buf.validate.field).required = true];
+  Settings settings = 1 [(buf.validate.field).required = true];
 }
 
 message UpdateSettingsRequest {
@@ -84,7 +84,7 @@ message UpdateSettingsRequest {
 
 message UpdateSettingsResponse {
   // The full instance-wide settings after the update was applied.
-  Settings instance_settings = 1 [(buf.validate.field).required = true];
+  Settings settings = 1 [(buf.validate.field).required = true];
 }
 
 message GetUniquenessPolicyRequest {}
