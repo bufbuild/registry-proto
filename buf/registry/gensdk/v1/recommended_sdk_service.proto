@@ -17,7 +17,7 @@ syntax = "proto3";
 package buf.registry.gensdk.v1;
 
 import "buf/registry/gensdk/v1/recommended_sdk.proto";
-import "buf/registry/plugin/v1beta1/plugin.proto";
+import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";
 
@@ -47,7 +47,7 @@ service RecommendedSDKService {
 
 message AddRecommendedSDKRequest {
   // The Plugin that generates the SDK to recommend.
-  buf.registry.plugin.v1beta1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+  buf.registry.plugin.v1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
   // The level at which to recommend the SDK.
   SDKRecommendationLevelRef recommendation_level = 2 [(buf.validate.field).required = true];
 }
@@ -56,7 +56,7 @@ message AddRecommendedSDKResponse {}
 
 message RemoveRecommendedSDKRequest {
   // The Plugin that generates the SDK to stop recommending.
-  buf.registry.plugin.v1beta1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
+  buf.registry.plugin.v1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
   // The level at which to stop recommending the SDK.
   SDKRecommendationLevelRef recommendation_level = 2 [(buf.validate.field).required = true];
 }
