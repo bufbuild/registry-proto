@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package buf.registry.audit.v1;
 
-import "buf/registry/admin/v1/instance_settings.proto";
+import "buf/registry/admin/v1/settings.proto";
 import "buf/registry/iam/v1/module_contributor.proto";
 import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/module/v1/module.proto";

@@ -20,11 +20,11 @@ import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/instance_settings/v1";
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/admin/v1";
 
 // The instance-wide settings for a BSR instance.
 //
-// There is exactly one InstanceSettings per BSR instance. It is administered by Users
+// There is exactly one Settings per BSR instance. It is administered by Users
 // with instance-level administrative permissions, but is readable by any authenticated
 // User, as the settings affect how every Module on the instance behaves.
 //
@@ -32,7 +32,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // triggers a potentially long-running, instance-wide backfill and collision scan, it is
 // managed through the dedicated GetUniquenessPolicy and UpdateUniquenessPolicy RPCs
 // rather than folded into the batched settings.
-message InstanceSettings {
+message Settings {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
   // The policy controlling whether breaking changes are enforced when Commits are pushed.
