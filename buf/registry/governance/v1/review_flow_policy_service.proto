@@ -1,0 +1,61 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.governance.v1;
+
+import "buf/registry/governance/v1/governance_scope.proto";
+import "buf/registry/governance/v1/review_flow_policy.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/governance/v1";
+
+// Operate on the review flow policy.
+//
+// The policy is administered by Users with instance-level administrative permissions,
+// but is readable by any authenticated User, as it affects how every Module on the
+// instance behaves.
+service ReviewFlowPolicyService {
+  // Get the review flow policy at a scope.
+  rpc GetReviewFlowPolicy(GetReviewFlowPolicyRequest) returns (GetReviewFlowPolicyResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Update the review flow policy at a scope.
+  rpc UpdateReviewFlowPolicy(UpdateReviewFlowPolicyRequest) returns (UpdateReviewFlowPolicyResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message GetReviewFlowPolicyRequest {
+  // The scope to retrieve the review flow policy for.
+  GovernanceScope scope = 1 [(buf.validate.field).required = true];
+}
+
+message GetReviewFlowPolicyResponse {
+  // The review flow policy.
+  ReviewFlowPolicy review_flow_policy = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateReviewFlowPolicyRequest {
+  // The scope to update the review flow policy at.
+  GovernanceScope scope = 1 [(buf.validate.field).required = true];
+  // The review flow policy to set.
+  ReviewFlowPolicy review_flow_policy = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateReviewFlowPolicyResponse {
+  // The review flow policy after the update was applied.
+  ReviewFlowPolicy review_flow_policy = 1 [(buf.validate.field).required = true];
+}

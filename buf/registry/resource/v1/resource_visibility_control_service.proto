@@ -1,0 +1,102 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.resource.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/resource/v1/resource_visibility_control.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/resource/v1";
+
+// Operate on the visibility controls for resources.
+//
+// Visibility controls are set at either the instance scope or an Organization scope; the
+// same service operates on both. See ResourceVisibilityControls for how controls at
+// different scopes layer.
+service ResourceVisibilityControlService {
+  // Get the visibility controls at a scope.
+  //
+  // The required Permission is determined by the scope: instance-scope controls are
+  // readable by any authenticated User, while Organization-scope controls require
+  // permission to read the Organization's settings.
+  rpc GetResourceVisibilityControls(GetResourceVisibilityControlsRequest) returns (GetResourceVisibilityControlsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
+  }
+  // Update the visibility controls at a scope.
+  //
+  // Only the controls present on the request are updated; controls that are not set are
+  // left unchanged. This operation is atomic: either all of the present controls are
+  // updated or an error is returned and none are.
+  //
+  // The required Permission is determined by the scope: instance-scope controls require
+  // instance-level administrative permissions, while Organization-scope controls require
+  // permission to update the Organization's settings.
+  rpc UpdateResourceVisibilityControls(UpdateResourceVisibilityControlsRequest) returns (UpdateResourceVisibilityControlsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
+  }
+}
+
+// The scope whose visibility controls are operated on, either the entire instance or a
+// single Organization.
+message ResourceVisibilityControlScope {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // Instance scopes to the entire instance.
+  message Instance {}
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The controls that apply instance-wide.
+    Instance instance = 1;
+    // The id of the Organization whose controls apply to the resources it owns.
+    string organization_id = 2 [(buf.validate.field).string.tuuid = true];
+  }
+}
+
+message GetResourceVisibilityControlsRequest {
+  // The scope to retrieve visibility controls for.
+  ResourceVisibilityControlScope scope = 1 [(buf.validate.field).required = true];
+}
+
+message GetResourceVisibilityControlsResponse {
+  // The visibility controls at the scope.
+  ResourceVisibilityControls resource_visibility_controls = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateResourceVisibilityControlsRequest {
+  // The scope to update visibility controls at.
+  ResourceVisibilityControlScope scope = 1 [(buf.validate.field).required = true];
+  // The visibility control for Modules to set.
+  //
+  // If unset, the Module visibility control is left unchanged.
+  ResourceVisibilityControl module_visibility_control = 2;
+  // The visibility control for Plugins to set.
+  //
+  // If unset, the Plugin visibility control is left unchanged.
+  ResourceVisibilityControl plugin_visibility_control = 3;
+  // The visibility control for Policies to set.
+  //
+  // If unset, the Policy visibility control is left unchanged.
+  ResourceVisibilityControl policy_visibility_control = 4;
+}
+
+message UpdateResourceVisibilityControlsResponse {
+  // The full visibility controls at the scope after the update was applied.
+  ResourceVisibilityControls resource_visibility_controls = 1 [(buf.validate.field).required = true];
+}

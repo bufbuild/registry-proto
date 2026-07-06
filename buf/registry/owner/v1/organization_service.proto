@@ -19,7 +19,6 @@ package buf.registry.owner.v1;
 import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/owner/v1/user.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
-import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
@@ -248,18 +247,6 @@ message UpdateOrganizationSettingsRequest {
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
     ];
-    // The Organization's visibility control for the Modules it owns to set.
-    //
-    // If unset, the Module visibility control is left unchanged.
-    buf.registry.resource.v1.ResourceVisibilityControl module_visibility_control = 5;
-    // The Organization's visibility control for the Plugins it owns to set.
-    //
-    // If unset, the Plugin visibility control is left unchanged.
-    buf.registry.resource.v1.ResourceVisibilityControl plugin_visibility_control = 6;
-    // The Organization's visibility control for the Policies it owns to set.
-    //
-    // If unset, the Policy visibility control is left unchanged.
-    buf.registry.resource.v1.ResourceVisibilityControl policy_visibility_control = 7;
   }
   // The OrganizationSettings to update.
   repeated Value values = 1 [

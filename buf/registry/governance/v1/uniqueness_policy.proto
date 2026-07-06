@@ -1,0 +1,29 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.governance.v1;
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/governance/v1";
+
+// The policy controlling whether fully-qualified names and file paths must be unique
+// across all Modules on the instance.
+message UniquenessPolicy {
+  // Whether uniqueness enforcement is enabled.
+  //
+  // When enabled, a Commit cannot be pushed if it introduces a fully-qualified name or
+  // file path that collides with one already present in another Module on the instance.
+  bool enabled = 1;
+}

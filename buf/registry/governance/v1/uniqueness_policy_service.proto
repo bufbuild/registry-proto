@@ -1,0 +1,74 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.governance.v1;
+
+import "buf/registry/governance/v1/governance_scope.proto";
+import "buf/registry/governance/v1/uniqueness_policy.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/governance/v1";
+
+// Operate on the uniqueness policy.
+//
+// The policy is administered by Users with instance-level administrative permissions,
+// but is readable by any authenticated User, as it affects how every Module on the
+// instance behaves.
+service UniquenessPolicyService {
+  // Get the uniqueness policy at a scope.
+  rpc GetUniquenessPolicy(GetUniquenessPolicyRequest) returns (GetUniquenessPolicyResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Update the uniqueness policy at a scope.
+  //
+  // Enabling the uniqueness policy triggers a backfill that indexes every Module on the
+  // instance and scans for collisions; this may take a significant amount of time and
+  // briefly blocks pushes across the instance. If existing collisions are found, the
+  // policy is not enabled and a failed-precondition error is returned.
+  rpc UpdateUniquenessPolicy(UpdateUniquenessPolicyRequest) returns (UpdateUniquenessPolicyResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message GetUniquenessPolicyRequest {
+  // The scope to retrieve the uniqueness policy for.
+  GovernanceScope scope = 1 [(buf.validate.field).required = true];
+}
+
+message GetUniquenessPolicyResponse {
+  // The uniqueness policy.
+  UniquenessPolicy uniqueness_policy = 1 [(buf.validate.field).required = true];
+  // Whether the uniqueness backfill task has completed.
+  //
+  // The uniqueness policy cannot be enforced until the backfill task has completed.
+  bool backfill_task_complete = 2;
+}
+
+message UpdateUniquenessPolicyRequest {
+  // The scope to update the uniqueness policy at.
+  GovernanceScope scope = 1 [(buf.validate.field).required = true];
+  // The uniqueness policy to set.
+  UniquenessPolicy uniqueness_policy = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateUniquenessPolicyResponse {
+  // The uniqueness policy after the update was applied.
+  UniquenessPolicy uniqueness_policy = 1 [(buf.validate.field).required = true];
+  // Whether the uniqueness backfill task has completed.
+  //
+  // The uniqueness policy cannot be enforced until the backfill task has completed.
+  bool backfill_task_complete = 2;
+}
