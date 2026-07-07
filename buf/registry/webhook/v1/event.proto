@@ -62,4 +62,6 @@ message ModuleCommitPushedPayload {
   buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
   // The Commit that was pushed.
   buf.registry.module.v1.Commit commit = 2 [(buf.validate.field).required = true];
+  // The labels associated with the commits
+  repeated string label_names = 3;
 }
