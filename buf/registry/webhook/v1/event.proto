@@ -66,7 +66,7 @@ message ModuleCommitPushedPayload {
   repeated string label_names = 3 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.items = {
-      string: {max_len: 255}
+      string: {max_len: 250}
     }
   ];
 }
