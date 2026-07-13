@@ -86,7 +86,7 @@ enum PolicyState {
 message PolicyRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
-  // The fully-qualified name of a Policy within a BSR intance.
+  // The fully-qualified name of a Policy within a BSR instance.
   //
   // A Name uniquely identifies a Policy.
   // This is used for requests when a caller only has the policy name and not the ID.
