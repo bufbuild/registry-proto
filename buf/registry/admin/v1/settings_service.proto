@@ -80,6 +80,10 @@ message UpdateSettingsRequest {
   //
   // If unset, the Policy visibility control is left unchanged.
   buf.registry.resource.v1.ResourceVisibilityControl policy_visibility_control = 5;
+  // The instance-wide visibility control for Organizations to set.
+  //
+  // If unset, the Organization visibility control is left unchanged.
+  buf.registry.resource.v1.ResourceVisibilityControl organization_visibility_control = 6;
 }
 
 message UpdateSettingsResponse {

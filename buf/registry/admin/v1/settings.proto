@@ -54,6 +54,10 @@ message Settings {
   // If unset, new Policies fall through to the owning Organization's control, and default to
   // private if no control applies at any level.
   buf.registry.resource.v1.ResourceVisibilityControl policy_visibility_control = 5;
+  // The instance-wide visibility control for Organizations.
+  //
+  // If unset, new Organizations are public by default.
+  buf.registry.resource.v1.ResourceVisibilityControl organization_visibility_control = 6;
 }
 
 // The policy controlling enforcement of breaking changes when Commits are pushed to the
