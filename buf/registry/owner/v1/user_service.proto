@@ -45,14 +45,22 @@ service UserService {
   // This operation is atomic. Either all Users are created or an error is returned.
   rpc CreateUsers(CreateUsersRequest) returns (CreateUsersResponse) {
     option idempotency_level = IDEMPOTENT;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.create";
+    // Creating a User requires the bsr.user.create Permission. Setting a
+    // verification_status additionally requires the
+    // bsr.user-verification-status.update Permission.
+    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Update existing Users.
   //
   // This operation is atomic. Either all Users are updated or an error is returned.
   rpc UpdateUsers(UpdateUsersRequest) returns (UpdateUsersResponse) {
     option idempotency_level = IDEMPOTENT;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.update";
+    // The Permissions required depend on which fields are set on the request:
+    // updating the description or url requires the bsr.user.update Permission,
+    // setting state requires the bsr.user-state.update Permission, and setting
+    // verification_status requires the bsr.user-verification-status.update
+    // Permission.
+    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Delete existing Users.
   //
