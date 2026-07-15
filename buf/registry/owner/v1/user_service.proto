@@ -45,22 +45,14 @@ service UserService {
   // This operation is atomic. Either all Users are created or an error is returned.
   rpc CreateUsers(CreateUsersRequest) returns (CreateUsersResponse) {
     option idempotency_level = IDEMPOTENT;
-    // Creating a User requires the bsr.user.create Permission. Setting a
-    // verification_status additionally requires the
-    // bsr.user-verification-status.update Permission.
-    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.create";
   }
   // Update existing Users.
   //
   // This operation is atomic. Either all Users are updated or an error is returned.
   rpc UpdateUsers(UpdateUsersRequest) returns (UpdateUsersResponse) {
     option idempotency_level = IDEMPOTENT;
-    // The Permissions required depend on which fields are set on the request:
-    // updating the description or url requires the bsr.user.update Permission,
-    // setting state requires the bsr.user-state.update Permission, and setting
-    // verification_status requires the bsr.user-verification-status.update
-    // Permission.
-    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.update";
   }
   // Delete existing Users.
   //
@@ -156,6 +148,9 @@ message CreateUsersRequest {
     // The type of the User.
     //
     // If not set, the default USER_TYPE_STANDARD is used.
+    //
+    // Only instance admins can create USER_TYPE_BOT Users. USER_TYPE_SYSTEM
+    // Users cannot be created through the API.
     UserType type = 2 [(buf.validate.field).enum.defined_only = true];
     // The configurable description of the User.
     string description = 3 [(buf.validate.field).string.max_len = 350];
@@ -168,6 +163,9 @@ message CreateUsersRequest {
     // The verification status of the User.
     //
     // If not set, the User will default to VERIFICATION_STATUS_UNVERIFIED.
+    //
+    // Only instance admins can set USER_VERIFICATION_STATUS_VERIFIED or
+    // USER_VERIFICATION_STATUS_OFFICIAL.
     UserVerificationStatus verification_status = 5 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to create.
@@ -203,6 +201,9 @@ message UpdateUsersRequest {
       }
     ];
     // The verification status of the User.
+    //
+    // Only instance admins can set USER_VERIFICATION_STATUS_VERIFIED or
+    // USER_VERIFICATION_STATUS_OFFICIAL.
     optional UserVerificationStatus verification_status = 5 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to update.
