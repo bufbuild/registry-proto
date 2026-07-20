@@ -186,6 +186,8 @@ message UpdateUsersRequest {
     // The User to update.
     UserRef user_ref = 1 [(buf.validate.field).required = true];
     // The state of the User.
+    //
+    // Only instance admins can change a User's state.
     optional UserState state = 2 [
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
@@ -202,8 +204,7 @@ message UpdateUsersRequest {
     ];
     // The verification status of the User.
     //
-    // Only instance admins can set USER_VERIFICATION_STATUS_VERIFIED or
-    // USER_VERIFICATION_STATUS_OFFICIAL.
+    // Only instance admins can set the verification status.
     optional UserVerificationStatus verification_status = 5 [(buf.validate.field).enum.defined_only = true];
   }
   // The Users to update.
