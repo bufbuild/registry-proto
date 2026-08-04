@@ -18,6 +18,7 @@ package buf.registry.webhook.v1;
 
 import "buf/registry/module/v1/commit.proto";
 import "buf/registry/module/v1/module.proto";
+import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/webhook/v1/webhook.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
@@ -53,6 +54,8 @@ message Event {
     option (buf.validate.oneof).required = true;
     // The payload for EVENT_TYPE_MODULE_COMMIT_PUSHED.
     ModuleCommitPushedPayload module_commit_pushed = 4;
+    // The payload for EVENT_TYPE_ORGANIZATION_CREATED.
+    OrganizationCreatedPayload organization_created = 5;
   }
 }
 
@@ -69,4 +72,10 @@ message ModuleCommitPushedPayload {
       string: {max_len: 250}
     }
   ];
+}
+
+// The payload of an Event of type EVENT_TYPE_ORGANIZATION_CREATED.
+message OrganizationCreatedPayload {
+  // The Organization that was created.
+  buf.registry.owner.v1.Organization organization = 1 [(buf.validate.field).required = true];
 }

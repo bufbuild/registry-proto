@@ -24,7 +24,16 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // A Webhook on the BSR.
 //
-// A Webhook subscribes to Events within a single Module, and delivers them to a URL.
+// A Webhook subscribes to Events and delivers them to a URL. Every EventType has a scope
+// that determines which Events a Webhook receives:
+//
+//   - A Module-scoped EventType, such as EVENT_TYPE_MODULE_COMMIT_PUSHED, delivers only
+//     Events that occurred within a single Module. Such a Webhook sets module_id.
+//   - An instance-scoped EventType, such as EVENT_TYPE_ORGANIZATION_CREATED, delivers
+//     Events that occurred anywhere on the instance and belong to no Module. Such a
+//     Webhook leaves module_id unset.
+//
+// A single Webhook cannot mix EventTypes of different scopes.
 message Webhook {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
@@ -38,6 +47,9 @@ message Webhook {
   // The last time the Webhook was updated.
   google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
   // The id of the Module that the Webhook is scoped to.
+  //
+  // This is set for Webhooks that subscribe to Module-scoped EventTypes, and is unset for
+  // Webhooks that subscribe to instance-scoped EventTypes.
   string module_id = 4 [(buf.validate.field).string.tuuid = true];
   // The types of Events that the Webhook subscribes to.
   repeated EventType event_types = 5 [
@@ -56,10 +68,19 @@ message Webhook {
 }
 
 // The type of an Event.
+//
+// Each EventType is either Module-scoped or instance-scoped. See Webhook for how the scope
+// of an EventType affects the Webhooks that can subscribe to it.
 enum EventType {
   EVENT_TYPE_UNSPECIFIED = 0;
   // A Commit was pushed to a Module.
+  //
+  // This EventType is Module-scoped.
   EVENT_TYPE_MODULE_COMMIT_PUSHED = 1;
+  // An Organization was created on the instance.
+  //
+  // This EventType is instance-scoped.
+  EVENT_TYPE_ORGANIZATION_CREATED = 2;
 }
 
 // WebhookRef is a reference to a Webhook.

@@ -97,6 +97,8 @@ message ListWebhooksRequest {
   //
   // If both owner_refs and module_refs are empty, all Webhooks on the instance are
   // listed, but this functionality is limited to Users with the necessary permissions.
+  // Instance-scoped Webhooks belong to no Module, so they are only returned by this
+  // unfiltered listing.
   repeated buf.registry.module.v1.ModuleRef module_refs = 3;
   // The order to return the Webhooks.
   //
@@ -118,9 +120,14 @@ message CreateWebhooksRequest {
   message Value {
     // The Module to scope the Webhook to.
     //
-    // The Webhook receives the subscribed Events for this Module only.
-    buf.registry.module.v1.ModuleRef module_ref = 1 [(buf.validate.field).required = true];
-
+    // This must be set if and only if every EventType in event_types is Module-scoped, in
+    // which case the Webhook receives the subscribed Events for this Module only. It must
+    // be unset when every EventType in event_types is instance-scoped, in which case the
+    // Webhook receives the subscribed Events from anywhere on the instance. Creating an
+    // instance-scoped Webhook is limited to Users with the necessary permissions.
+    //
+    // A single Value cannot mix EventTypes of different scopes.
+    buf.registry.module.v1.ModuleRef module_ref = 1;
     // The types of Events that the Webhook subscribes to.
     repeated EventType event_types = 2 [
       (buf.validate.field).repeated.min_items = 1,
