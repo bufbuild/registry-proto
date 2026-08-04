@@ -86,7 +86,23 @@ message ListTokensRequest {
     ORDER_CREATE_TIME_DESC = 1;
     // Order by create_time oldest to newest.
     ORDER_CREATE_TIME_ASC = 2;
+    // Order by expire_time newest to oldest.
+    ORDER_EXPIRE_TIME_DESC = 3;
+    // Order by expire_time oldest to newest.
+    ORDER_EXPIRE_TIME_ASC = 4;
   }
+
+  // The filter for expired and active tokens.
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    // Show active only
+    STATE_ACTIVE = 1;
+    // Show expired only
+    STATE_EXPIRED = 2;
+    // Show both active and expired
+    STATE_ALL = 3;
+  }
+
   // The maximum number of items to return.
   //
   // The default value is 10.
@@ -104,6 +120,10 @@ message ListTokensRequest {
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  // The active state of the Tokens to be returned.
+  //
+  // If not specified, defaults to STATE_ACTIVE.
+  State state = 5 [(buf.validate.field).enum.defined_only = true];
 }
 
 message ListTokensResponse {
