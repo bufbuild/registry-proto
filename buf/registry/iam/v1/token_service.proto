@@ -82,16 +82,16 @@ message ListTokensRequest {
   // The list order.
   enum Order {
     ORDER_UNSPECIFIED = 0;
-    // Order by create_time newest to oldest.
+    // Order by create_time latest to earliest.
     ORDER_CREATE_TIME_DESC = 1;
-    // Order by create_time oldest to newest.
+    // Order by create_time earliest to latest.
     ORDER_CREATE_TIME_ASC = 2;
-    // Order by expire_time newest to oldest.
+    // Order by expire_time latest to earliest.
     //
     // Tokens that do not expire are treated as having the latest possible
     // expire_time, and are listed first.
     ORDER_EXPIRE_TIME_DESC = 3;
-    // Order by expire_time oldest to newest.
+    // Order by expire_time earliest to latest.
     //
     // Tokens that do not expire are treated as having the latest possible
     // expire_time, and are listed last.
