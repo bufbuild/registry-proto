@@ -82,11 +82,33 @@ message ListTokensRequest {
   // The list order.
   enum Order {
     ORDER_UNSPECIFIED = 0;
-    // Order by create_time newest to oldest.
+    // Order by create_time latest to earliest.
     ORDER_CREATE_TIME_DESC = 1;
-    // Order by create_time oldest to newest.
+    // Order by create_time earliest to latest.
     ORDER_CREATE_TIME_ASC = 2;
+    // Order by expire_time latest to earliest.
+    //
+    // Tokens that do not expire are treated as having the latest possible
+    // expire_time, and are listed first.
+    ORDER_EXPIRE_TIME_DESC = 3;
+    // Order by expire_time earliest to latest.
+    //
+    // Tokens that do not expire are treated as having the latest possible
+    // expire_time, and are listed last.
+    ORDER_EXPIRE_TIME_ASC = 4;
   }
+
+  // The filter for expired and active tokens.
+  enum ExpireFilter {
+    EXPIRE_FILTER_UNSPECIFIED = 0;
+    // Only return unexpired tokens, including Tokens that do not expire.
+    EXPIRE_FILTER_UNEXPIRED_ONLY = 1;
+    // Only return expired tokens.
+    EXPIRE_FILTER_EXPIRED_ONLY = 2;
+    // Return both unexpired and expired tokens.
+    EXPIRE_FILTER_ALL = 3;
+  }
+
   // The maximum number of items to return.
   //
   // The default value is 10.
@@ -104,6 +126,10 @@ message ListTokensRequest {
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
+  // The active state of the Tokens to be returned.
+  //
+  // If not specified, defaults to EXPIRE_FILTER_UNEXPIRED_ONLY.
+  ExpireFilter expire_filter = 5 [(buf.validate.field).enum.defined_only = true];
 }
 
 message ListTokensResponse {
