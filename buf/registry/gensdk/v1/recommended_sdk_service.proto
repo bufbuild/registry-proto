@@ -31,18 +31,18 @@ service RecommendedSDKService {
   // same level.
   rpc AddRecommendedSDK(AddRecommendedSDKRequest) returns (AddRecommendedSDKResponse) {
     option idempotency_level = IDEMPOTENT;
-    // bsr.module-settings.update is required if the recommendation level is module
-    // bsr.organization-settings.update is required if the recommendation level is organization,
-    // bsr.instance-settings.update is required if the recommendation level is instance,
+    // bsr.module-settings.update is required if the recommendation level is a module
+    // bsr.organization-settings.update is required if the recommendation level is an organization,
+    // bsr.instance-settings.update is required if the recommendation level is the instance,
     // Additionally, bsr.plugin.get is required for any private plugins.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Remove an SDK from the list of recommended SDKs at a given level.
   rpc RemoveRecommendedSDK(RemoveRecommendedSDKRequest) returns (RemoveRecommendedSDKResponse) {
     option idempotency_level = IDEMPOTENT;
-    // bsr.module-settings.update is required if the recommendation level is module
-    // bsr.organization-settings.update is required if the recommendation level is organization,
-    // bsr.instance-settings.update is required if the recommendation level is instance,
+    // bsr.module-settings.update is required if the recommendation level is a module
+    // bsr.organization-settings.update is required if the recommendation level is an organization,
+    // bsr.instance-settings.update is required if the recommendation level is the instance,
     // Additionally, bsr.plugin.get is required for any private plugins.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
@@ -52,9 +52,9 @@ service RecommendedSDKService {
   // make a request per level to determine whether an SDK is recommended at a higher level.
   rpc ListRecommendedSDKs(ListRecommendedSDKsRequest) returns (ListRecommendedSDKsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    // If the recommendation level is module, bsr.module.get is required.
-    // If the recommendation level is organization, bsr.organization.get is required.
-    // If the recommendation level is instance, no permission required.
+    // If the recommendation level is a private module, bsr.module.get is required.
+    // If the recommendation level is a private organization, bsr.organization.get is required.
+    // If the recommendation level is the instance, no permission required.
     // The result is filtered to the SDKs whose plugin the caller may read and has bsr.plugin.get for.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
