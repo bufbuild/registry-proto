@@ -28,7 +28,8 @@ service UserService {
   // Get Users by id or name.
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.get";
+    // Users are public on an instance: reading them requires no Permission.
+    option (buf.registry.priv.extension.v1beta1.method).no_required_permission = true;
   }
   // Get the currently authenticated User.
   rpc GetCurrentUser(GetCurrentUserRequest) returns (GetCurrentUserResponse) {
@@ -38,7 +39,9 @@ service UserService {
   // List Users, usually by Organization.
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user.list";
+    // bsr.user.list is required if no organization_refs are provided.
+    // bsr.organization-membership.list is required on each Organization in organization_refs.
+    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Create new Users.
   //

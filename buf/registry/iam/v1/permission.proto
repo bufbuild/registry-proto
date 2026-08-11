@@ -23,11 +23,7 @@ import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
 
-// A Permission on the BSR.
-//
-// A Permission is an atomic capability that gates access to one or more RPCs. Permissions are
-// registered by the system and granted to Users, and may be further restricted on a Token via
-// ScopedPermissions.
+// A Permission on the BSR. It is used to restrict the capabilities of a Token via ScopedPermissions.
 //
 // A Permission is identified by its name; it does not have a separate id.
 message Permission {
@@ -51,5 +47,14 @@ message Permission {
     (buf.validate.field).repeated.unique = true,
     (buf.validate.field).repeated.items.enum.defined_only = true,
     (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
+  // Other Permissions that this Permission includes.
+  //
+  // Binding this Permission at a scope also satisfies checks for every included
+  // Permission at that same scope, exactly as if the included Permissions were
+  // bound alongside it.
+  repeated string included_permissions = 4 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.string.(buf.registry.priv.validate.v1beta1.permission_name) = true
   ];
 }

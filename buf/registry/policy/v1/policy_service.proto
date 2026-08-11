@@ -18,6 +18,7 @@ package buf.registry.policy.v1;
 
 import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/policy/v1/policy.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/policy/v1";
@@ -27,28 +28,36 @@ service PolicyService {
   // Get Policies by id or name.
   rpc GetPolicies(GetPoliciesRequest) returns (GetPoliciesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.policy.get";
   }
   // List Policies, usually for a specific Organization.
   rpc ListPolicies(ListPoliciesRequest) returns (ListPoliciesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    // bsr.organization.get is required for any OrganizationRef that resolves to a private Organization.
+    // The response is filtered to public Policies and private Policies that the caller may read and
+    // has bsr.policy.get for.
+    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Create new Policies.
   //
   // This operation is atomic. Either all Policies are created or an error is returned.
   rpc CreatePolicies(CreatePoliciesRequest) returns (CreatePoliciesResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.policy.create";
   }
   // Update existing Policies.
   //
   // This operation is atomic. Either all Policies are updated or an error is returned.
   rpc UpdatePolicies(UpdatePoliciesRequest) returns (UpdatePoliciesResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.policy.update";
   }
   // Delete existing Policies.
   //
   // This operation is atomic. Either all Policies are deleted or an error is returned.
   rpc DeletePolicies(DeletePoliciesRequest) returns (DeletePoliciesResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.policy.delete";
   }
 }
 

@@ -18,6 +18,7 @@ package buf.registry.plugin.v1;
 
 import "buf/registry/owner/v1/owner.proto";
 import "buf/registry/plugin/v1/plugin.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1";
@@ -27,28 +28,36 @@ service PluginService {
   // Get Plugins by id or name.
   rpc GetPlugins(GetPluginsRequest) returns (GetPluginsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.plugin.get";
   }
   // List Plugins, usually for a specific Organization.
   rpc ListPlugins(ListPluginsRequest) returns (ListPluginsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    // bsr.organization.get is required for any OwnerRef that resolves to a private Organization.
+    // The response is filtered to public Plugins and private Plugins that the caller may read and
+    // has bsr.plugin.get for.
+    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Create new Plugins.
   //
   // This operation is atomic. Either all Plugins are created or an error is returned.
   rpc CreatePlugins(CreatePluginsRequest) returns (CreatePluginsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.plugin.create";
   }
   // Update existing Plugins.
   //
   // This operation is atomic. Either all Plugins are updated or an error is returned.
   rpc UpdatePlugins(UpdatePluginsRequest) returns (UpdatePluginsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.plugin.update";
   }
   // Delete existing Plugins.
   //
   // This operation is atomic. Either all Plugins are deleted or an error is returned.
   rpc DeletePlugins(DeletePluginsRequest) returns (DeletePluginsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.plugin.delete";
   }
 }
 
