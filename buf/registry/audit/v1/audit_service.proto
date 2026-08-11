@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.audit.v1;
 
 import "buf/registry/audit/v1/event.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "google/protobuf/timestamp.proto";
 
 // AuditService is the Audit service.
@@ -24,6 +25,7 @@ service AuditService {
   // ListEvents lists audited events recorded in the BSR instance.
   rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.audit.list";
   }
 }
 

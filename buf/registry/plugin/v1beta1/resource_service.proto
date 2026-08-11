@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.plugin.v1beta1;
 
 import "buf/registry/plugin/v1beta1/resource.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
@@ -26,6 +27,9 @@ service ResourceService {
   // Get Resources.
   rpc GetResources(GetResourcesRequest) returns (GetResourcesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    // Every Resource (Plugin, Label, or Commit) is read from its Plugin, so
+    // every ResourceRef requires the bsr.plugin.get Permission.
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.plugin.get";
   }
 }
 
