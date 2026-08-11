@@ -39,10 +39,8 @@ service UserService {
   // List Users, usually by Organization.
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    // The Permission required depends on the request: listing all Users on the
-    // instance (no organization_refs) requires the bsr.user.list Permission,
-    // and listing the members of an Organization requires the
-    // bsr.organization-membership.list Permission on that Organization.
+    // bsr.user.list is required if no organization_refs are provided.
+    // bsr.organization-membership.list is required on each Organization in organization_refs.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Create new Users.

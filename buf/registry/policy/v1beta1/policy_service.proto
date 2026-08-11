@@ -33,10 +33,9 @@ service PolicyService {
   // List Policies, usually for a specific User or Organization.
   rpc ListPolicies(ListPoliciesRequest) returns (ListPoliciesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    // The Permission required depends on the request: an OwnerRef that names a
-    // private Organization requires the bsr.organization.get Permission on it;
-    // otherwise no Permission is required. The response is filtered to the
-    // Policies the caller may read (the bsr.policy.get Permission).
+    // bsr.organization.get is required for any OwnerRef that resolves to a private Organization.
+    // The response is filtered to public Policies and private Policies that the caller may read and
+    // has bsr.policy.get for.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Create new Policies.

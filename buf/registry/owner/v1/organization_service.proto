@@ -34,12 +34,9 @@ service OrganizationService {
   // List Organizations, usually by User.
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    // The Permission required depends on the request: listing all Organizations
-    // on the instance (no user_refs) requires the bsr.organization.list
-    // Permission. Listing the Organizations of specific Users requires no
-    // Permission: the response is restricted to the Organizations whose
-    // memberships the caller may read (the bsr.organization-membership.get
-    // Permission).
+    // bsr.organization.list is required if no user_refs are provided.
+    // If user_refs are provided, the response is filtered to the Organizations whose memberships
+    // the caller may read and has bsr.organization-membership.get for.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Create new Organizations.

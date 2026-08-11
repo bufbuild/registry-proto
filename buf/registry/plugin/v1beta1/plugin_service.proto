@@ -34,10 +34,9 @@ service PluginService {
   // List Plugins, usually for a specific Organization.
   rpc ListPlugins(ListPluginsRequest) returns (ListPluginsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    // The Permission required depends on the request: an OwnerRef that names a
-    // private Organization requires the bsr.organization.get Permission on it;
-    // otherwise no Permission is required. The response is filtered to the
-    // Plugins the caller may read (the bsr.plugin.get Permission).
+    // bsr.organization.get is required for any OwnerRef that resolves to a private Organization.
+    // The response is filtered to public Plugins and private Plugins that the caller may read and
+    // has bsr.plugin.get for.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Create new Plugins.

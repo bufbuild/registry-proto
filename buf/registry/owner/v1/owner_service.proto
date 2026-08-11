@@ -29,9 +29,8 @@ service OwnerService {
   // Get Users or Organizations by id or name.
   rpc GetOwners(GetOwnersRequest) returns (GetOwnersResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    // The Permission required for each OwnerRef depends on the type of the
-    // owner it references: a User requires no Permission, and an Organization
-    // requires the bsr.organization.get Permission.
+    // bsr.organization.get is required for any OwnerRef that resolves to a private Organization.
+    // No Permission is required for an OwnerRef that resolves to a User.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
 }

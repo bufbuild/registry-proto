@@ -33,8 +33,9 @@ service ModuleService {
   // List Modules, usually for a specific User or Organization.
   rpc ListModules(ListModulesRequest) returns (ListModulesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    // bsr.organization.get is required for OwnerRefs resolving to private organizations.
-    // The response is filtered to the modules the caller may read and has bsr.module.get for.
+    // bsr.organization.get is required for any OwnerRef that resolves to a private Organization.
+    // The response is filtered to public Modules and private Modules that the caller may read and
+    // has bsr.module.get for.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Create new Modules.
