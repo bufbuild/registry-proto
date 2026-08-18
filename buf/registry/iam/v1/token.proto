@@ -74,26 +74,28 @@ message Token {
   //
   // In other words, ScopedPermissions can restrict the permissions of a Token,
   // but cannot add any permissions that the User does not already have.
-  repeated ScopedPermission scoped_permissions = 7 [
+  repeated ScopedPermissions scoped_permissions = 7 [
     (buf.validate.field).repeated.max_items = 250,
     (buf.validate.field).cel = {
-      id: "scoped_permissions.unique"
-      message: "scoped permissions must have unique scope and permission pairs"
-      expression: "this.map(sp, (has(sp.scope.instance) ? 'instance' : string(sp.scope.resource.resource_type) + '/' + sp.scope.resource.resource_id) + '|' + sp.permission).unique()"
+      id: "scoped_permissions.unique_scope"
+      message: "scoped permissions must have unique scopes"
+      expression: "this.map(sp, has(sp.scope.instance) ? 'instance' : string(sp.scope.resource.resource_type) + '/' + sp.scope.resource.resource_id).unique()"
     }
   ];
 }
 
-// A permission that applies within a specific Scope.
+// A set of permissions that apply within a specific Scope.
 //
 // ScopedPermissions restrict a Token to a subset of its owning User's permissions.
-message ScopedPermission {
-  // The Scope that the permission applies to.
+message ScopedPermissions {
+  // The Scope that the permissions apply to.
   Scope scope = 1 [(buf.validate.field).required = true];
-  // The permission allowed within the Scope (e.g. "bsr.module.delete").
-  string permission = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.permission_name) = true
+  // The permissions allowed within the Scope (e.g. "bsr.module.delete").
+  repeated string permissions = 2 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 100,
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.string.(buf.registry.priv.validate.v1beta1.permission_name) = true
   ];
 }
 
