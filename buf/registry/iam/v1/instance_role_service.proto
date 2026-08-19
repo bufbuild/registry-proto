@@ -77,4 +77,7 @@ message UpdateUserInstanceRolesRequest {
   ];
 }
 
-message UpdateUserInstanceRolesResponse {}
+message UpdateUserInstanceRolesResponse {
+  // The updated instance roles in the same order as requested.
+  repeated UserInstanceRole user_instance_roles = 1 [(buf.validate.field).repeated.min_items = 1];
+}
