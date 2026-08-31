@@ -19,6 +19,8 @@ package buf.registry.audit.v1;
 import "buf/registry/admin/v1/settings.proto";
 import "buf/registry/iam/v1/module_contributor.proto";
 import "buf/registry/iam/v1/organization_membership.proto";
+import "buf/registry/iam/v1/token.proto";
+import "buf/registry/iam/v1/trust_credential.proto";
 import "buf/registry/module/v1/module.proto";
 import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/policy/v1/policy.proto";
@@ -44,7 +46,7 @@ message Actor {
 
 // ResourceType is the type of the resource that was affected by the audited event.
 //
-// [#next-free-field: 25]
+// [#next-free-field: 26]
 enum ResourceType {
   RESOURCE_TYPE_UNSPECIFIED = 0;
   RESOURCE_TYPE_USER = 1;
@@ -71,6 +73,7 @@ enum ResourceType {
   RESOURCE_TYPE_SDK_PLUGIN_CONSTRAINT = 21;
   RESOURCE_TYPE_AUTHORIZATION_REQUEST = 23;
   RESOURCE_TYPE_RECOMMENDED_SDK = 24;
+  RESOURCE_TYPE_TRUST_CREDENTIAL = 25;
 }
 
 // Resource is the affected resource by the audited event.
@@ -85,7 +88,7 @@ message Resource {
 
 // EventType is the type of audited event.
 //
-// [#next-free-field: 88]
+// [#next-free-field: 91]
 enum EventType {
   EVENT_TYPE_UNSPECIFIED = 0;
   EVENT_TYPE_ORGANIZATION_CREATED = 1;
@@ -175,6 +178,9 @@ enum EventType {
   EVENT_TYPE_AUTHORIZATION_REQUEST_DENIED = 85;
   EVENT_TYPE_RECOMMENDED_SDK_ADDED = 86;
   EVENT_TYPE_RECOMMENDED_SDK_REMOVED = 87;
+  EVENT_TYPE_TRUST_CREDENTIAL_CREATED = 88;
+  EVENT_TYPE_TRUST_CREDENTIAL_DELETED = 89;
+  EVENT_TYPE_TRUST_CREDENTIAL_UPDATED = 90;
 }
 
 // EventMetadata provides additional details about the audited event.
@@ -190,7 +196,7 @@ message EventMetadata {
 // it happened, who did it, which resource was affected, and more contextual information on the
 // event.
 //
-// [#next-free-field: 94]
+// [#next-free-field: 97]
 message Event {
   // Unique id of the audited event.
   string event_id = 1;
@@ -295,6 +301,9 @@ message Event {
     PayloadAuthorizationRequestDenied authorization_request_denied = 91;
     PayloadRecommendedSDKAdded recommended_sdk_added = 92;
     PayloadRecommendedSDKRemoved recommended_sdk_removed = 93;
+    PayloadTrustCredentialCreated trust_credential_created = 94;
+    PayloadTrustCredentialDeleted trust_credential_deleted = 95;
+    PayloadTrustCredentialUpdated trust_credential_updated = 96;
   }
 }
 
@@ -1137,4 +1146,48 @@ message PayloadRecommendedSDKRemoved {
   string plugin_id = 7;
   // plugin_name is the name of the plugin of the recommended SDK.
   string plugin_name = 8;
+}
+
+message PayloadTrustCredentialCreated {
+  // owner_id is the id of the owner of the trust credential.
+  string owner_id = 1;
+  // issuer_url is the url of the OIDC issuer whose tokens the trust credential accepts.
+  string issuer_url = 2;
+  // subject is the sub claim a workload's OIDC token must match, i.e. exactly which workloads this
+  // grant trusts.
+  string subject = 3;
+  // custom_claims are the additional claims a workload's OIDC token must carry, if any.
+  repeated buf.registry.iam.v1.CustomClaim custom_claims = 4;
+  // scoped_permissions are the permissions carried by the tokens the trust credential mints.
+  // Empty means the tokens carry the owner's permissions resolved at request time.
+  repeated buf.registry.iam.v1.ScopedPermissions scoped_permissions = 5;
+}
+
+message PayloadTrustCredentialDeleted {
+  // owner_id is the id of the owner of the trust credential.
+  string owner_id = 1;
+  // issuer_url is the url of the OIDC issuer whose tokens the trust credential accepted.
+  string issuer_url = 2;
+  // subject is the sub claim the trust credential required when it was deleted.
+  string subject = 3;
+  // custom_claims are the additional claims it required, if any.
+  repeated buf.registry.iam.v1.CustomClaim custom_claims = 4;
+  // scoped_permissions are the permissions the trust credential's tokens carried.
+  repeated buf.registry.iam.v1.ScopedPermissions scoped_permissions = 5;
+}
+
+message PayloadTrustCredentialUpdated {
+  // owner_id is the id of the owner of the trust credential.
+  string owner_id = 1;
+  // issuer_url is the url of the OIDC issuer the trust credential accepts tokens from after
+  // the update.
+  string issuer_url = 2;
+  // subject is the sub claim the trust credential requires after the update, i.e. exactly which
+  // workloads it trusts from now on.
+  string subject = 3;
+  // custom_claims are the additional claims required after the update, if any.
+  repeated buf.registry.iam.v1.CustomClaim custom_claims = 4;
+  // scoped_permissions are the permissions carried by the tokens the trust credential mints
+  // after the update.
+  repeated buf.registry.iam.v1.ScopedPermissions scoped_permissions = 5;
 }
