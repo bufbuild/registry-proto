@@ -18,6 +18,8 @@ package buf.registry.owner.v1;
 
 import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/owner/v1/user.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
@@ -27,28 +29,49 @@ service OrganizationService {
   // Get Organizations by id or name.
   rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.get";
   }
   // List Organizations, usually by User.
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    // bsr.organization.list is required if no user_refs are provided.
+    // If user_refs are provided, the response is filtered to the Organizations whose memberships
+    // the caller may read and has bsr.organization-membership.get for.
+    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Create new Organizations.
   //
   // This operation is atomic. Either all Organizations are created or an error is returned.
   rpc CreateOrganizations(CreateOrganizationsRequest) returns (CreateOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.create";
   }
   // Update existing organizations.
   //
   // This operation is atomic. Either all Organizations are updated or an error is returned.
   rpc UpdateOrganizations(UpdateOrganizationsRequest) returns (UpdateOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.update";
   }
   // Delete existing organizations.
   //
   // This operation is atomic. Either all Organizations are deleted or an error is returned.
   rpc DeleteOrganizations(DeleteOrganizationsRequest) returns (DeleteOrganizationsResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization.delete";
+  }
+  // Get the settings of Organizations.
+  rpc GetOrganizationSettings(GetOrganizationSettingsRequest) returns (GetOrganizationSettingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-settings.get";
+  }
+  // Update the settings of Organizations.
+  //
+  // This operation is atomic. Either all OrganizationSettings are updated or an error is
+  // returned.
+  rpc UpdateOrganizationSettings(UpdateOrganizationSettingsRequest) returns (UpdateOrganizationSettingsResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.organization-settings.update";
   }
 }
 
@@ -189,3 +212,66 @@ message DeleteOrganizationsRequest {
 }
 
 message DeleteOrganizationsResponse {}
+
+message GetOrganizationSettingsRequest {
+  // The Organizations to retrieve settings for.
+  repeated OrganizationRef organization_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetOrganizationSettingsResponse {
+  // The retrieved OrganizationSettings in the same order as requested.
+  repeated OrganizationSettings organization_settings = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdateOrganizationSettingsRequest {
+  // An individual request to update the settings of an Organization.
+  //
+  // Only the settings that are set are updated.
+  message Value {
+    // The Organization to update the settings of.
+    OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
+    // The base role that members of the Organization receive on the Modules the Organization
+    // owns.
+    optional BaseResourceRole base_module_role = 2 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+    // The base role that members of the Organization receive on the Plugins the Organization
+    // owns.
+    optional BaseResourceRole base_plugin_role = 3 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+    // The base role that members of the Organization receive on the Policies the Organization
+    // owns.
+    optional BaseResourceRole base_policy_role = 4 [
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+    // The Organization's visibility control for the Modules it owns to set.
+    //
+    // If unset, the Module visibility control is left unchanged.
+    buf.registry.resource.v1.ResourceVisibilityControl module_visibility_control = 5;
+    // The Organization's visibility control for the Plugins it owns to set.
+    //
+    // If unset, the Plugin visibility control is left unchanged.
+    buf.registry.resource.v1.ResourceVisibilityControl plugin_visibility_control = 6;
+    // The Organization's visibility control for the Policies it owns to set.
+    //
+    // If unset, the Policy visibility control is left unchanged.
+    buf.registry.resource.v1.ResourceVisibilityControl policy_visibility_control = 7;
+  }
+  // The OrganizationSettings to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdateOrganizationSettingsResponse {
+  // The updated OrganizationSettings in the same order as given on the request.
+  repeated OrganizationSettings organization_settings = 1 [(buf.validate.field).repeated.min_items = 1];
+}

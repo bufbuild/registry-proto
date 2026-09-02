@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.owner.v1;
 
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -80,6 +81,78 @@ enum OrganizationVisibility {
   ORGANIZATION_VISIBILITY_PUBLIC = 1;
   // ORGANIZATION_VISIBILITY_PRIVATE says that the organization is private.
   ORGANIZATION_VISIBILITY_PRIVATE = 2;
+}
+
+// The settings of an Organization.
+//
+// Settings control behavior that applies to the Organization's members and the resources the
+// Organization owns, as opposed to the Organization's profile, which is part of the Organization
+// itself.
+message OrganizationSettings {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Organization that the settings apply to.
+  string organization_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The base role that members of the Organization receive on the Modules the Organization owns.
+  BaseResourceRole base_module_role = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The base role that members of the Organization receive on the Plugins the Organization owns.
+  BaseResourceRole base_plugin_role = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The base role that members of the Organization receive on the Policies the Organization owns.
+  BaseResourceRole base_policy_role = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The Organization's visibility control for the Modules it owns.
+  //
+  // This control is ignored when a strict instance-level control is set. If unset, new Modules
+  // fall through to the instance-level control, and default to private if no control applies at
+  // any level.
+  buf.registry.resource.v1.ResourceVisibilityControl module_visibility_control = 5;
+  // The Organization's visibility control for the Plugins it owns.
+  //
+  // This control is ignored when a strict instance-level control is set. If unset, new Plugins
+  // fall through to the instance-level control, and default to private if no control applies at
+  // any level.
+  buf.registry.resource.v1.ResourceVisibilityControl plugin_visibility_control = 6;
+  // The Organization's visibility control for the Policies it owns.
+  //
+  // This control is ignored when a strict instance-level control is set. If unset, new Policies
+  // fall through to the instance-level control, and default to private if no control applies at
+  // any level.
+  buf.registry.resource.v1.ResourceVisibilityControl policy_visibility_control = 7;
+}
+
+// A base role that members of an Organization receive on the resources the Organization owns.
+//
+// Base roles apply to members with the member role. Members with the admin or owner role receive
+// at least admin access to owned resources, and bot users always receive write access,
+// regardless of base roles.
+//
+// An owner base role is intentionally not representable: it would allow Organization admins to
+// escalate themselves to resource owners.
+enum BaseResourceRole {
+  BASE_RESOURCE_ROLE_UNSPECIFIED = 0;
+  // Members can administer the resource.
+  BASE_RESOURCE_ROLE_ADMIN = 1;
+  // Members can write to the resource.
+  BASE_RESOURCE_ROLE_WRITE = 2;
+  // Members can write only non-default content of the resource, for example pushing to a
+  // non-default Label of a Module.
+  BASE_RESOURCE_ROLE_LIMITED_WRITE = 3;
+  // Members can read the resource.
+  BASE_RESOURCE_ROLE_READ = 4;
 }
 
 // OrganizationRef is a reference to an Organization, either an id or a name.

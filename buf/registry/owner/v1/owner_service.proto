@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.owner.v1;
 
 import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
@@ -28,6 +29,9 @@ service OwnerService {
   // Get Users or Organizations by id or name.
   rpc GetOwners(GetOwnersRequest) returns (GetOwnersResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    // bsr.organization.get is required for any OwnerRef that resolves to a private Organization.
+    // No Permission is required for an OwnerRef that resolves to a User.
+    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
 }
 

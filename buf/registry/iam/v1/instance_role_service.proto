@@ -1,0 +1,83 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/iam/v1/instance_role.proto";
+import "buf/registry/owner/v1/user.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
+
+// Operate on the instance roles of Users.
+service InstanceRoleService {
+  // Get the instance roles of Users.
+  //
+  // Reading instance roles requires elevated privilege; it is not exposed on the standard
+  // User read RPCs.
+  rpc GetUserInstanceRoles(GetUserInstanceRolesRequest) returns (GetUserInstanceRolesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user-instance-role.get";
+  }
+  // Update the instance roles of existing Users.
+  //
+  // An instance must always retain at least one instance admin. It is an error to demote the
+  // last admin.
+  //
+  // This operation is atomic. Either all Users are updated or an error is returned.
+  rpc UpdateUserInstanceRoles(UpdateUserInstanceRolesRequest) returns (UpdateUserInstanceRolesResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.user-instance-role.update";
+  }
+}
+
+message GetUserInstanceRolesRequest {
+  // The Users whose instance roles to retrieve.
+  repeated buf.registry.owner.v1.UserRef user_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetUserInstanceRolesResponse {
+  // The retrieved instance roles in the same order as requested.
+  repeated UserInstanceRole user_instance_roles = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdateUserInstanceRolesRequest {
+  // An individual request to update a User's instance role.
+  message Value {
+    // The User whose instance role to update.
+    buf.registry.owner.v1.UserRef user_ref = 1 [(buf.validate.field).required = true];
+    // The instance role to assign to the User.
+    InstanceRole instance_role = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+  }
+  // The Users to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdateUserInstanceRolesResponse {
+  // The updated instance roles in the same order as requested.
+  repeated UserInstanceRole user_instance_roles = 1 [(buf.validate.field).repeated.min_items = 1];
+}

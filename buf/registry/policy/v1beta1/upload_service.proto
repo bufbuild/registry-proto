@@ -30,7 +30,10 @@ service UploadService {
   // Upload contents for given set of Policies.
   //
   // Contents are expected to be a single YAML file.
-  rpc Upload(UploadRequest) returns (UploadResponse) {}
+  rpc Upload(UploadRequest) returns (UploadResponse) {
+    // bsr.plugin.get is required for any private Plugin referenced.
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.policy.push";
+  }
 }
 
 message UploadRequest {
