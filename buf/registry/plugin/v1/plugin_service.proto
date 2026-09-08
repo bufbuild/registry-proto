@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package buf.registry.plugin.v1;
 
-import "buf/registry/owner/v1/owner.proto";
+import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
@@ -33,7 +33,7 @@ service PluginService {
   // List Plugins, usually for a specific Organization.
   rpc ListPlugins(ListPluginsRequest) returns (ListPluginsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    // bsr.organization.get is required for any OwnerRef that resolves to a private Organization.
+    // bsr.organization.get is required for any OrganizationRef that resolves to a private Organization.
     // The response is filtered to public Plugins and private Plugins that the caller may read and
     // has bsr.plugin.get for.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
@@ -95,7 +95,7 @@ message ListPluginsRequest {
   //
   // If empty, all Plugins for all Organizations are listed, but this functionality is limited to
   // Users with the necessary permissions.
-  repeated buf.registry.owner.v1.OwnerRef owner_refs = 3;
+  repeated buf.registry.owner.v1.OrganizationRef organization_refs = 3;
   // The order to return the Plugins.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
@@ -114,9 +114,8 @@ message ListPluginsResponse {
 message CreatePluginsRequest {
   // An individual request to create a Plugin.
   message Value {
-    // The Organization to create the Plugin under. The OwnerRef must be a reference to an
-    // Organization and cannot be a User reference.
-    buf.registry.owner.v1.OwnerRef owner_ref = 1 [(buf.validate.field).required = true];
+    // The Organization to create the Plugin under.
+    buf.registry.owner.v1.OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
     // The name of the Plugin.
     string name = 2 [(buf.validate.field).string = {
       min_len: 2
