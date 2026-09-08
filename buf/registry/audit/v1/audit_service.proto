@@ -18,7 +18,10 @@ package buf.registry.audit.v1;
 
 import "buf/registry/audit/v1/event.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/audit/v1";
 
 // AuditService is the Audit service.
 service AuditService {
@@ -30,20 +33,35 @@ service AuditService {
 }
 
 message ListEventsRequest {
-  // The page size for listing audited events, values between 1-250.
-  uint32 page_size = 1;
-  // The page token for paginating. The first page is returned if this is empty.
-  string page_token = 2;
-  // The start timestamp to filter events from.
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // Only return Events at or after this time, inclusive.
+  //
+  // If not set, there is no lower bound.
   google.protobuf.Timestamp start_time = 3;
-  // The end timestamp to filter events to.
+  // Only return Events at or before this time, inclusive.
+  //
+  // If not set, there is no upper bound.
   google.protobuf.Timestamp end_time = 4;
+
+  option (buf.validate.message).cel = {
+    id: "list_events_request.time_range"
+    message: "end_time must not be before start_time"
+    expression: "!has(this.start_time) || !has(this.end_time) || this.start_time <= this.end_time"
+  };
 }
 
 message ListEventsResponse {
-  // The token for the next page of audited events. There are no more pages if
-  // this is empty.
-  string next_page_token = 1;
-  // The list of audited events in the current page.
-  repeated buf.registry.audit.v1.Event events = 2;
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed Events.
+  repeated Event events = 2;
 }
