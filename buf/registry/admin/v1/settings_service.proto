@@ -33,8 +33,7 @@ service SettingsService {
   // Update the instance-wide settings.
   //
   // Only the settings present on the request are updated; settings that are not set are
-  // left unchanged. This operation is atomic: either all of the present settings are
-  // updated or an error is returned and none are.
+  // left unchanged. This operation is atomic.
   rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse) {
     option idempotency_level = IDEMPOTENT;
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.instance-settings.update";
@@ -75,19 +74,19 @@ message UpdateSettingsRequest {
   // The instance-wide visibility control for Modules to set.
   //
   // If unset, the Module visibility control is left unchanged.
-  buf.registry.resource.v1.ResourceVisibilityControl module_visibility_control = 3;
+  buf.registry.resource.v1.ResourceVisibilityControlUpdate module_visibility_control = 3;
   // The instance-wide visibility control for Plugins to set.
   //
   // If unset, the Plugin visibility control is left unchanged.
-  buf.registry.resource.v1.ResourceVisibilityControl plugin_visibility_control = 4;
+  buf.registry.resource.v1.ResourceVisibilityControlUpdate plugin_visibility_control = 4;
   // The instance-wide visibility control for Policies to set.
   //
   // If unset, the Policy visibility control is left unchanged.
-  buf.registry.resource.v1.ResourceVisibilityControl policy_visibility_control = 5;
+  buf.registry.resource.v1.ResourceVisibilityControlUpdate policy_visibility_control = 5;
   // The instance-wide visibility control for Organizations to set.
   //
   // If unset, the Organization visibility control is left unchanged.
-  buf.registry.resource.v1.ResourceVisibilityControl organization_visibility_control = 6;
+  buf.registry.resource.v1.ResourceVisibilityControlUpdate organization_visibility_control = 6;
 }
 
 message UpdateSettingsResponse {

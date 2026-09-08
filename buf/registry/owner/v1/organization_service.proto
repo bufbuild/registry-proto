@@ -228,8 +228,6 @@ message GetOrganizationSettingsResponse {
 
 message UpdateOrganizationSettingsRequest {
   // An individual request to update the settings of an Organization.
-  //
-  // Only the settings that are set are updated.
   message Value {
     // The Organization to update the settings of.
     OrganizationRef organization_ref = 1 [(buf.validate.field).required = true];
@@ -254,15 +252,15 @@ message UpdateOrganizationSettingsRequest {
     // The Organization's visibility control for the Modules it owns to set.
     //
     // If unset, the Module visibility control is left unchanged.
-    buf.registry.resource.v1.ResourceVisibilityControl module_visibility_control = 5;
+    buf.registry.resource.v1.ResourceVisibilityControlUpdate module_visibility_control = 5;
     // The Organization's visibility control for the Plugins it owns to set.
     //
     // If unset, the Plugin visibility control is left unchanged.
-    buf.registry.resource.v1.ResourceVisibilityControl plugin_visibility_control = 6;
+    buf.registry.resource.v1.ResourceVisibilityControlUpdate plugin_visibility_control = 6;
     // The Organization's visibility control for the Policies it owns to set.
     //
     // If unset, the Policy visibility control is left unchanged.
-    buf.registry.resource.v1.ResourceVisibilityControl policy_visibility_control = 7;
+    buf.registry.resource.v1.ResourceVisibilityControlUpdate policy_visibility_control = 7;
   }
   // The OrganizationSettings to update.
   repeated Value values = 1 [

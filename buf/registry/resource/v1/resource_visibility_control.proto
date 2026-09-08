@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.resource.v1;
 
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/resource/v1";
@@ -52,4 +53,20 @@ message ResourceVisibilityControl {
   // resource_visibility is used when no explicit visibility is given when a resource is created or
   // updated, but it may be overridden.
   bool strict = 2;
+}
+
+// An update to a ResourceVisibilityControl on instance or Organization settings.
+message ResourceVisibilityControlUpdate {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The visibility control to set, replacing any existing control.
+    ResourceVisibilityControl resource_visibility_control = 1;
+    // Remove the existing control.
+    //
+    // Resources of the governed type fall through to the next layer with a control. If no
+    // controls are defined, the default controls for the resource type apply.
+    bool clear = 2 [(buf.validate.field).bool.const = true];
+  }
 }
