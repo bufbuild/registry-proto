@@ -1128,7 +1128,7 @@ message PayloadRecommendedSdkAdded {
     (buf.validate.field).string.tuuid = true,
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
-  // owner_name is the set to the organization name for recommended SDKs at the organization level. Otherwise it is set
+  // owner_name is set to the organization name for recommended SDKs at the organization level. Otherwise it is set
   // to the module's owner name. Only set for recommended SDKs added at the organization or module level.
   string owner_name = 2;
   // module_id is the id of the module of the recommended SDK. Only set for recommended SDKs added at the module level.
@@ -1156,7 +1156,7 @@ message PayloadRecommendedSdkRemoved {
     (buf.validate.field).string.tuuid = true,
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
-  // owner_name is the set to the organization name for recommended SDKs at the organization level. Otherwise it is set
+  // owner_name is set to the organization name for recommended SDKs at the organization level. Otherwise it is set
   // to the module's owner name. Only set for recommended SDKs added at the organization or module level.
   string owner_name = 2;
   // module_id is the id of the module of the recommended SDK. Only set for recommended SDKs added at the module level.
