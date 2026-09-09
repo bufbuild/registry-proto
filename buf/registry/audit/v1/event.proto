@@ -213,7 +213,7 @@ message EventMetadata {
 // [#next-free-field: 94]
 message Event {
   // Unique id of the audited event.
-  string event_id = 1 [(buf.validate.field).string.tuuid = true];
+  string id = 1 [(buf.validate.field).string.tuuid = true];
   // Type of the audited event. It specifies "what" happened.
   EventType type = 2;
   // Actor of the audited event. It specifies "who" did it.
@@ -245,9 +245,9 @@ message Event {
     PayloadModuleContributorRemoved module_contributor_removed = 22;
     PayloadModuleVisibilityChanged module_visibility_changed = 23;
     PayloadModuleDefaultLabelNameChanged module_default_label_name_changed = 24;
-    PayloadModuleIDPGroupAdded module_idp_group_added = 25;
-    PayloadModuleIDPGroupUpdated module_idp_group_updated = 26;
-    PayloadModuleIDPGroupRemoved module_idp_group_removed = 27;
+    PayloadModuleIdpGroupAdded module_idp_group_added = 25;
+    PayloadModuleIdpGroupUpdated module_idp_group_updated = 26;
+    PayloadModuleIdpGroupRemoved module_idp_group_removed = 27;
     PayloadPolicyCreated policy_created = 28;
     PayloadPolicyDeleted policy_deleted = 29;
     PayloadPolicyDeprecated policy_deprecated = 30;
@@ -270,14 +270,14 @@ message Event {
     PayloadUserLoggedIn user_logged_in = 47;
     PayloadUserLoggedOut user_logged_out = 48;
     PayloadGenerationPluginCreated generation_plugin_created = 49;
-    PayloadOrganizationIDPGroupAdded idp_group_added = 50;
-    PayloadOrganizationIDPGroupUpdated idp_group_updated = 51;
-    PayloadOrganizationIDPGroupRemoved idp_group_removed = 52;
+    PayloadOrganizationIdpGroupAdded organization_idp_group_added = 50;
+    PayloadOrganizationIdpGroupUpdated organization_idp_group_updated = 51;
+    PayloadOrganizationIdpGroupRemoved organization_idp_group_removed = 52;
     PayloadTokenCreated token_created = 53;
     PayloadTokenDeleted token_deleted = 54;
     PayloadUserReactivated user_reactivated = 55;
-    PayloadSCIMTokenCreated scim_token_created = 56;
-    PayloadSCIMTokenDeleted scim_token_deleted = 57;
+    PayloadScimTokenCreated scim_token_created = 56;
+    PayloadScimTokenDeleted scim_token_deleted = 57;
     PayloadModuleCommitDeleted module_commit_deleted = 58;
     PayloadModuleLabelCreated module_label_created = 59;
     PayloadModuleLabelMoved module_label_moved = 60;
@@ -291,7 +291,7 @@ message Event {
     PayloadInstanceUniquenessPolicyEnabled instance_uniqueness_policy_enabled = 68;
     PayloadInstanceUniquenessPolicyDisabled instance_uniqueness_policy_disabled = 69;
     PayloadInstanceResourceVisibilityControlChanged instance_resource_visibility_control_changed = 70;
-    PayloadUserAutoMergedFromNewIdP user_auto_merged_from_new_idp = 71;
+    PayloadUserAutoMergedFromNewIdp user_auto_merged_from_new_idp = 71;
     PayloadDeviceAuthorizationGrantApproved device_authorization_grant_approved = 72;
     PayloadDeviceAuthorizationGrantDenied device_authorization_grant_denied = 73;
     PayloadPluginLabelCreated plugin_label_created = 74;
@@ -300,17 +300,17 @@ message Event {
     PayloadPluginLabelUnarchived plugin_label_unarchived = 77;
     PayloadInstanceReviewFlowEnabled instance_review_flow_enabled = 78;
     PayloadInstanceReviewFlowDisabled instance_review_flow_disabled = 79;
-    PayloadSDKPluginConstraintCreated sdk_plugin_constraint_created = 80;
-    PayloadSDKPluginConstraintUpdated sdk_plugin_constraint_updated = 81;
-    PayloadSDKPluginConstraintDeleted sdk_plugin_constraint_deleted = 82;
+    PayloadSdkPluginConstraintCreated sdk_plugin_constraint_created = 80;
+    PayloadSdkPluginConstraintUpdated sdk_plugin_constraint_updated = 81;
+    PayloadSdkPluginConstraintDeleted sdk_plugin_constraint_deleted = 82;
     PayloadPolicyEnforcementCreated policy_enforcement_created = 83;
     PayloadPolicyEnforcementDeleted policy_enforcement_deleted = 84;
     PayloadPolicyEnforcementPolicyChanged policy_enforcement_policy_changed = 85;
     PayloadPolicyEnforcementTargetsChanged policy_enforcement_targets_changed = 86;
     PayloadAuthorizationRequestApproved authorization_request_approved = 87;
     PayloadAuthorizationRequestDenied authorization_request_denied = 88;
-    PayloadRecommendedSDKAdded recommended_sdk_added = 89;
-    PayloadRecommendedSDKRemoved recommended_sdk_removed = 90;
+    PayloadRecommendedSdkAdded recommended_sdk_added = 89;
+    PayloadRecommendedSdkRemoved recommended_sdk_removed = 90;
     PayloadTrustCredentialCreated trust_credential_created = 91;
     PayloadTrustCredentialDeleted trust_credential_deleted = 92;
     PayloadTrustCredentialUpdated trust_credential_updated = 93;
@@ -360,34 +360,34 @@ message PayloadOrganizationMemberRemoved {
   buf.registry.iam.v1.OrganizationRoleSource member_role_source = 4;
 }
 
-message PayloadOrganizationIDPGroupAdded {
-  // organization_id is the id of the organization with the new IDP group.
+message PayloadOrganizationIdpGroupAdded {
+  // organization_id is the id of the organization with the new IdP group.
   string organization_id = 1 [(buf.validate.field).string.tuuid = true];
-  // organization_name is the name of the organization with the new IDP group.
+  // organization_name is the name of the organization with the new IdP group.
   string organization_name = 2;
-  // role_override is the role override associated with the new IDP group.
+  // role_override is the role override associated with the new IdP group.
   buf.registry.iam.v1.OrganizationRole role_override = 3;
 }
 
-message PayloadOrganizationIDPGroupUpdated {
-  // organization_id is the id of the organization with the updated IDP group.
+message PayloadOrganizationIdpGroupUpdated {
+  // organization_id is the id of the organization with the updated IdP group.
   string organization_id = 1 [(buf.validate.field).string.tuuid = true];
-  // organization_name is the name of the organization with the updated IDP group.
+  // organization_name is the name of the organization with the updated IdP group.
   string organization_name = 2;
-  // old_role_override is the role override associated with the IDP updated group. Only set if the
+  // old_role_override is the role override associated with the IdP updated group. Only set if the
   // role override was changed.
   buf.registry.iam.v1.OrganizationRole old_role_override = 3;
-  // new_role_override is the role override associated with the IDP updated group. Only set if the
+  // new_role_override is the role override associated with the IdP updated group. Only set if the
   // role override was changed.
   buf.registry.iam.v1.OrganizationRole new_role_override = 4;
 }
 
-message PayloadOrganizationIDPGroupRemoved {
-  // organization_id is the id of the organization with the removed IDP group.
+message PayloadOrganizationIdpGroupRemoved {
+  // organization_id is the id of the organization with the removed IdP group.
   string organization_id = 1 [(buf.validate.field).string.tuuid = true];
-  // organization_name is the name of the organization with the removed IDP group.
+  // organization_name is the name of the organization with the removed IdP group.
   string organization_name = 2;
-  // role_override is the role override associated with the removed IDP group.
+  // role_override is the role override associated with the removed IdP group.
   buf.registry.iam.v1.OrganizationRole role_override = 3;
 }
 
@@ -516,34 +516,34 @@ message PayloadModuleDefaultLabelNameChanged {
   string new_default_label_name = 4;
 }
 
-message PayloadModuleIDPGroupAdded {
-  // module_id is the id of the module with the new IDP group.
+message PayloadModuleIdpGroupAdded {
+  // module_id is the id of the module with the new IdP group.
   string module_id = 1 [(buf.validate.field).string.tuuid = true];
-  // module_name is the name of the module with the new IDP group.
+  // module_name is the name of the module with the new IdP group.
   string module_name = 2;
-  // role_override is the role override associated with the new IDP group.
+  // role_override is the role override associated with the new IdP group.
   buf.registry.iam.v1.ModuleContributorRole role_override = 3;
 }
 
-message PayloadModuleIDPGroupUpdated {
-  // module_id is the id of the module with the updated IDP group.
+message PayloadModuleIdpGroupUpdated {
+  // module_id is the id of the module with the updated IdP group.
   string module_id = 1 [(buf.validate.field).string.tuuid = true];
-  // module_name is the name of the module with the updated IDP group.
+  // module_name is the name of the module with the updated IdP group.
   string module_name = 2;
-  // old_role_override is the role override associated with the IDP updated group. Only set if the
+  // old_role_override is the role override associated with the IdP updated group. Only set if the
   // role override was changed.
   buf.registry.iam.v1.ModuleContributorRole old_role_override = 3;
-  // new_role_override is the role override associated with the IDP updated group. Only set if the
+  // new_role_override is the role override associated with the IdP updated group. Only set if the
   // role override was changed.
   buf.registry.iam.v1.ModuleContributorRole new_role_override = 4;
 }
 
-message PayloadModuleIDPGroupRemoved {
-  // module_id is the id of the module with the removed IDP group.
+message PayloadModuleIdpGroupRemoved {
+  // module_id is the id of the module with the removed IdP group.
   string module_id = 1 [(buf.validate.field).string.tuuid = true];
-  // module_name is the name of the module with the removed IDP group.
+  // module_name is the name of the module with the removed IdP group.
   string module_name = 2;
-  // role_override is the role override associated with the removed IDP group.
+  // role_override is the role override associated with the removed IdP group.
   buf.registry.iam.v1.ModuleContributorRole role_override = 3;
 }
 
@@ -689,11 +689,11 @@ message PayloadUserLoggedIn {}
 
 message PayloadUserLoggedOut {}
 
-// PayloadUserAutoMergedFromNewIdP is the payload for the audit event
+// PayloadUserAutoMergedFromNewIdp is the payload for the audit event
 // EVENT_TYPE_USER_AUTO_MERGED_FROM_NEW_IDP. It has no additional information
 // to be included, since the new user is automatically merged to an existing user
 // without the new user being created.
-message PayloadUserAutoMergedFromNewIdP {}
+message PayloadUserAutoMergedFromNewIdp {}
 
 message PayloadGenerationPluginCreated {
   // owner_id is the id of the owner of the plugin.
@@ -721,8 +721,8 @@ message PayloadGenerationPluginStatusUpdated {
 message PayloadTokenCreated {
   // owner_id is the id of the owner of the token.
   string owner_id = 1 [(buf.validate.field).string.tuuid = true];
-  // token_expiry_time is the expiry time of the token.
-  google.protobuf.Timestamp token_expiry_time = 2;
+  // expire_time is the time the token expires.
+  google.protobuf.Timestamp expire_time = 2;
 }
 
 message PayloadTokenDeleted {
@@ -730,12 +730,12 @@ message PayloadTokenDeleted {
   string owner_id = 1 [(buf.validate.field).string.tuuid = true];
 }
 
-message PayloadSCIMTokenCreated {
-  // token_expiry_time is the expiry time of the token.
-  google.protobuf.Timestamp token_expiry_time = 1;
+message PayloadScimTokenCreated {
+  // expire_time is the time the token expires.
+  google.protobuf.Timestamp expire_time = 1;
 }
 
-message PayloadSCIMTokenDeleted {}
+message PayloadScimTokenDeleted {}
 
 // PayloadModuleCommitDeleted exists for historical reasons - individual module commits
 // can no longer be deleted.
@@ -963,7 +963,7 @@ message PayloadPolicyLabelUnarchived {
   string policy_name = 4;
 }
 
-message PayloadSDKPluginConstraintCreated {
+message PayloadSdkPluginConstraintCreated {
   // module_owner_id is the id of the owner of the module of the SDK constraint.
   string module_owner_id = 1 [(buf.validate.field).string.tuuid = true];
   // module_owner_name is the name of the owner of the module of the SDK constraint.
@@ -982,7 +982,7 @@ message PayloadSDKPluginConstraintCreated {
   string plugin_name = 8;
 }
 
-message PayloadSDKPluginConstraintUpdated {
+message PayloadSdkPluginConstraintUpdated {
   // module_owner_id is the id of the owner of the module of the SDK constraint.
   string module_owner_id = 1 [(buf.validate.field).string.tuuid = true];
   // module_owner_name is the name of the owner of the module of the SDK constraint.
@@ -1001,7 +1001,7 @@ message PayloadSDKPluginConstraintUpdated {
   string plugin_name = 8;
 }
 
-message PayloadSDKPluginConstraintDeleted {
+message PayloadSdkPluginConstraintDeleted {
   // module_owner_id is the id of the owner of the module of the SDK constraint.
   string module_owner_id = 1 [(buf.validate.field).string.tuuid = true];
   // module_owner_name is the name of the owner of the module of the SDK constraint.
@@ -1121,14 +1121,23 @@ message PayloadOrganizationUniquenessPolicyEnabled {}
 
 message PayloadOrganizationUniquenessPolicyDisabled {}
 
-message PayloadRecommendedSDKAdded {
-  // module_owner_id is the id of the owner of the module of the recommended SDK.
-  string module_owner_id = 1 [(buf.validate.field).string.tuuid = true];
-  // module_owner_name is the name of the owner of the module of the recommended SDK.
-  string module_owner_name = 2;
-  // module_id is the id of the module of the recommended SDK.
-  string module_id = 3 [(buf.validate.field).string.tuuid = true];
-  // module_name is the name of the module of the recommended SDK.
+message PayloadRecommendedSdkAdded {
+  // owner_id is set to the organization id for recommended SDKs at the organization level. Otherwise it is set to the
+  // module's owner id. Only set for recommended SDKs added at the organization or module level.
+  string owner_id = 1 [
+    (buf.validate.field).string.tuuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  // owner_name is the set to the organization name for recommended SDKs at the organization level. Otherwise it is set
+  // to the module's owner name. Only set for recommended SDKs added at the organization or module level.
+  string owner_name = 2;
+  // module_id is the id of the module of the recommended SDK. Only set for recommended SDKs added at the module level.
+  string module_id = 3 [
+    (buf.validate.field).string.tuuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  // module_name is the name of the module of the recommended SDK. Only set for recommended SDKs added at the module
+  // level.
   string module_name = 4;
   // plugin_owner_id is the id of the owner of the plugin of the recommended SDK.
   string plugin_owner_id = 5 [(buf.validate.field).string.tuuid = true];
@@ -1140,14 +1149,23 @@ message PayloadRecommendedSDKAdded {
   string plugin_name = 8;
 }
 
-message PayloadRecommendedSDKRemoved {
-  // module_owner_id is the id of the owner of the module of the recommended SDK.
-  string module_owner_id = 1 [(buf.validate.field).string.tuuid = true];
-  // module_owner_name is the name of the owner of the module of the recommended SDK.
-  string module_owner_name = 2;
-  // module_id is the id of the module of the recommended SDK.
-  string module_id = 3 [(buf.validate.field).string.tuuid = true];
-  // module_name is the name of the module of the recommended SDK.
+message PayloadRecommendedSdkRemoved {
+  // owner_id is set to the organization id for recommended SDKs at the organization level. Otherwise it is set to the
+  // module's owner id. Only set for recommended SDKs added at the organization or module level.
+  string owner_id = 1 [
+    (buf.validate.field).string.tuuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  // owner_name is the set to the organization name for recommended SDKs at the organization level. Otherwise it is set
+  // to the module's owner name. Only set for recommended SDKs added at the organization or module level.
+  string owner_name = 2;
+  // module_id is the id of the module of the recommended SDK. Only set for recommended SDKs added at the module level.
+  string module_id = 3 [
+    (buf.validate.field).string.tuuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  // module_name is the name of the module of the recommended SDK. Only set for recommended SDKs added at the module
+  // level.
   string module_name = 4;
   // plugin_owner_id is the id of the owner of the plugin of the recommended SDK.
   string plugin_owner_id = 5 [(buf.validate.field).string.tuuid = true];
