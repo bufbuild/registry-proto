@@ -748,7 +748,7 @@ message PayloadModuleCommitDeleted {
   string module_id = 3 [(buf.validate.field).string.tuuid = true];
   // module_name is the name of the module from which the commit will be deleted.
   string module_name = 4;
-  // label is the name of the draft. Optional.
+  // label is the name of the label the commit was on, if any.
   string label = 5;
 }
 
