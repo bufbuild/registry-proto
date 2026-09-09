@@ -589,9 +589,9 @@ message PayloadPolicyVisibilityChanged {
   // owner_name is the name of the owner of the policy.
   string owner_name = 2;
   // old_visibility is the old visibility of the policy.
-  buf.registry.policy.v1.PolicyVisibility old_visibility = 4;
+  buf.registry.policy.v1.PolicyVisibility old_visibility = 3;
   // new_visibility is the new visibility of the policy.
-  buf.registry.policy.v1.PolicyVisibility new_visibility = 5;
+  buf.registry.policy.v1.PolicyVisibility new_visibility = 4;
 }
 
 message PayloadPolicyCommitPushed {
@@ -873,7 +873,7 @@ message PayloadPluginLabelCreated {
   // plugin_name is the name of the plugin on which the label was created.
   string plugin_name = 4;
   // commit_id is the id of the commit on which the label was created.
-  string commit_id = 6 [(buf.validate.field).string.tuuid = true];
+  string commit_id = 5 [(buf.validate.field).string.tuuid = true];
 }
 
 message PayloadPluginLabelMoved {
@@ -886,9 +886,9 @@ message PayloadPluginLabelMoved {
   // plugin_name is the name of the plugin on which the label was moved.
   string plugin_name = 4;
   // to_commit_id is the id of the commit on which the label was moved to.
-  string to_commit_id = 6 [(buf.validate.field).string.tuuid = true];
+  string to_commit_id = 5 [(buf.validate.field).string.tuuid = true];
   // from_commit_id is the id of the commit on which the label was moved from.
-  string from_commit_id = 7 [(buf.validate.field).string.tuuid = true];
+  string from_commit_id = 6 [(buf.validate.field).string.tuuid = true];
 }
 
 message PayloadPluginLabelArchived {
@@ -923,7 +923,7 @@ message PayloadPolicyLabelCreated {
   // policy_name is the name of the policy on which the label was created.
   string policy_name = 4;
   // commit_id is the id of the commit on which the label was created.
-  string commit_id = 6 [(buf.validate.field).string.tuuid = true];
+  string commit_id = 5 [(buf.validate.field).string.tuuid = true];
 }
 
 message PayloadPolicyLabelMoved {
@@ -936,9 +936,9 @@ message PayloadPolicyLabelMoved {
   // policy_name is the name of the policy on which the label was moved.
   string policy_name = 4;
   // to_commit_id is the id of the commit on which the label was moved to.
-  string to_commit_id = 6 [(buf.validate.field).string.tuuid = true];
+  string to_commit_id = 5 [(buf.validate.field).string.tuuid = true];
   // from_commit_id is the id of the commit on which the label was moved from.
-  string from_commit_id = 7 [(buf.validate.field).string.tuuid = true];
+  string from_commit_id = 6 [(buf.validate.field).string.tuuid = true];
 }
 
 message PayloadPolicyLabelArchived {
