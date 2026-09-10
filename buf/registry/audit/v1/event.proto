@@ -848,19 +848,19 @@ message PayloadInstanceUniquenessPolicyDisabled {}
 
 message PayloadDeviceAuthorizationGrantApproved {
   // client_id is the id of the registered oauth2 client of the grant.
-  string client_id = 1;
+  string client_id = 1 [(buf.validate.field).string.tuuid = true];
 }
 message PayloadDeviceAuthorizationGrantDenied {
   // client_id is the id of the registered oauth2 client of the grant.
-  string client_id = 1;
+  string client_id = 1 [(buf.validate.field).string.tuuid = true];
 }
 message PayloadAuthorizationRequestApproved {
   // client_id is the id of the registered oauth2 client of the request.
-  string client_id = 1;
+  string client_id = 1 [(buf.validate.field).string.tuuid = true];
 }
 message PayloadAuthorizationRequestDenied {
   // client_id is the id of the registered oauth2 client of the request.
-  string client_id = 1;
+  string client_id = 1 [(buf.validate.field).string.tuuid = true];
 }
 
 message PayloadPluginLabelCreated {
