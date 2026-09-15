@@ -85,11 +85,11 @@ message ListIdpGroupMappingsRequest {
   //
   // If empty, the first page is returned.
   string page_token = 2 [(buf.validate.field).string.max_len = 4096];
-  // The Organization to filter mappings by.
+  // The Organizations to filter mappings by.
   //
-  // If set, only mappings on the Organization and on the Modules it owns are returned. If unset,
+  // If set, only mappings on the Organizations and on the Modules they own are returned. If unset,
   // mappings across the entire instance are returned, subject to the caller's permissions.
-  buf.registry.owner.v1.OrganizationRef organization_ref = 3;
+  buf.registry.owner.v1.OrganizationRef organization_refs = 3;
   // The order to return the mappings.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
