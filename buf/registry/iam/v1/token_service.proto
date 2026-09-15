@@ -96,6 +96,16 @@ message ListTokensRequest {
     // Tokens that do not expire are treated as having the latest possible
     // expire_time, and are listed last.
     ORDER_EXPIRE_TIME_ASC = 4;
+    // Order by last_used_time latest to earliest.
+    //
+    // Tokens that have no recorded use are treated as having the earliest possible
+    // last_used_time, and are listed last.
+    ORDER_LAST_USED_TIME_DESC = 5;
+    // Order by last_used_time earliest to latest.
+    //
+    // Tokens that have no recorded use are treated as having the earliest possible
+    // last_used_time, and are listed first.
+    ORDER_LAST_USED_TIME_ASC = 6;
   }
 
   // The filter for expired and active tokens.
