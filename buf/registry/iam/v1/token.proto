@@ -84,11 +84,11 @@ message Token {
   ];
   // The last time the Token was used to authenticate a request.
   //
-  // If not set, no use of the Token has been recorded. This is the case for Tokens that have never
-  // been used, and for Tokens created before usage tracking began that have not been used since.
+  // If not present, it means the last used time is unknown. This is true for tokens
+  // created or last used before BSR started tracking the last used time.
   //
-  // Use of a Token does not change its update_time.
-  google.protobuf.Timestamp last_used_time = 8;
+  // If present with zero value, it means the token has never been used.
+  optional google.protobuf.Timestamp last_used_time = 8;
 }
 
 // A set of permissions that apply within a specific Scope.
