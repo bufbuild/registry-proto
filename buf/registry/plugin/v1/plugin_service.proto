@@ -148,6 +148,7 @@ message CreatePluginsRequest {
 }
 
 message CreatePluginsResponse {
+  // The created Plugins in the same order as given on the request.
   repeated Plugin plugins = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
