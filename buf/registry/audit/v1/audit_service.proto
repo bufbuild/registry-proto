@@ -36,10 +36,10 @@ message ListEventsRequest {
   // The list order.
   enum Order {
     ORDER_UNSPECIFIED = 0;
+    // Order by event_time latest to earliest.
+    ORDER_EVENT_TIME_DESC = 1;
     // Order by event_time earliest to latest.
-    //
-    // Events recorded at the same time are ordered by their id.
-    ORDER_EVENT_TIME_ASC = 1;
+    ORDER_EVENT_TIME_ASC = 2;
   }
 
   // The maximum number of items to return.
@@ -60,7 +60,7 @@ message ListEventsRequest {
   google.protobuf.Timestamp end_time = 4;
   // The order to return the Events.
   //
-  // If not specified, defaults to ORDER_EVENT_TIME_ASC.
+  // If not specified, defaults to ORDER_EVENT_TIME_DESC.
   Order order = 5 [(buf.validate.field).enum.defined_only = true];
 
   option (buf.validate.message).cel = {
