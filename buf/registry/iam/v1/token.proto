@@ -88,7 +88,7 @@ message Token {
   // created or last used before BSR started tracking the last used time.
   //
   // If present with zero value, it means the token has never been used.
-  optional google.protobuf.Timestamp last_used_time = 8;
+  google.protobuf.Timestamp last_used_time = 8;
 }
 
 // A set of permissions that apply within a specific Scope.

@@ -1094,10 +1094,10 @@ message PayloadInstanceResourceVisibilityControlChanged {
   ResourceType resource_type = 1;
   // The old visibility control for resources of that type under the instance. If not
   // present, then this visibility control was just created.
-  optional buf.registry.resource.v1.ResourceVisibilityControl old_visibility_control = 2;
+  buf.registry.resource.v1.ResourceVisibilityControl old_visibility_control = 2;
   // The new visibility control for resources of that type under the instance. If not
   // present, then this visibility control was just deleted.
-  optional buf.registry.resource.v1.ResourceVisibilityControl new_visibility_control = 3;
+  buf.registry.resource.v1.ResourceVisibilityControl new_visibility_control = 3;
 }
 
 message PayloadOrganizationResourceVisibilityControlChanged {
@@ -1105,10 +1105,10 @@ message PayloadOrganizationResourceVisibilityControlChanged {
   ResourceType resource_type = 1;
   // The old visibility control for resources of that type under the organization. If not present,
   // then this visibility control was just created.
-  optional buf.registry.resource.v1.ResourceVisibilityControl old_visibility_control = 2;
+  buf.registry.resource.v1.ResourceVisibilityControl old_visibility_control = 2;
   // The new visibility control for resources of that type under the organization. If not present,
   // then this visibility control was just deleted.
-  optional buf.registry.resource.v1.ResourceVisibilityControl new_visibility_control = 3;
+  buf.registry.resource.v1.ResourceVisibilityControl new_visibility_control = 3;
 }
 
 message PayloadOrganizationUniquenessPolicyEnabled {}
