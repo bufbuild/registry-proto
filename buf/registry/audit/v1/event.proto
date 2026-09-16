@@ -365,8 +365,8 @@ message PayloadOrganizationIdpGroupAdded {
   string organization_id = 1 [(buf.validate.field).string.tuuid = true];
   // organization_name is the name of the organization with the new IdP group.
   string organization_name = 2;
-  // role_override is the role override associated with the new IdP group.
-  buf.registry.iam.v1.OrganizationRole role_override = 3;
+  // role is the role mapped users receive within the organization.
+  buf.registry.iam.v1.OrganizationRole role = 3;
 }
 
 message PayloadOrganizationIdpGroupUpdated {
@@ -374,12 +374,10 @@ message PayloadOrganizationIdpGroupUpdated {
   string organization_id = 1 [(buf.validate.field).string.tuuid = true];
   // organization_name is the name of the organization with the updated IdP group.
   string organization_name = 2;
-  // old_role_override is the role override associated with the IdP updated group. Only set if the
-  // role override was changed.
-  buf.registry.iam.v1.OrganizationRole old_role_override = 3;
-  // new_role_override is the role override associated with the IdP updated group. Only set if the
-  // role override was changed.
-  buf.registry.iam.v1.OrganizationRole new_role_override = 4;
+  // old_role is the role mapped users received within the organization before the update.
+  buf.registry.iam.v1.OrganizationRole old_role = 3;
+  // new_role is the role mapped users receive within the organization after the update.
+  buf.registry.iam.v1.OrganizationRole new_role = 4;
 }
 
 message PayloadOrganizationIdpGroupRemoved {
@@ -387,8 +385,6 @@ message PayloadOrganizationIdpGroupRemoved {
   string organization_id = 1 [(buf.validate.field).string.tuuid = true];
   // organization_name is the name of the organization with the removed IdP group.
   string organization_name = 2;
-  // role_override is the role override associated with the removed IdP group.
-  buf.registry.iam.v1.OrganizationRole role_override = 3;
 }
 
 message PayloadModuleCreated {
@@ -543,8 +539,6 @@ message PayloadModuleIdpGroupRemoved {
   string module_id = 1 [(buf.validate.field).string.tuuid = true];
   // module_name is the name of the module with the removed IdP group.
   string module_name = 2;
-  // role_override is the role override associated with the removed IdP group.
-  buf.registry.iam.v1.ModuleContributorRole role_override = 3;
 }
 
 message PayloadPolicyCreated {
