@@ -119,7 +119,7 @@ message TokenRef {
   // instead.
   message Name {
     // The reference to the user which owns the token.
-    buf.registry.owner.v1.UserRef user_ref = 1;
+    buf.registry.owner.v1.UserRef user_ref = 1 [(buf.validate.field).required = true];
     // The name of the token.
     string name = 2 [
       (buf.validate.field).required = true,

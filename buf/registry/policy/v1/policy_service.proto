@@ -151,14 +151,13 @@ message UpdatePoliciesRequest {
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
     ];
-    reserved 3;
     // The deprecation status of the Policy.
-    optional PolicyState state = 4 [
+    optional PolicyState state = 3 [
       (buf.validate.field).enum.defined_only = true,
       (buf.validate.field).enum.not_in = 0
     ];
     // The configurable description of the Policy.
-    optional string description = 5 [(buf.validate.field).string.max_len = 350];
+    optional string description = 4 [(buf.validate.field).string.max_len = 350];
   }
   // The Policies to update.
   repeated Value values = 1 [

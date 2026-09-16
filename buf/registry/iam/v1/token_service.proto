@@ -166,8 +166,8 @@ message CreateTokensRequest {
     ];
     // The time the Token expires.
     //
-    // If not set, the Token does not expire.
-    google.protobuf.Timestamp expire_time = 3;
+    // If set, it must be in the future. If not set, the Token does not expire.
+    google.protobuf.Timestamp expire_time = 3 [(buf.validate.field).timestamp.gt_now = true];
     // The scoped permissions of the Token.
     //
     // If empty, the Token has no declared permission restrictions and its effective

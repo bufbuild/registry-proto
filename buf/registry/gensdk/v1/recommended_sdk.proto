@@ -61,11 +61,11 @@ message SDKRecommendationLevel {
   }
 }
 
-// The level at which an SDK is recommended.
-//
-// An SDK can be recommended at more than one level at once; for example, an SDK
-// recommended at the instance level may also be recommended for a specific Module.
+// SDKRecommendationLevelRef is a reference to an SDKRecommendationLevel, naming
+// the instance, an Organization, or a Module.
 message SDKRecommendationLevelRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
   // The SDK is recommended across the entire instance.
   //
   // Eager generation is enqueued for the SDK across all Modules on the instance.
