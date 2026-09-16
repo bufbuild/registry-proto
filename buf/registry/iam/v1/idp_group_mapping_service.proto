@@ -89,7 +89,7 @@ message ListIdpGroupMappingsRequest {
   //
   // If set, only mappings on the Organizations and on the Modules they own are returned. If unset,
   // mappings across the entire instance are returned, subject to the caller's permissions.
-  repeated buf.registry.owner.v1.OrganizationRef organization_refs = 3;
+  repeated buf.registry.owner.v1.OrganizationRef organization_refs = 3 [(buf.validate.field).repeated.max_items = 250];
   // The order to return the mappings.
   //
   // If not specified, defaults to ORDER_CREATE_TIME_DESC.
