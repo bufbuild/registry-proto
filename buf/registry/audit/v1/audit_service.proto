@@ -33,6 +33,15 @@ service AuditService {
 }
 
 message ListEventsRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by event_time earliest to latest.
+    //
+    // Events recorded at the same time are ordered by their id.
+    ORDER_EVENT_TIME_ASC = 1;
+  }
+
   // The maximum number of items to return.
   //
   // The default value is 10.
@@ -49,6 +58,10 @@ message ListEventsRequest {
   //
   // If not set, there is no upper bound.
   google.protobuf.Timestamp end_time = 4;
+  // The order to return the Events.
+  //
+  // If not specified, defaults to ORDER_EVENT_TIME_ASC.
+  Order order = 5 [(buf.validate.field).enum.defined_only = true];
 
   option (buf.validate.message).cel = {
     id: "list_events_request.time_range"
