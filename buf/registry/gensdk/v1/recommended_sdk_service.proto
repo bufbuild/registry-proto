@@ -24,12 +24,12 @@ import "buf/validate/validate.proto";
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/gensdk/v1";
 
 // Manage recommended SDKs.
-service RecommendedSDKService {
+service RecommendedSdkService {
   // Add an SDK to the list of recommended SDKs at a given level.
   //
   // Returns an error with code ALREADY_EXISTS if the SDK is already recommended at the
   // same level.
-  rpc AddRecommendedSDK(AddRecommendedSDKRequest) returns (AddRecommendedSDKResponse) {
+  rpc AddRecommendedSdk(AddRecommendedSdkRequest) returns (AddRecommendedSdkResponse) {
     option idempotency_level = IDEMPOTENT;
     // bsr.module-settings.update is required if the recommendation level is a Module.
     // bsr.organization-settings.update is required if the recommendation level is an Organization.
@@ -38,7 +38,7 @@ service RecommendedSDKService {
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
   // Remove an SDK from the list of recommended SDKs at a given level.
-  rpc RemoveRecommendedSDK(RemoveRecommendedSDKRequest) returns (RemoveRecommendedSDKResponse) {
+  rpc RemoveRecommendedSdk(RemoveRecommendedSdkRequest) returns (RemoveRecommendedSdkResponse) {
     option idempotency_level = IDEMPOTENT;
     // bsr.module-settings.update is required if the recommendation level is a Module.
     // bsr.organization-settings.update is required if the recommendation level is an Organization.
@@ -50,7 +50,7 @@ service RecommendedSDKService {
   //
   // Because the same SDK can be recommended at more than one level at once, callers can
   // make a request per level to determine whether an SDK is recommended at a higher level.
-  rpc ListRecommendedSDKs(ListRecommendedSDKsRequest) returns (ListRecommendedSDKsResponse) {
+  rpc ListRecommendedSdks(ListRecommendedSdksRequest) returns (ListRecommendedSdksResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
     // bsr.module.get is required if the recommendation level is a private Module.
     // bsr.organization.get is required if the recommendation level is a private Organization.
@@ -61,25 +61,25 @@ service RecommendedSDKService {
   }
 }
 
-message AddRecommendedSDKRequest {
+message AddRecommendedSdkRequest {
   // The Plugin that generates the SDK to recommend.
   buf.registry.plugin.v1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
   // The level at which to recommend the SDK.
-  SDKRecommendationLevelRef recommendation_level = 2 [(buf.validate.field).required = true];
+  SdkRecommendationLevelRef recommendation_level = 2 [(buf.validate.field).required = true];
 }
 
-message AddRecommendedSDKResponse {}
+message AddRecommendedSdkResponse {}
 
-message RemoveRecommendedSDKRequest {
+message RemoveRecommendedSdkRequest {
   // The Plugin that generates the SDK to stop recommending.
   buf.registry.plugin.v1.PluginRef plugin_ref = 1 [(buf.validate.field).required = true];
   // The level at which to stop recommending the SDK.
-  SDKRecommendationLevelRef recommendation_level = 2 [(buf.validate.field).required = true];
+  SdkRecommendationLevelRef recommendation_level = 2 [(buf.validate.field).required = true];
 }
 
-message RemoveRecommendedSDKResponse {}
+message RemoveRecommendedSdkResponse {}
 
-message ListRecommendedSDKsRequest {
+message ListRecommendedSdksRequest {
   // The maximum number of items to return on a page.
   //
   // The default value is 10.
@@ -91,14 +91,14 @@ message ListRecommendedSDKsRequest {
   // The level at which to list recommended SDKs.
   //
   // Only SDKs recommended at this level are included in the response.
-  SDKRecommendationLevelRef recommendation_level = 3 [(buf.validate.field).required = true];
+  SdkRecommendationLevelRef recommendation_level = 3 [(buf.validate.field).required = true];
 }
 
-message ListRecommendedSDKsResponse {
+message ListRecommendedSdksResponse {
   // The next page token.
   //
   // If empty, there are no more pages.
   string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
   // The listed recommended SDKs, all at the level given on the request.
-  repeated RecommendedSDK recommended_sdks = 2;
+  repeated RecommendedSdk recommended_sdks = 2;
 }

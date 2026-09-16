@@ -23,11 +23,11 @@ import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/gensdk/v1";
 
-// An SDK that is recommended at a given SDKRecommendationLevel.
+// An SDK that is recommended at a given SdkRecommendationLevel.
 //
 // A recommended SDK signals to Users that a particular Plugin should be used to generate
 // code, and causes eager generation to be enqueued for the SDK at the recommended level.
-message RecommendedSDK {
+message RecommendedSdk {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
 
   // The id of the Plugin that generates the recommended SDK.
@@ -37,14 +37,14 @@ message RecommendedSDK {
   ];
 
   // The level at which the SDK is recommended.
-  SDKRecommendationLevel recommendation_level = 2 [(buf.validate.field).required = true];
+  SdkRecommendationLevel recommendation_level = 2 [(buf.validate.field).required = true];
 }
 
 // The level at which an SDK is recommended.
 //
 // An SDK can be recommended at more than one level at once; for example, an SDK
 // recommended at the instance level may also be recommended for a specific Module.
-message SDKRecommendationLevel {
+message SdkRecommendationLevel {
   // The SDK is recommended across the entire instance.
   //
   // Eager generation is enqueued for the SDK across all Modules on the instance.
@@ -61,9 +61,9 @@ message SDKRecommendationLevel {
   }
 }
 
-// SDKRecommendationLevelRef is a reference to an SDKRecommendationLevel, naming
+// SdkRecommendationLevelRef is a reference to an SdkRecommendationLevel, naming
 // the instance, an Organization, or a Module.
-message SDKRecommendationLevelRef {
+message SdkRecommendationLevelRef {
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   // The SDK is recommended across the entire instance.
