@@ -22,6 +22,7 @@ import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/module/v1/module.proto";
 import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/policy/v1/policy.proto";
+import "buf/registry/resource/v1/resource_type.proto";
 import "buf/registry/resource/v1/resource_visibility_control.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
@@ -1082,7 +1083,7 @@ message PayloadPolicyEnforcementTargetsChanged {
 
 message PayloadInstanceResourceVisibilityControlChanged {
   // The resource type that had its visibility control changed.
-  ResourceType resource_type = 1;
+  buf.registry.resource.v1.ResourceType resource_type = 1;
   // The old visibility control for resources of that type under the instance. If not
   // present, then this visibility control was just created.
   buf.registry.resource.v1.ResourceVisibilityControl old_visibility_control = 2;
@@ -1093,7 +1094,7 @@ message PayloadInstanceResourceVisibilityControlChanged {
 
 message PayloadOrganizationResourceVisibilityControlChanged {
   // The resource type that had its visibility control changed.
-  ResourceType resource_type = 1;
+  buf.registry.resource.v1.ResourceType resource_type = 1;
   // The old visibility control for resources of that type under the organization. If not present,
   // then this visibility control was just created.
   buf.registry.resource.v1.ResourceVisibilityControl old_visibility_control = 2;
