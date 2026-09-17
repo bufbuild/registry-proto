@@ -18,6 +18,7 @@ package buf.registry.module.v1beta1;
 
 import "buf/registry/module/v1beta1/digest.proto";
 import "buf/registry/module/v1beta1/resource.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1beta1";
@@ -27,6 +28,7 @@ service ResourceService {
   // Get Resources.
   rpc GetResources(GetResourcesRequest) returns (GetResourcesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.module.get";
   }
 }
 

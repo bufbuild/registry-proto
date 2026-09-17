@@ -19,6 +19,7 @@ package buf.registry.plugin.v1beta1;
 import "buf/plugin/check/v1/category.proto";
 import "buf/plugin/check/v1/rule.proto";
 import "buf/registry/plugin/v1beta1/resource.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/plugin/v1beta1";
@@ -28,10 +29,12 @@ service CheckService {
   // List Rules for a given Plugin, Label, or Commit.
   rpc ListRules(ListRulesRequest) returns (ListRulesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.plugin.get";
   }
   // List Categories for a given Plugin, Label, or Commit.
   rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.plugin.get";
   }
 }
 

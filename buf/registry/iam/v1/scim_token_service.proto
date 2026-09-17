@@ -1,0 +1,126 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/iam/v1/scim_token.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
+
+// Operate on SCIM Tokens.
+service ScimTokenService {
+  // List SCIM Tokens.
+  rpc ListScimTokens(ListScimTokensRequest) returns (ListScimTokensResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.scim-token.list";
+  }
+  // Create new SCIM Tokens.
+  //
+  // The secret value of each SCIM Token is returned only in the response to this call. It cannot be
+  // retrieved afterwards.
+  //
+  // This operation is atomic. Either all SCIM Tokens are created or an error is returned.
+  //
+  // This operation is not idempotent: each call mints a new SCIM Token with a new secret value.
+  rpc CreateScimTokens(CreateScimTokensRequest) returns (CreateScimTokensResponse) {
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.scim-token.create";
+  }
+  // Delete existing SCIM Tokens.
+  //
+  // This operation is atomic. Either all SCIM Tokens are deleted or an error is returned.
+  rpc DeleteScimTokens(DeleteScimTokensRequest) returns (DeleteScimTokensResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.scim-token.delete";
+  }
+}
+
+message ListScimTokensRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+  }
+  // The maximum number of items to return.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // The order to return the SCIM Tokens.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 3 [(buf.validate.field).enum.defined_only = true];
+}
+
+message ListScimTokensResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The list of SCIM Tokens.
+  repeated ScimToken scim_tokens = 2;
+}
+
+message CreateScimTokensRequest {
+  // An individual request to create a SCIM Token.
+  message Value {
+    // The time the SCIM Token expires.
+    //
+    // If set, it must be in the future. If not set, the SCIM Token does not expire.
+    google.protobuf.Timestamp expire_time = 1 [(buf.validate.field).timestamp.gt_now = true];
+  }
+  // The SCIM Tokens to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreateScimTokensResponse {
+  // An individual created SCIM Token along with its secret value.
+  message Value {
+    // The created SCIM Token.
+    ScimToken scim_token = 1 [(buf.validate.field).required = true];
+    // The secret value of the SCIM Token.
+    //
+    // This is the bearer credential used to authenticate to the SCIM API. It is returned only here,
+    // at creation time, and cannot be retrieved afterwards.
+    string secret = 2 [
+      debug_redact = true,
+      (buf.validate.field).required = true
+    ];
+  }
+  // The created SCIM Tokens in the same order as given on the request.
+  repeated Value values = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeleteScimTokensRequest {
+  // The SCIM Tokens to delete.
+  repeated ScimTokenRef scim_token_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeleteScimTokensResponse {}

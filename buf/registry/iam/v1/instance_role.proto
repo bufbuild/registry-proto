@@ -1,0 +1,51 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
+
+// The instance-wide role of a User.
+//
+// An instance admin is authorized for all instance-scoped operations. All other Users are
+// members, whose access derives solely from Organization and resource grants.
+enum InstanceRole {
+  INSTANCE_ROLE_UNSPECIFIED = 0;
+  // The User is an administrator of the entire instance.
+  INSTANCE_ROLE_ADMIN = 1;
+  // The User is a regular member of the instance with no instance-wide authority.
+  INSTANCE_ROLE_MEMBER = 2;
+}
+
+// The instance role of a User.
+message UserInstanceRole {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the User.
+  string user_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The instance role of the User.
+  InstanceRole instance_role = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+}

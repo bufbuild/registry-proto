@@ -26,6 +26,7 @@ service ResourceService {
   // Get Resources.
   rpc GetResources(GetResourcesRequest) returns (GetResourcesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.policy.get";
   }
 }
 

@@ -1,0 +1,54 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/resource/v1/resource_type.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
+
+// The scope that a restriction applies to.
+//
+// A Scope is either the entire instance or a single resource.
+message Scope {
+  // Instance scopes to the entire instance.
+  message Instance {}
+  // Resource scopes to a single resource.
+  //
+  // If the resource owns other resources (e.g. Organizations),
+  // those resources are also included in the scope.
+  message Resource {
+    // The id of the resource.
+    string resource_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.tuuid = true
+    ];
+    // The type of the resource that resource_id refers to.
+    buf.registry.resource.v1.ResourceType resource_type = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).enum.defined_only = true,
+      (buf.validate.field).enum.not_in = 0
+    ];
+  }
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The Scope applies to all resources on the instance.
+    Instance instance = 1;
+    // The Scope applies to a single resource.
+    Resource resource = 2;
+  }
+}
