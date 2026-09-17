@@ -19,7 +19,6 @@ package buf.registry.audit.v1;
 import "buf/registry/admin/v1/settings.proto";
 import "buf/registry/iam/v1/module_contributor.proto";
 import "buf/registry/iam/v1/organization_membership.proto";
-import "buf/registry/iam/v1/token.proto";
 import "buf/registry/module/v1/module.proto";
 import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/policy/v1/policy.proto";
