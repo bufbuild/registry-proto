@@ -1173,30 +1173,35 @@ message PayloadRecommendedSdkRemoved {
 }
 
 message PayloadTrustCredentialCreated {
-  // owner_id is the id of the owner of the trust credential.
-  string owner_id = 1 [(buf.validate.field).string.tuuid = true];
+  // user_id is the id of the user that owns the trust credential.
+  string user_id = 1 [(buf.validate.field).string.tuuid = true];
+  // issuer is the workload identity issuer whose OIDC tokens the trust credential accepts.
+  buf.registry.iam.v1.WorkloadIdentityIssuer issuer = 2;
   // issuer_url is the url of the OIDC issuer whose tokens the trust credential accepts.
-  string issuer_url = 2;
-  // subject is the sub claim a workload's OIDC token must match, i.e. exactly which workloads this grant trusts.
-  string subject = 3;
+  string issuer_url = 3;
+  // subject is the sub claim a workload's OIDC token must match, i.e. exactly which workloads this
+  // grant trusts.
+  string subject = 4;
   // custom_claims are the additional claims a workload's OIDC token must carry, if any.
-  repeated buf.registry.iam.v1.CustomClaim custom_claims = 4;
+  repeated buf.registry.iam.v1.CustomClaim custom_claims = 5;
   // scoped_permissions are the permissions carried by the tokens the trust credential mints.
-  // Empty means the tokens carry the owner's permissions resolved at request time.
-  repeated buf.registry.iam.v1.ScopedPermissions scoped_permissions = 5;
+  // Empty means the tokens carry the user's permissions resolved at request time.
+  repeated buf.registry.iam.v1.ScopedPermissions scoped_permissions = 6;
 }
 
 message PayloadTrustCredentialDeleted {
-  // owner_id is the id of the owner of the trust credential.
-  string owner_id = 1 [(buf.validate.field).string.tuuid = true];
+  // user_id is the id of the user that owns the trust credential.
+  string user_id = 1 [(buf.validate.field).string.tuuid = true];
+  // issuer is the workload identity issuer whose OIDC tokens the trust credential accepted.
+  buf.registry.iam.v1.WorkloadIdentityIssuer issuer = 2;
   // issuer_url is the url of the OIDC issuer whose tokens the trust credential accepted.
-  string issuer_url = 2;
+  string issuer_url = 3;
   // subject is the sub claim the trust credential required when it was deleted.
-  string subject = 3;
+  string subject = 4;
   // custom_claims are the additional claims it required, if any.
-  repeated buf.registry.iam.v1.CustomClaim custom_claims = 4;
+  repeated buf.registry.iam.v1.CustomClaim custom_claims = 5;
   // scoped_permissions are the permissions the trust credential's tokens carried.
-  repeated buf.registry.iam.v1.ScopedPermissions scoped_permissions = 5;
+  repeated buf.registry.iam.v1.ScopedPermissions scoped_permissions = 6;
 }
 
 message PayloadTrustCredentialUpdated {
@@ -1205,19 +1210,21 @@ message PayloadTrustCredentialUpdated {
   message TrustCredentialState {
     // name is the name of the trust credential.
     string name = 1;
+    // issuer is the workload identity issuer whose OIDC tokens the trust credential accepts.
+    buf.registry.iam.v1.WorkloadIdentityIssuer issuer = 2;
     // issuer_url is the url of the OIDC issuer whose tokens the trust credential accepts.
-    string issuer_url = 2;
+    string issuer_url = 3;
     // subject is the sub claim a workload's OIDC token must match, i.e. exactly which workloads
     // the trust credential trusts.
-    string subject = 3;
+    string subject = 4;
     // custom_claims are the additional claims a workload's OIDC token must carry, if any.
-    repeated buf.registry.iam.v1.CustomClaim custom_claims = 4;
+    repeated buf.registry.iam.v1.CustomClaim custom_claims = 5;
     // scoped_permissions are the permissions carried by the tokens the trust credential mints.
-    // Empty means the tokens carry the owner's permissions resolved at request time.
-    repeated buf.registry.iam.v1.ScopedPermissions scoped_permissions = 5;
+    // Empty means the tokens carry the user's permissions resolved at request time.
+    repeated buf.registry.iam.v1.ScopedPermissions scoped_permissions = 6;
   }
-  // owner_id is the id of the owner of the trust credential.
-  string owner_id = 1 [(buf.validate.field).string.tuuid = true];
+  // user_id is the id of the user that owns the trust credential.
+  string user_id = 1 [(buf.validate.field).string.tuuid = true];
   // old_state is the trust rules the trust credential carried before the update.
   TrustCredentialState old_state = 2;
   // new_state is the trust rules the trust credential carries after the update, i.e. exactly
