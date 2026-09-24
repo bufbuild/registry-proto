@@ -121,7 +121,7 @@ message PluginRef {
     // The name of the Organization.
     string organization = 1 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 32
+      (buf.validate.field).string.max_len = 48
     ];
     // The name of the Plugin.
     string plugin = 2 [(buf.validate.field).string = {

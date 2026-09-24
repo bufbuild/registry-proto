@@ -88,7 +88,7 @@ message LabelRef {
     // The name of the owner of the Plugin that contains the Label, an Organization.
     string owner = 1 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 32
+      (buf.validate.field).string.max_len = 48
     ];
     // The name of the Plugin that contains the Label.
     string plugin = 2 [(buf.validate.field).string = {
