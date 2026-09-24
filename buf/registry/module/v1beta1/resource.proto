@@ -71,7 +71,7 @@ message ResourceRef {
     // The name of the User or Organization that owns the resource.
     string owner = 1 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 32
+      (buf.validate.field).string.max_len = 48
     ];
     // The name of the Module that contains or is the resource.
     string module = 2 [(buf.validate.field).string = {

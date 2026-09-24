@@ -71,7 +71,7 @@ message ResourceRef {
     // The name of the Organization that owns the resource.
     string owner = 1 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.max_len = 32
+      (buf.validate.field).string.max_len = 48
     ];
     // The name of the Policy that contains or is the resource.
     string policy = 2 [(buf.validate.field).string = {

@@ -128,11 +128,12 @@ message ListOrganizationsResponse {
 message CreateOrganizationsRequest {
   // An individual request to create an Organization.
   message Value {
-    // The name of the Organization.
+    // The name of the Organization. The min_len and max_len values are lower and upper bounds. A
+    // BSR may further constrain these values.
     string name = 1 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.min_len = 1,
-      (buf.validate.field).string.max_len = 32,
+      (buf.validate.field).string.max_len = 48,
       (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]*[a-z0-9])?$"
     ];
     // The configurable description of the Organization.
