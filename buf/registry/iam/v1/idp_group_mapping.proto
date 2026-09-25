@@ -102,6 +102,25 @@ message ModuleIdpGroupMapping {
   ];
 }
 
+// An IdP group mapping on an Instance.
+//
+// A mapping grants admin on the Instance to all Users who are members of an identity provider
+// group: a mapped User receives the role when they log in. Group membership is provisioned by the
+// identity provider, not managed through this API.
+//
+// A mapping is uniquely identified by its IdP group name.
+message InstanceIdpGroupMapping {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The name of the IdP group, as it appears in the identity provider.
+  string group_name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.idp_group_name) = true
+  ];
+  // The time the mapping was created.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+}
+
 // An IdP group mapping on any resource.
 message IdpGroupMapping {
   option (buf.registry.priv.extension.v1beta1.message).response_only = true;
@@ -112,6 +131,8 @@ message IdpGroupMapping {
     OrganizationIdpGroupMapping organization = 1;
     // A mapping on a Module.
     ModuleIdpGroupMapping module = 2;
+    // A mapping on an Instance.
+    InstanceIdpGroupMapping instance = 3;
   }
 }
 
@@ -120,6 +141,8 @@ message IdpGroupMapping {
 //
 // This is used in requests.
 message IdpGroupMappingRef {
+  message Instance {}
+
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   // The name of the IdP group.
@@ -133,5 +156,7 @@ message IdpGroupMappingRef {
     buf.registry.owner.v1.OrganizationRef organization_ref = 2;
     // The Module that the mapping applies to.
     buf.registry.module.v1.ModuleRef module_ref = 3;
+    // Mapping applies to the whole instance.
+    Instance instance = 4;
   }
 }

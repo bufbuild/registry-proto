@@ -55,7 +55,7 @@ message Actor {
 
 // ResourceType is the type of the resource that was affected by the audited event.
 //
-// [#next-free-field: 26]
+// [#next-free-field: 27]
 enum ResourceType {
   RESOURCE_TYPE_UNSPECIFIED = 0;
   RESOURCE_TYPE_USER = 1;
@@ -83,6 +83,7 @@ enum ResourceType {
   RESOURCE_TYPE_AUTHORIZATION_REQUEST = 23;
   RESOURCE_TYPE_RECOMMENDED_SDK = 24;
   RESOURCE_TYPE_TRUST_CREDENTIAL = 25;
+  RESOURCE_TYPE_INSTANCE_IDP_GROUP = 26;
 }
 
 // Resource is the affected resource by the audited event.
@@ -104,7 +105,7 @@ message Resource {
 
 // EventType is the type of audited event.
 //
-// [#next-free-field: 91]
+// [#next-free-field: 93]
 enum EventType {
   EVENT_TYPE_UNSPECIFIED = 0;
   EVENT_TYPE_ORGANIZATION_CREATED = 1;
@@ -197,6 +198,8 @@ enum EventType {
   EVENT_TYPE_TRUST_CREDENTIAL_CREATED = 88;
   EVENT_TYPE_TRUST_CREDENTIAL_DELETED = 89;
   EVENT_TYPE_TRUST_CREDENTIAL_UPDATED = 90;
+  EVENT_TYPE_INSTANCE_IDP_GROUP_CREATED = 91;
+  EVENT_TYPE_INSTANCE_IDP_GROUP_DELETED = 92;
 }
 
 // EventMetadata provides additional details about the audited event.
@@ -211,7 +214,7 @@ message EventMetadata {
 // it happened, who did it, which resource was affected, and more contextual information on the
 // event.
 //
-// [#next-free-field: 94]
+// [#next-free-field: 96]
 message Event {
   // Unique id of the audited event.
   string id = 1 [(buf.validate.field).string.tuuid = true];
@@ -315,6 +318,8 @@ message Event {
     PayloadTrustCredentialCreated trust_credential_created = 91;
     PayloadTrustCredentialDeleted trust_credential_deleted = 92;
     PayloadTrustCredentialUpdated trust_credential_updated = 93;
+    PayloadInstanceIdpGroupCreated instance_idp_group_created = 94;
+    PayloadInstanceIdpGroupDeleted instance_idp_group_deleted = 95;
   }
 }
 
@@ -1231,3 +1236,7 @@ message PayloadTrustCredentialUpdated {
   // which workloads it trusts from now on.
   TrustCredentialState new_state = 3;
 }
+
+message PayloadInstanceIdpGroupCreated {}
+
+message PayloadInstanceIdpGroupDeleted {}
