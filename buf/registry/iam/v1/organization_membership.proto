@@ -62,6 +62,13 @@ message OrganizationMembership {
   // The individual role assignments that make up the membership, at most one per
   // OrganizationRoleSource.
   repeated OrganizationRoleAssignment role_assignments = 6 [(buf.validate.field).repeated.min_items = 1];
+  // The name of the User that is a member of the Organization.
+  string user_name = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32,
+    (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]*[a-z0-9])?$"
+  ];
 }
 
 // An individual role assignment within an OrganizationMembership.
