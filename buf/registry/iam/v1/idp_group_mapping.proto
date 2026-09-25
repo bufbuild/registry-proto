@@ -19,7 +19,6 @@ package buf.registry.iam.v1;
 import "buf/registry/iam/v1/module_contributor.proto";
 import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/module/v1/module.proto";
-import "buf/registry/owner/v1/instance.proto";
 import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/priv/validate/v1beta1/validate.proto";
@@ -144,6 +143,8 @@ message IdpGroupMapping {
 //
 // This is used in requests.
 message IdpGroupMappingRef {
+  message Instance {}
+
   option (buf.registry.priv.extension.v1beta1.message).request_only = true;
 
   // The name of the IdP group.
@@ -158,6 +159,6 @@ message IdpGroupMappingRef {
     // The Module that the mapping applies to.
     buf.registry.module.v1.ModuleRef module_ref = 3;
     // Mapping applies to the whole instance.
-    buf.registry.owner.v1.Instance instance = 4;
+    Instance instance = 4;
   }
 }
