@@ -119,8 +119,6 @@ message InstanceIdpGroupMapping {
   ];
   // The time the mapping was created.
   google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
-  // The last time the mapping was updated.
-  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
 }
 
 // An IdP group mapping on any resource.
