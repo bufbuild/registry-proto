@@ -21,6 +21,8 @@ import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/registry/resource/v1/resource_type.proto";
 import "buf/validate/validate.proto";
 
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/iam/v1";
+
 // EffectivePermission is used to desrcibe whether a permission is effective for a (user, scope) pair,
 // as well as the reason if the permission is not effective.
 //
