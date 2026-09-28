@@ -103,7 +103,8 @@ message ListEffectivePermissionRequest {
   // The user whose token the permission is determined effective or not for. A permission's effectiveness
   // is only well defined when a (user, scope) pair is given. See EffectivePermission's docs.
   //
-  // If not set, defaults to the currently authenticated User.
+  // If not set, defaults to the currently authenticated User. This field exists because instance
+  // admins can create tokens for machine users.
   buf.registry.owner.v1.UserRef user_ref = 3;
   // The scope at which each permission is determined effective or not. A permission's effectiveness
   // is only well defined when a (user, scope) pair is given. See EffectivePermission's docs.
