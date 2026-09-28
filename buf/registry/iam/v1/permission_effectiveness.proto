@@ -1,0 +1,73 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.iam.v1;
+
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/priv/validate/v1beta1/validate.proto";
+import "buf/registry/resource/v1/resource_type.proto";
+import "buf/validate/validate.proto";
+
+// EffectivePermission is used to desrcibe whether a permission is effective for a (user, scope) pair,
+// as well as the reason if the permission is not effective.
+//
+// Definition: a permission is effective for a (user, scope) pair if there exists some RPC request
+// that succeeds when a token with this permission scoped to this scope is used, and fails with the
+// same token without this permission.
+//
+// For example, if a user has only a read role for private module foo/bar. Then `bsr.module.get`
+// scoped to this module is effective for this user on foo/bar while `bsr.module.push` at the same
+// scope isn't effective.
+message EffectivePermission {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The name of the Permission.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.permission_name) = true
+  ];
+
+  // Whether the permission is effective, and the reason if it's not.
+  EffectiveKind effectiveness_kind = 2;
+
+  // EffectiveKind indicates the permission is effective or the reason why it's not effective.
+  enum EffectiveKind {
+    EFFECTIVE_KIND_UNSPECIFIED = 0;
+    // The permission is effective.
+    EFFECTIVE_KIND_EFFECTIVE = 1;
+    // The permission is a `get` permission and all resources at this scope are all publicly readable.
+    //
+    // For example, `bsr.module.get` scoped to public module foo/bar, or scoped to an organization
+    // where all modules are public.
+    EFFECTIVE_KIND_PUBLIC_READABLE = 2;
+    // The permission is for resource type Organization, Module, Plugin or Policy and the scope doesn't
+    // have any resource of this type, unless the permission is the create permission.
+    //
+    // For example, `bsr.module.push` scoped to an organization without any modules.
+    //
+    // Permissions for sub-resources like pending commits (`bsr.commit.review`), notifications (`bsr.notification.list`),
+    // webhooks (`bsr.webhook.delete`) do not get this effective kind even when these resources don't exist.
+    EFFECTIVE_KIND_NO_SUCH_RESOURCE = 3;
+    // The permission are only checked in RPCs that require a higher role that the user has.
+    //
+    // For example, `bsr.module.push` scoped to an organization where the user has a `READ` role.
+    EFFECTIVE_KIND_INSUFFICIENT_ROLE = 4;
+    // The feature is disabled for the instance.
+    //
+    // For example, `bsr.commit.review` when review flow is disabled.
+    EFFECTIVE_KIND_FEATURE_DISABLED = 5;
+  }
+}
