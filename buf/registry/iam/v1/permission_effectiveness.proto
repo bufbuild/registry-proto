@@ -71,5 +71,11 @@ message EffectivePermission {
     //
     // For example, `bsr.commit.review` when review flow is disabled.
     EFFECTIVE_KIND_FEATURE_DISABLED = 5;
+    // The action is not supported for the specifc case.
+    //
+    // For example, for (user A, user A scope), `bsr.token.update` is effective, while it's not effective
+    // for (machine user, machine user scope), because bot users are not allowed to managed tokens, regardless
+    // of its role.
+    EFFECTIVE_KIND_FEATURE_UNSUPPORTED = 6;
   }
 }
