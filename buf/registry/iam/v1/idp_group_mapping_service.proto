@@ -132,6 +132,8 @@ message CreateIdpGroupMappingsRequest {
         (buf.validate.field).enum.not_in = 0
       ];
     }
+    // A mapping to create on an entire Instance.
+    message Instance {}
     // The name of the IdP group, as it appears in the identity provider.
     string group_name = 1 [
       (buf.validate.field).required = true,
@@ -144,6 +146,8 @@ message CreateIdpGroupMappingsRequest {
       Organization organization = 2;
       // Create the mapping on a Module.
       Module module = 3;
+      // Create the mapping on the Instance.
+      Instance instance = 4;
     }
   }
   // The mappings to create.
