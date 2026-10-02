@@ -1245,8 +1245,8 @@ message PayloadInstanceIdpGroupCreated {}
 message PayloadInstanceIdpGroupDeleted {}
 
 message PayloadUserInstanceRoleChanged {
-  // old_role is the old role of the member.
+  // old_role is the old role of the user.
   repeated buf.registry.iam.v1.InstanceRole old_role = 1;
-  // new_role is the new role of the member.
+  // new_role is the new role of the user.
   repeated buf.registry.iam.v1.InstanceRole new_role = 2;
 }
