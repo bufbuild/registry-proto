@@ -201,7 +201,7 @@ enum EventType {
   EVENT_TYPE_TRUST_CREDENTIAL_UPDATED = 90;
   EVENT_TYPE_INSTANCE_IDP_GROUP_CREATED = 91;
   EVENT_TYPE_INSTANCE_IDP_GROUP_DELETED = 92;
-  EVENT_TYPE_USER_ROLE_CHANGED = 93;
+  EVENT_TYPE_USER_INSTANCE_ROLE_CHANGED = 93;
 }
 
 // EventMetadata provides additional details about the audited event.
@@ -322,7 +322,7 @@ message Event {
     PayloadTrustCredentialUpdated trust_credential_updated = 93;
     PayloadInstanceIdpGroupCreated instance_idp_group_created = 94;
     PayloadInstanceIdpGroupDeleted instance_idp_group_deleted = 95;
-    PayloadUserRoleChanged user_role_changed = 96;
+    PayloadUserInstanceRoleChanged user_role_changed = 96;
   }
 }
 
@@ -1244,24 +1244,9 @@ message PayloadInstanceIdpGroupCreated {}
 
 message PayloadInstanceIdpGroupDeleted {}
 
-enum UserRoleActionTaken {
-  USER_ROLE_ACTION_TAKEN_UNSPECIFIED = 0;
-  USER_ROLE_ACTION_TAKEN_GRANTED = 1;
-  USER_ROLE_ACTION_TAKEN_REVOKED = 2;
-}
-
-message PayloadUserRoleChanged {
-  // user_id is the id of the user whose role was changed.
-  string user_id = 1 [
-    (buf.validate.field).string.tuuid = true,
-    (buf.validate.field).required = true
-  ];
-  // action_taken is the specific action we wook
-  UserRoleActionTaken action_taken = 2 [(buf.validate.field).required = true];
-  // role_kind is the specific type of role that action was taken upon.
-  oneof role_kind {
-    buf.registry.iam.v1.InstanceRole instance = 3;
-    buf.registry.iam.v1.OrganizationRole organization = 4;
-    buf.registry.iam.v1.ModuleContributorRole repository = 5;
-  }
+message PayloadUserInstanceRoleChanged {
+  // old_role is the old role of the member.
+  repeated buf.registry.iam.v1.InstanceRole old_role = 1;
+  // new_role is the new role of the member.
+  repeated buf.registry.iam.v1.InstanceRole new_role = 2;
 }
