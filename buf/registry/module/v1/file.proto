@@ -35,6 +35,11 @@ message File {
       max_len: 4096
       not_contains: "\\"
       pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
+    },
+    (buf.validate.field).cel = {
+      id: "file.path.no_control_chars"
+      message: "path must not contain control characters"
+      expression: "!this.matches(r'[\\x00-\\x1F\\x7F]')"
     }
   ];
   // The content of the File.
