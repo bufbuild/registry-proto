@@ -40,8 +40,6 @@ service PermissionService {
     //
     // bsr.{organization, user, module, plugin, policy}.get is required on the scope it it's not the
     // instance scope.
-    //
-    // bsr.user.get on the User in user_ref is required to list Permissions for another User.
     option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
 }
