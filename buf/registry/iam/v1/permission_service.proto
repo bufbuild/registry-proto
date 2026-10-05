@@ -36,7 +36,13 @@ service PermissionService {
   // List Permissions.
   rpc ListPermissions(ListPermissionsRequest) returns (ListPermissionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    option (buf.registry.priv.extension.v1beta1.method).no_required_permission = true;
+    // No Permission is required if user_ref is unset or refers to the authenticated User.
+    //
+    // bsr.{organization, user, module, plugin, policy}.get is required on the scope it it's not the
+    // instance scope.
+    //
+    // bsr.user.get on the User in user_ref is required to list Permissions for another User.
+    option (buf.registry.priv.extension.v1beta1.method).dynamic_permission = true;
   }
 }
 
@@ -79,10 +85,16 @@ message ListPermissionsRequest {
   //
   // If both this field and scope are specified, the RPC returns the token owner's allowed Permissions on the scope.
   //
-  // If this is unspecifed but scope is specified, the RPC returns the authenticated user's allowed Permissions on the scope.
+  // If this is unspecified but scope is specified, the RPC returns the authenticated User's allowed Permissions on the scope.
   //
   // If neither field is specified, the returned Permissions are not filtered by scope.
   buf.registry.owner.v1.UserRef user_ref = 6;
+
+  option (buf.validate.message).cel = {
+    id: "list_permissions_request.user_ref_requires_scope"
+    message: "user_ref must not be set unless scope is set"
+    expression: "!has(this.user_ref) || has(this.scope)"
+  };
 }
 
 message ListPermissionsResponse {
