@@ -35,6 +35,11 @@ message File {
       max_len: 4096
       not_contains: "\\"
       pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
+    },
+    (buf.validate.field).cel = {
+      id: "file.path.no_newline"
+      message: "file path must not contain a newline"
+      expression: "!this.contains('\\n')"
     }
   ];
   // The content of the File.
