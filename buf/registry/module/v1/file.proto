@@ -37,9 +37,9 @@ message File {
       pattern: "^([^/.][^/]?|[^/][^/.]|[^/]{3,})(/([^/.][^/]?|[^/][^/.]|[^/]{3,}))*$"
     },
     (buf.validate.field).cel = {
-      id: "file.path.no_newline"
-      message: "file path must not contain a newline"
-      expression: "!this.contains('\\n')"
+      id: "file.path.no_control_chars"
+      message: "path must not contain control characters"
+      expression: "!this.matches('[\\\\x00-\\\\x1F\\\\x7F]')"
     }
   ];
   // The content of the File.
