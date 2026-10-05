@@ -17,6 +17,8 @@ syntax = "proto3";
 package buf.registry.iam.v1;
 
 import "buf/registry/iam/v1/permission.proto";
+import "buf/registry/iam/v1/scope.proto";
+import "buf/registry/owner/v1/user.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/registry/resource/v1/resource_type.proto";
@@ -71,6 +73,16 @@ message ListPermissionsRequest {
     (buf.validate.field).repeated.items.enum.defined_only = true,
     (buf.validate.field).repeated.items.enum.not_in = 0
   ];
+  // If specified, only the Permissions allowed on the scope for the token owner are returned.
+  Scope scope = 5;
+  // This field can only be specified if scope is specified.
+  //
+  // If both token_owner and scope are specified, the RPC returns the token owner's allowed Permissions on the scope.
+  //
+  // If this is unspecifed but scope is specified, the RPC returns the authenticated user's allowed Permissions on the scope.
+  //
+  // If neither field is specified, the returned Permissions are not filtered by scope.
+  buf.registry.owner.v1.UserRef token_owner = 6;
 }
 
 message ListPermissionsResponse {
