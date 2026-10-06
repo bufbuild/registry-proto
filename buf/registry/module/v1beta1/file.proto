@@ -44,7 +44,7 @@ message File {
     (buf.validate.field).cel = {
       id: "file.path.no_url_encoded_paths"
       message: "path must not contain url encodable paths"
-      expression: "!this.matches(r'[%]')"
+      expression: "!this.contains('%')"
     }
   ];
   // The content of the File.
