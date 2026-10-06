@@ -39,7 +39,7 @@ message File {
     (buf.validate.field).cel = {
       id: "file.path.no_control_chars"
       message: "path must not contain control characters"
-      expression: "!this.matches(r'[\\x00-\\x1F\\x7F%]')"
+      expression: "!this.matches(r'[\\x00-\\x1F\\x7F]')"
     },
     (buf.validate.field).cel = {
       id: "file.path.no_url_encoded_paths"
