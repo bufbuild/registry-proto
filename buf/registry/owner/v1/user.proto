@@ -128,8 +128,8 @@ message UserRef {
 // An instance admin is authorized for all instance-scoped operations. All other Users are
 // members, whose access derives solely from Organization and resource grants.
 //
-// Direct copy of InstanceRole from the Iam package. Hierarchy prevents us from re-using
-// the enumerator stored there. Must stay in sync with buf.registry.iam.v1.InstanceRole.
+// This is kept in sync with buf.registry.iam.v1.InstanceRole. The iam package already imports
+// this package so we can't share the existing type.
 enum UserInstanceRole {
   USER_INSTANCE_ROLE_UNSPECIFIED = 0;
   // The User is an administrator of the entire instance.
