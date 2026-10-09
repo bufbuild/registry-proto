@@ -40,6 +40,11 @@ message File {
       id: "file.path.no_control_chars"
       message: "path must not contain control characters"
       expression: "!this.matches(r'[\\x00-\\x1F\\x7F]')"
+    },
+    (buf.validate.field).cel = {
+      id: "file.path.no_url_encoded_paths"
+      message: "path must not contain url encodable paths"
+      expression: "!this.contains('%')"
     }
   ];
   // The content of the File.
