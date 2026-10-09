@@ -133,6 +133,14 @@ message ListUsersRequest {
   ];
   // Only return Users with a name that contains this string using a case-insensitive comparison.
   string name_query = 7 [(buf.validate.field).string.max_len = 32];
+  // Only return Users whose instance role matches one of these roles.
+  //
+  // Maps to the individual instance role assignment of the user and does not map to effective role permissions.
+  repeated UserInstanceRole has_roles = 8 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
 }
 
 message ListUsersResponse {
