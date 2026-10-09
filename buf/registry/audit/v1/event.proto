@@ -17,6 +17,7 @@ syntax = "proto3";
 package buf.registry.audit.v1;
 
 import "buf/registry/admin/v1/settings.proto";
+import "buf/registry/iam/v1/instance_role.proto";
 import "buf/registry/iam/v1/module_contributor.proto";
 import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/iam/v1/token.proto";
@@ -105,7 +106,7 @@ message Resource {
 
 // EventType is the type of audited event.
 //
-// [#next-free-field: 93]
+// [#next-free-field: 94]
 enum EventType {
   EVENT_TYPE_UNSPECIFIED = 0;
   EVENT_TYPE_ORGANIZATION_CREATED = 1;
@@ -200,6 +201,7 @@ enum EventType {
   EVENT_TYPE_TRUST_CREDENTIAL_UPDATED = 90;
   EVENT_TYPE_INSTANCE_IDP_GROUP_CREATED = 91;
   EVENT_TYPE_INSTANCE_IDP_GROUP_DELETED = 92;
+  EVENT_TYPE_USER_INSTANCE_ROLE_CHANGED = 93;
 }
 
 // EventMetadata provides additional details about the audited event.
@@ -214,7 +216,7 @@ message EventMetadata {
 // it happened, who did it, which resource was affected, and more contextual information on the
 // event.
 //
-// [#next-free-field: 96]
+// [#next-free-field: 97]
 message Event {
   // Unique id of the audited event.
   string id = 1 [(buf.validate.field).string.tuuid = true];
@@ -320,6 +322,7 @@ message Event {
     PayloadTrustCredentialUpdated trust_credential_updated = 93;
     PayloadInstanceIdpGroupCreated instance_idp_group_created = 94;
     PayloadInstanceIdpGroupDeleted instance_idp_group_deleted = 95;
+    PayloadUserInstanceRoleChanged user_role_changed = 96;
   }
 }
 
@@ -1240,3 +1243,10 @@ message PayloadTrustCredentialUpdated {
 message PayloadInstanceIdpGroupCreated {}
 
 message PayloadInstanceIdpGroupDeleted {}
+
+message PayloadUserInstanceRoleChanged {
+  // old_role is the old role of the user.
+  repeated buf.registry.iam.v1.InstanceRole old_role = 1;
+  // new_role is the new role of the user.
+  repeated buf.registry.iam.v1.InstanceRole new_role = 2;
+}
