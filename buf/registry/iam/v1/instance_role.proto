@@ -25,6 +25,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 //
 // An instance admin is authorized for all instance-scoped operations. All other Users are
 // members, whose access derives solely from Organization and resource grants.
+//
+// Changes made to this should also be made to buf.registry.owner.v1.UserInstanceRole.
 enum InstanceRole {
   INSTANCE_ROLE_UNSPECIFIED = 0;
   // The User is an administrator of the entire instance.
