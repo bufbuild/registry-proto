@@ -87,6 +87,14 @@ message UpdateSettingsRequest {
   //
   // If unset, the Organization visibility control is left unchanged.
   buf.registry.resource.v1.ResourceVisibilityControlUpdate organization_visibility_control = 6;
+  // The instance-wide visibility control for Users to set.
+  //
+  // If unset, the User visibility control is left unchanged.
+  buf.registry.resource.v1.ResourceVisibilityControlUpdate user_visibility_control = 7 [(buf.validate.field).cel = {
+    id: "user_visibility_control.no_strict"
+    message: "strict is not supported for the User visibility control"
+    expression: "!has(this.resource_visibility_control) || !this.resource_visibility_control.strict"
+  }];
 }
 
 message UpdateSettingsResponse {
