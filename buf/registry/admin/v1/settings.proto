@@ -61,7 +61,7 @@ message Settings {
   // The instance-wide visibility control for Users.
   //
   // Users have no per-User visibility (either everyone is public or everyone is private), and this
-  // control is the visibility of every User on the instance instead of a default for new Users.
+  // sets the visibility of all existing users and users that will be created.
   //
   // If unset or public, every User is public. If private, a User is visible only to those it shares
   // an Organization with, and to instance admins.
