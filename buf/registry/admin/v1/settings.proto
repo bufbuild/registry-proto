@@ -58,6 +58,14 @@ message Settings {
   //
   // If unset, new Organizations are public by default.
   buf.registry.resource.v1.ResourceVisibilityControl organization_visibility_control = 6;
+  // The instance-wide visibility control for Users.
+  //
+  // Users have no per-User visibility (either everyone is public or everyone is private), and this
+  // sets the visibility of all existing and newly created users.
+  //
+  // If unset or public, every User is public. If private, a User is visible only to those it shares
+  // an Organization with, and to instance admins.
+  buf.registry.resource.v1.ResourceVisibilityControl user_visibility_control = 7;
 }
 
 // The policy controlling enforcement of breaking changes when Commits are pushed to the
