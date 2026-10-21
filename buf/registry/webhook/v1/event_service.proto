@@ -1,0 +1,65 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.webhook.v1;
+
+import "buf/registry/webhook/v1/event.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/webhook/v1";
+
+// EventService is implemented by Webhook receivers, not by the BSR.
+//
+// The BSR calls HandleEvent using the Connect protocol with JSON encoding. If the url
+// path ends in "/buf.registry.webhook.v1.EventService/HandleEvent", the url is called as
+// is. Otherwise the path is appended to the url.
+//
+// If the Webhook has a signing secret, each delivery has a Buf-Signature-256 header set
+// to "sha256=" followed by the lowercase hex HMAC-SHA256 of the request body. Receivers
+// should verify the signature against the raw body before decoding it, and reject
+// requests with an old send_time.
+//
+// Receivers that do not use Connect must respond to a successful delivery with status
+// 200, Content-Type: application/json, and the body "{}". Any other response is a
+// failure.
+//
+// Receivers must respond within 10 seconds, or the delivery is treated as failed. Failed
+// deliveries are retried for a limited time and then dropped. An Event may be delivered
+// more than once and out of order. Use the Event id to deduplicate.
+//
+// New Event types and payload fields are added over time. Receivers should accept Events
+// they do not recognize.
+service EventService {
+  // HandleEvent handles a single Event.
+  //
+  // A successful response acknowledges the Event. An error causes the Event to be
+  // retried, so return success for Events that are ignored.
+  rpc HandleEvent(HandleEventRequest) returns (HandleEventResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message HandleEventRequest {
+  // The Event being delivered.
+  Event event = 1 [(buf.validate.field).required = true];
+  // The time this delivery was sent.
+  //
+  // Changes on each retry, unlike the Event's event_time.
+  google.protobuf.Timestamp send_time = 2 [(buf.validate.field).required = true];
+}
+
+message HandleEventResponse {}

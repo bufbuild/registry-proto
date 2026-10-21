@@ -1,0 +1,99 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.webhook.v1;
+
+import "buf/registry/module/v1/commit.proto";
+import "buf/registry/module/v1/module.proto";
+import "buf/registry/owner/v1/organization.proto";
+import "buf/registry/webhook/v1/webhook.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/webhook/v1";
+
+// An Event delivered to a Webhook.
+//
+// See EventService for delivery and retry behavior.
+message Event {
+  // The id of the Event.
+  //
+  // The same id is used for every delivery of the Event.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The type of the Event.
+  //
+  // Receivers should ignore types they do not recognize.
+  EventType type = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The time the Event occurred.
+  google.protobuf.Timestamp event_time = 3 [(buf.validate.field).required = true];
+  // The payload of the Event, matching its type.
+  //
+  // Unset if the receiver's schema predates the payload.
+  oneof payload {
+    // The payload for EVENT_TYPE_PING.
+    PingPayload ping = 4;
+    // The payload for EVENT_TYPE_MODULE_COMMIT_PUSHED.
+    ModuleCommitPushedPayload module_commit_pushed = 5;
+    // The payload for EVENT_TYPE_MODULE_CREATED.
+    ModuleCreatedPayload module_created = 6;
+    // The payload for EVENT_TYPE_ORGANIZATION_CREATED.
+    OrganizationCreatedPayload organization_created = 7;
+  }
+}
+
+// The payload of an Event of type EVENT_TYPE_PING.
+message PingPayload {
+  // The id of the Webhook that was pinged.
+  //
+  // Empty if the Webhook has not been created.
+  string webhook_id = 1 [
+    (buf.validate.field).string.tuuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+}
+
+// The payload of an Event of type EVENT_TYPE_MODULE_COMMIT_PUSHED.
+message ModuleCommitPushedPayload {
+  // The Module that the Commit was pushed to.
+  buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
+  // The Commit that was pushed.
+  buf.registry.module.v1.Commit commit = 2 [(buf.validate.field).required = true];
+  // The labels that are associated with the Commit.
+  repeated string label_names = 3 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.items = {
+      string: {max_len: 250}
+    }
+  ];
+}
+
+// The payload of an Event of type EVENT_TYPE_MODULE_CREATED.
+message ModuleCreatedPayload {
+  // The Module that was created.
+  buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
+}
+
+// The payload of an Event of type EVENT_TYPE_ORGANIZATION_CREATED.
+message OrganizationCreatedPayload {
+  // The Organization that was created.
+  buf.registry.owner.v1.Organization organization = 1 [(buf.validate.field).required = true];
+}
