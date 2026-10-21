@@ -43,13 +43,14 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // deliveries are retried for a limited time and then dropped. An Event may be delivered
 // more than once and out of order. Use the Event id to deduplicate.
 //
-// New Event types and payload fields are added over time. Receivers should accept Events
-// they do not recognize.
+// New fields are added to Event payloads over time. Receivers that decode the request
+// body themselves should be configured to discard unknown fields to stay forward
+// compatible. Connect handlers do this by default.
 service EventService {
   // HandleEvent handles a single Event.
   //
   // A successful response acknowledges the Event. An error causes the Event to be
-  // retried, so return success for Events that are ignored.
+  // retried.
   rpc HandleEvent(HandleEventRequest) returns (HandleEventResponse) {
     option idempotency_level = IDEMPOTENT;
   }

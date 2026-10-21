@@ -37,8 +37,6 @@ message Event {
     (buf.validate.field).string.tuuid = true
   ];
   // The type of the Event.
-  //
-  // Receivers should ignore types they do not recognize.
   EventType type = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.not_in = 0
@@ -46,8 +44,6 @@ message Event {
   // The time the Event occurred.
   google.protobuf.Timestamp event_time = 3 [(buf.validate.field).required = true];
   // The payload of the Event, matching its type.
-  //
-  // Unset if the receiver's schema predates the payload.
   oneof payload {
     // The payload for EVENT_TYPE_PING.
     PingPayload ping = 4;
