@@ -175,7 +175,6 @@ message WebhookRef {
 
   // The name of a Webhook within its scope.
   //
-  // A Name uniquely identifies a Webhook.
   // This is used for requests when a caller only has the Webhook name and not the id.
   message Name {
     // The scope of the Webhook.
