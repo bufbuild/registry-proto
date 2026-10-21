@@ -51,8 +51,6 @@ message Webhook {
   // The scope of the Webhook.
   WebhookScope scope = 5 [(buf.validate.field).required = true];
   // The types of Events that the Webhook subscribes to.
-  //
-  // May include types that the client does not recognize.
   repeated EventType event_types = 6 [
     (buf.validate.field).repeated.min_items = 1,
     (buf.validate.field).repeated.max_items = 128,
