@@ -1,0 +1,355 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.webhook.v1;
+
+import "buf/registry/module/v1/module.proto";
+import "buf/registry/owner/v1/organization.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/webhook/v1/event.proto";
+import "buf/registry/webhook/v1/webhook.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/webhook/v1";
+
+// Operate on Webhooks.
+//
+// Permissions are checked against each Webhook's scope. Instance Webhooks require an
+// instance admin, Organization Webhooks an Organization owner or admin, and Module
+// Webhooks a Module admin.
+service WebhookService {
+  // Get Webhooks by id or name.
+  rpc GetWebhooks(GetWebhooksRequest) returns (GetWebhooksResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.get";
+  }
+  // List Webhooks, usually by Organization or Module.
+  //
+  // If no Organizations or Modules are given, all Webhooks on the instance are listed,
+  // subject to the caller's permissions.
+  rpc ListWebhooks(ListWebhooksRequest) returns (ListWebhooksResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.list";
+  }
+  // Create new Webhooks.
+  //
+  // This operation is atomic. Either all Webhooks are created or an error is returned.
+  rpc CreateWebhooks(CreateWebhooksRequest) returns (CreateWebhooksResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.create";
+  }
+  // Update existing Webhooks.
+  //
+  // The scope of a Webhook cannot be changed. A new name must be unique within the
+  // scope.
+  //
+  // This operation is atomic. Either all Webhooks are updated or an error is returned.
+  rpc UpdateWebhooks(UpdateWebhooksRequest) returns (UpdateWebhooksResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.update";
+  }
+  // Delete existing Webhooks.
+  //
+  // This operation is atomic. Either all Webhooks are deleted or an error is returned.
+  rpc DeleteWebhooks(DeleteWebhooksRequest) returns (DeleteWebhooksResponse) {
+    option idempotency_level = IDEMPOTENT;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.delete";
+  }
+  // Send an EVENT_TYPE_PING Event to an existing or draft Webhook.
+  //
+  // Delivery failures are reported in the response, not as errors. The receiver's
+  // response body is never returned.
+  //
+  // Requires bsr.webhook.create for both draft and existing Webhooks, since a ping sends
+  // a request to a caller-chosen url.
+  rpc PingWebhook(PingWebhookRequest) returns (PingWebhookResponse) {
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.create";
+  }
+}
+
+message GetWebhooksRequest {
+  // The Webhooks to request.
+  repeated WebhookRef webhook_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message GetWebhooksResponse {
+  // The retrieved Webhooks in the same order as requested.
+  repeated Webhook webhooks = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message ListWebhooksRequest {
+  // The list order.
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    // Order by create_time newest to oldest.
+    ORDER_CREATE_TIME_DESC = 1;
+    // Order by create_time oldest to newest.
+    ORDER_CREATE_TIME_ASC = 2;
+    // Order by name in reverse lexicographic order.
+    //
+    // Webhooks with the same name are ordered by scope type: instance, Organization, then
+    // Module.
+    ORDER_NAME_DESC = 3;
+    // Order by name in lexicographic order.
+    //
+    // Webhooks with the same name are ordered by scope type: instance, Organization, then
+    // Module.
+    ORDER_NAME_ASC = 4;
+  }
+  // The maximum number of items to return on a page.
+  //
+  // The default value is 10.
+  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 250];
+  // The page to start from.
+  //
+  // If empty, the first page is returned.
+  string page_token = 2 [(buf.validate.field).string.max_len = 4096];
+  // Only return Webhooks within one of these Organizations, including Webhooks on the
+  // Modules they own.
+  //
+  // If empty, Webhooks are not filtered by Organization.
+  repeated buf.registry.owner.v1.OrganizationRef organization_refs = 3 [(buf.validate.field).repeated.max_items = 250];
+  // Only return Webhooks on one of these Modules.
+  //
+  // If empty, Webhooks are not filtered by Module.
+  repeated buf.registry.module.v1.ModuleRef module_refs = 4 [(buf.validate.field).repeated.max_items = 250];
+  // The order to return the Webhooks.
+  //
+  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  Order order = 5 [(buf.validate.field).enum.defined_only = true];
+  // Only return Webhooks with these scope types.
+  repeated WebhookScopeType has_scope_types = 6 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
+}
+
+message ListWebhooksResponse {
+  // The next page token.
+  //
+  // If empty, there are no more pages.
+  string next_page_token = 1 [(buf.validate.field).string.max_len = 4096];
+  // The listed Webhooks.
+  repeated Webhook webhooks = 2;
+}
+
+message CreateWebhooksRequest {
+  // An individual request to create a Webhook.
+  message Value {
+    // The name of the Webhook.
+    //
+    // Must be unique within the scope.
+    string name = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.min_len = 2,
+      (buf.validate.field).string.max_len = 100,
+      (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]*[a-z0-9])?$"
+    ];
+    // The scope of the Webhook.
+    WebhookScopeRef scope_ref = 2 [(buf.validate.field).required = true];
+    // The types of Events that the Webhook subscribes to.
+    repeated EventType event_types = 3 [
+      (buf.validate.field).repeated.min_items = 1,
+      (buf.validate.field).repeated.max_items = 128,
+      (buf.validate.field).repeated.unique = true,
+      (buf.validate.field).repeated.items.enum.defined_only = true,
+      (buf.validate.field).repeated.items.enum.not_in = 0,
+      (buf.validate.field).repeated.items.enum.not_in = 1
+    ];
+    // The URL that Events are delivered to.
+    //
+    // Must not include credentials, a query, or a fragment.
+    string url = 4 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).cel = {
+        id: "string.http_uri"
+        expression: "this.startsWith('https://') || this.startsWith('http://')"
+        message: "value must be an https or http URL"
+      },
+      (buf.validate.field).string.max_len = 1024
+    ];
+    // The secret used to sign deliveries.
+    //
+    // If empty, deliveries are not signed.
+    bytes signing_secret = 5 [
+      debug_redact = true,
+      (buf.validate.field).bytes.min_len = 16,
+      (buf.validate.field).bytes.max_len = 256,
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+    ];
+  }
+  // The Webhooks to create.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message CreateWebhooksResponse {
+  // The created Webhooks in the same order as given on the request.
+  repeated Webhook webhooks = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdateWebhooksRequest {
+  // An individual request to update a Webhook.
+  message Value {
+    // The Webhook to update.
+    WebhookRef webhook_ref = 1 [(buf.validate.field).required = true];
+    // The URL that Events are delivered to.
+    //
+    // Must not include credentials, a query, or a fragment. If not set, the url is not
+    // updated.
+    optional string url = 2 [
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).cel = {
+        id: "string.http_uri"
+        expression: "this.startsWith('https://') || this.startsWith('http://')"
+        message: "value must be an https or http URL"
+      },
+      (buf.validate.field).string.max_len = 1024
+    ];
+    // The types of Events that the Webhook subscribes to.
+    //
+    // If set, replaces the existing types. Each type must occur within the Webhook's
+    // scope. If empty, the types are not updated.
+    repeated EventType event_types = 3 [
+      (buf.validate.field).repeated.max_items = 128,
+      (buf.validate.field).repeated.unique = true,
+      (buf.validate.field).repeated.items.enum.defined_only = true,
+      (buf.validate.field).repeated.items.enum.not_in = 0,
+      (buf.validate.field).repeated.items.enum.not_in = 1
+    ];
+    // The name of the Webhook.
+    //
+    // If not set, the name is not updated.
+    optional string name = 4 [
+      (buf.validate.field).string.min_len = 2,
+      (buf.validate.field).string.max_len = 100,
+      (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]*[a-z0-9])?$"
+    ];
+    // The secret used to sign deliveries.
+    //
+    // If not set, the secret is not updated. If empty, the secret is removed.
+    optional bytes signing_secret = 5 [
+      debug_redact = true,
+      (buf.validate.field).cel = {
+        id: "signing_secret_len_or_empty"
+        expression: "size(this) == 0 || size(this) >= 16"
+        message: "value must be empty or at least 16 bytes"
+      },
+      (buf.validate.field).bytes.max_len = 256
+    ];
+  }
+  // The Webhooks to update.
+  repeated Value values = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message UpdateWebhooksResponse {
+  // The updated Webhooks in the same order as given on the request.
+  repeated Webhook webhooks = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message DeleteWebhooksRequest {
+  // The Webhooks to delete.
+  repeated WebhookRef webhook_refs = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 250
+  ];
+}
+
+message DeleteWebhooksResponse {}
+
+message PingWebhookRequest {
+  // A Webhook that already exists.
+  message Existing {
+    // The Webhook to ping.
+    WebhookRef webhook_ref = 1 [(buf.validate.field).required = true];
+    // The URL to deliver the ping to instead of the Webhook's url.
+    //
+    // Used to test a new url with the existing signing secret. Must not include
+    // credentials, a query, or a fragment.
+    optional string url = 2 [
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).cel = {
+        id: "string.http_uri"
+        expression: "this.startsWith('https://') || this.startsWith('http://')"
+        message: "value must be an https or http URL"
+      },
+      (buf.validate.field).string.max_len = 1024
+    ];
+  }
+  // A Webhook that has not been created yet.
+  message Draft {
+    // The scope the Webhook will be created in.
+    //
+    // Used only for authorization.
+    WebhookScopeRef scope_ref = 1 [(buf.validate.field).required = true];
+    // The URL to deliver the ping to.
+    //
+    // Must not include credentials, a query, or a fragment.
+    string url = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.uri = true,
+      (buf.validate.field).cel = {
+        id: "string.http_uri"
+        expression: "this.startsWith('https://') || this.startsWith('http://')"
+        message: "value must be an https or http URL"
+      },
+      (buf.validate.field).string.max_len = 1024
+    ];
+    // The secret used to sign the ping.
+    //
+    // If empty, the ping is not signed.
+    bytes signing_secret = 3 [
+      debug_redact = true,
+      (buf.validate.field).bytes.min_len = 16,
+      (buf.validate.field).bytes.max_len = 256,
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+    ];
+  }
+  // The Webhook to ping.
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // A Webhook that already exists.
+    Existing existing = 1;
+    // A Webhook that has not been created yet.
+    Draft draft = 2;
+  }
+}
+
+message PingWebhookResponse {
+  // The ping Event that was delivered.
+  Event event = 1 [(buf.validate.field).required = true];
+  // The HTTP status code the receiver responded with.
+  //
+  // Zero if no response was received.
+  uint32 http_status_code = 2;
+  // Why the delivery failed.
+  //
+  // Empty on success. Never contains the receiver's response.
+  string error_message = 3;
+  // How long the delivery took.
+  google.protobuf.Duration duration = 4 [(buf.validate.field).required = true];
+}
