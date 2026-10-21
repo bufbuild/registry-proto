@@ -322,7 +322,7 @@ message Event {
     PayloadTrustCredentialUpdated trust_credential_updated = 93;
     PayloadInstanceIdpGroupCreated instance_idp_group_created = 94;
     PayloadInstanceIdpGroupDeleted instance_idp_group_deleted = 95;
-    PayloadUserInstanceRoleChanged user_role_changed = 96;
+    PayloadUserInstanceRoleChanged user_instance_role_changed = 96;
   }
 }
 
@@ -1246,7 +1246,7 @@ message PayloadInstanceIdpGroupDeleted {}
 
 message PayloadUserInstanceRoleChanged {
   // old_role is the old role of the user.
-  repeated buf.registry.iam.v1.InstanceRole old_role = 1;
+  buf.registry.iam.v1.InstanceRole old_role = 1;
   // new_role is the new role of the user.
-  repeated buf.registry.iam.v1.InstanceRole new_role = 2;
+  buf.registry.iam.v1.InstanceRole new_role = 2;
 }
