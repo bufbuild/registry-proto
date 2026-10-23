@@ -19,6 +19,7 @@ package buf.registry.module.v1;
 import "buf/registry/module/v1/module.proto";
 import "buf/registry/owner/v1/owner.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/module/v1";
@@ -135,8 +136,10 @@ message CreateModulesRequest {
     // The configurable description of the Module.
     string description = 4 [(buf.validate.field).string.max_len = 350];
     // The configurable URL in the description of the module.
+    //
+    // Must be an http or https URL.
     string url = 5 [
-      (buf.validate.field).string.uri = true,
+      (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.http_url) = true,
       (buf.validate.field).string.max_len = 255,
       (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
     ];
@@ -175,12 +178,10 @@ message UpdateModulesRequest {
     // The configurable description of the module.
     optional string description = 5 [(buf.validate.field).string.max_len = 350];
     // The configurable URL in the description of the module.
+    //
+    // Must be an http or https URL.
     optional string url = 6 [
-      (buf.validate.field).cel = {
-        id: "uri_or_empty"
-        expression: "this == '' || this.isUri()"
-        message: "value must be a valid URI"
-      },
+      (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.http_url) = true,
       (buf.validate.field).string.max_len = 255
     ];
     // The name of the default Label of the Module.
