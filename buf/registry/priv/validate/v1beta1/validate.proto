@@ -49,6 +49,26 @@ extend buf.validate.StringRules {
     }
   ];
 
+  // A validation rule for http and https URLs.
+  //
+  // The value must be a valid URI with an http or https scheme, compared
+  // case-insensitively, and a non-empty host. For example,
+  // "https://buf.build/docs".
+  //
+  // The empty string is allowed so that optional fields can be cleared.
+  optional bool http_url = 12002 [
+    (buf.validate.predefined).cel = {
+      id: "string.http_url.uri"
+      message: "value must be a valid URI"
+      expression: "this == '' || this.isUri()"
+    },
+    (buf.validate.predefined).cel = {
+      id: "string.http_url.scheme"
+      message: "value must be an http or https URL with a host"
+      expression: "this == '' || this.matches('(?i)^https?://([^/?#@]*@)?[^/?#@:][^/?#@]*([/?#]|$)')"
+    }
+  ];
+
   // A validation rule for IdP group names.
   //
   // An IdP group name is the name of a group as it appears in the identity provider. It is between
