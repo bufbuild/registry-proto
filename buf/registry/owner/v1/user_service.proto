@@ -177,8 +177,7 @@ message CreateUsersRequest {
     // Must be an http or https URL.
     string url = 4 [
       (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.http_url) = true,
-      (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+      (buf.validate.field).string.max_len = 255
     ];
     // The verification status of the User.
     //
