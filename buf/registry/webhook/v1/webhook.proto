@@ -1,0 +1,198 @@
+// Copyright 2023-2025 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.webhook.v1;
+
+import "buf/registry/module/v1/module.proto";
+import "buf/registry/owner/v1/organization.proto";
+import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/webhook/v1";
+
+// A Webhook on the BSR.
+//
+// A Webhook delivers Events that occur within its scope to its url.
+message Webhook {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The id of the Webhook.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The time the Webhook was created.
+  google.protobuf.Timestamp create_time = 2 [(buf.validate.field).required = true];
+  // The last time the Webhook was updated.
+  google.protobuf.Timestamp update_time = 3 [(buf.validate.field).required = true];
+  // The name of the Webhook.
+  //
+  // Unique within the Webhook's scope.
+  string name = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 100,
+    (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]*[a-z0-9])?$"
+  ];
+  // The scope of the Webhook.
+  WebhookScope scope = 5 [(buf.validate.field).required = true];
+  // The types of Events that the Webhook subscribes to.
+  repeated EventType event_types = 6 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 128,
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0,
+    (buf.validate.field).repeated.items.enum.not_in = 1
+  ];
+  // The URL that Events are delivered to.
+  //
+  // Must not include credentials, a query, or a fragment.
+  string url = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).cel = {
+      id: "string.http_uri"
+      expression: "this.startsWith('https://') || this.startsWith('http://')"
+      message: "value must be an https or http URL"
+    },
+    (buf.validate.field).string.max_len = 1024
+  ];
+  // Whether the Webhook has a signing secret.
+  //
+  // The secret itself is never returned.
+  bool has_signing_secret = 8;
+}
+
+// The type of an Event.
+//
+// Each type occurs only within certain scopes. A Webhook can only subscribe to types that
+// occur within its scope.
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  // A test Event sent by WebhookService.PingWebhook.
+  //
+  // Webhooks cannot subscribe to this type.
+  EVENT_TYPE_PING = 1;
+  // Commits were pushed to one or more Modules in a single upload.
+  //
+  // Occurs within the instance, the owning Organization, and the Module.
+  EVENT_TYPE_MODULE_COMMITS_PUSHED = 2;
+  // One or more Modules were created.
+  //
+  // Occurs within the instance and the owning Organization.
+  EVENT_TYPE_MODULES_CREATED = 3;
+  // One or more Organizations were created.
+  //
+  // Occurs within the instance.
+  EVENT_TYPE_ORGANIZATIONS_CREATED = 4;
+}
+
+// The type of a WebhookScope.
+enum WebhookScopeType {
+  WEBHOOK_SCOPE_TYPE_UNSPECIFIED = 0;
+  // The Webhook is scoped to the instance.
+  WEBHOOK_SCOPE_TYPE_INSTANCE = 1;
+  // The Webhook is scoped to an Organization.
+  WEBHOOK_SCOPE_TYPE_ORGANIZATION = 2;
+  // The Webhook is scoped to a Module.
+  WEBHOOK_SCOPE_TYPE_MODULE = 3;
+}
+
+// The scope of a Webhook.
+//
+// A Webhook has exactly one scope. To receive Events at several levels, create a Webhook
+// per scope. Webhooks may share a url.
+message WebhookScope {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
+
+  // The BSR instance, for Events that are not tied to a single Organization.
+  message Instance {}
+
+  // A single Organization, covering Events for everything it owns.
+  message Organization {
+    // The id of the Organization.
+    string organization_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.tuuid = true
+    ];
+  }
+
+  // A single Module.
+  message Module {
+    // The id of the Module.
+    string module_id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.tuuid = true
+    ];
+  }
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    Instance instance = 1;
+    Organization organization = 2;
+    Module module = 3;
+  }
+}
+
+// WebhookScopeRef is a reference to the scope of a Webhook.
+//
+// This is used in requests.
+message WebhookScopeRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The BSR instance, for Events that are not tied to a single Organization.
+  message Instance {}
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    Instance instance = 1;
+    // A single Organization, covering Events for everything it owns.
+    buf.registry.owner.v1.OrganizationRef organization_ref = 2;
+    // A single Module.
+    buf.registry.module.v1.ModuleRef module_ref = 3;
+  }
+}
+
+// WebhookRef is a reference to a Webhook.
+//
+// This is used in requests.
+message WebhookRef {
+  option (buf.registry.priv.extension.v1beta1.message).request_only = true;
+
+  // The name of a Webhook within its scope.
+  //
+  // This is used for requests when a caller only has the Webhook name and not the id.
+  message Name {
+    // The scope of the Webhook.
+    WebhookScopeRef scope_ref = 1 [(buf.validate.field).required = true];
+    // The name of the Webhook.
+    string name = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.min_len = 2,
+      (buf.validate.field).string.max_len = 100,
+      (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]*[a-z0-9])?$"
+    ];
+  }
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    // The id of the Webhook.
+    string id = 1 [(buf.validate.field).string.tuuid = true];
+    // The name of the Webhook within its scope.
+    Name name = 2;
+  }
+}

@@ -27,6 +27,7 @@ import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/policy/v1/policy.proto";
 import "buf/registry/resource/v1/resource_type.proto";
 import "buf/registry/resource/v1/resource_visibility_control.proto";
+import "buf/registry/webhook/v1/webhook.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -56,7 +57,7 @@ message Actor {
 
 // ResourceType is the type of the resource that was affected by the audited event.
 //
-// [#next-free-field: 27]
+// [#next-free-field: 28]
 enum ResourceType {
   RESOURCE_TYPE_UNSPECIFIED = 0;
   RESOURCE_TYPE_USER = 1;
@@ -85,6 +86,7 @@ enum ResourceType {
   RESOURCE_TYPE_RECOMMENDED_SDK = 24;
   RESOURCE_TYPE_TRUST_CREDENTIAL = 25;
   RESOURCE_TYPE_INSTANCE_IDP_GROUP = 26;
+  RESOURCE_TYPE_WEBHOOK = 27;
 }
 
 // Resource is the affected resource by the audited event.
@@ -106,7 +108,7 @@ message Resource {
 
 // EventType is the type of audited event.
 //
-// [#next-free-field: 94]
+// [#next-free-field: 97]
 enum EventType {
   EVENT_TYPE_UNSPECIFIED = 0;
   EVENT_TYPE_ORGANIZATION_CREATED = 1;
@@ -202,6 +204,9 @@ enum EventType {
   EVENT_TYPE_INSTANCE_IDP_GROUP_CREATED = 91;
   EVENT_TYPE_INSTANCE_IDP_GROUP_DELETED = 92;
   EVENT_TYPE_USER_INSTANCE_ROLE_CHANGED = 93;
+  EVENT_TYPE_WEBHOOK_CREATED = 94;
+  EVENT_TYPE_WEBHOOK_UPDATED = 95;
+  EVENT_TYPE_WEBHOOK_DELETED = 96;
 }
 
 // EventMetadata provides additional details about the audited event.
@@ -216,7 +221,7 @@ message EventMetadata {
 // it happened, who did it, which resource was affected, and more contextual information on the
 // event.
 //
-// [#next-free-field: 97]
+// [#next-free-field: 100]
 message Event {
   // Unique id of the audited event.
   string id = 1 [(buf.validate.field).string.tuuid = true];
@@ -323,6 +328,9 @@ message Event {
     PayloadInstanceIdpGroupCreated instance_idp_group_created = 94;
     PayloadInstanceIdpGroupDeleted instance_idp_group_deleted = 95;
     PayloadUserInstanceRoleChanged user_instance_role_changed = 96;
+    PayloadWebhookCreated webhook_created = 97;
+    PayloadWebhookUpdated webhook_updated = 98;
+    PayloadWebhookDeleted webhook_deleted = 99;
   }
 }
 
@@ -1249,4 +1257,46 @@ message PayloadUserInstanceRoleChanged {
   buf.registry.iam.v1.InstanceRole old_role = 1;
   // new_role is the new role of the user.
   buf.registry.iam.v1.InstanceRole new_role = 2;
+}
+
+message PayloadWebhookCreated {
+  // scope is the scope the webhook is subscribed within.
+  buf.registry.webhook.v1.WebhookScope scope = 1;
+  // event_types are the types of events the webhook subscribes to.
+  repeated buf.registry.webhook.v1.EventType event_types = 2;
+  // url is the url that events are delivered to.
+  string url = 3;
+  // has_signing_secret is whether deliveries to the webhook are signed.
+  bool has_signing_secret = 4;
+}
+
+message PayloadWebhookUpdated {
+  // WebhookState is the set of updatable properties a webhook carried at a point in time.
+  message WebhookState {
+    // name is the name of the webhook.
+    string name = 1;
+    // event_types are the types of events the webhook subscribes to.
+    repeated buf.registry.webhook.v1.EventType event_types = 2;
+    // url is the url that events are delivered to.
+    string url = 3;
+    // has_signing_secret is whether deliveries to the webhook are signed.
+    bool has_signing_secret = 4;
+  }
+  // scope is the scope the webhook is subscribed within.
+  buf.registry.webhook.v1.WebhookScope scope = 1;
+  // old_state is the state of the webhook before the update.
+  WebhookState old_state = 2;
+  // new_state is the state of the webhook after the update.
+  WebhookState new_state = 3;
+  // signing_secret_changed is whether the signing secret was set, replaced, or removed.
+  bool signing_secret_changed = 4;
+}
+
+message PayloadWebhookDeleted {
+  // scope is the scope the webhook was subscribed within.
+  buf.registry.webhook.v1.WebhookScope scope = 1;
+  // event_types are the types of events the webhook subscribed to.
+  repeated buf.registry.webhook.v1.EventType event_types = 2;
+  // url is the url that events were delivered to.
+  string url = 3;
 }
