@@ -87,18 +87,18 @@ enum EventType {
   //
   // Webhooks cannot subscribe to this type.
   EVENT_TYPE_PING = 1;
-  // A Commit was pushed to a Module.
+  // Commits were pushed to one or more Modules in a single upload.
   //
   // Occurs within the instance, the owning Organization, and the Module.
-  EVENT_TYPE_MODULE_COMMIT_PUSHED = 2;
-  // A Module was created.
+  EVENT_TYPE_MODULE_COMMITS_PUSHED = 2;
+  // One or more Modules were created.
   //
   // Occurs within the instance and the owning Organization.
-  EVENT_TYPE_MODULE_CREATED = 3;
-  // An Organization was created.
+  EVENT_TYPE_MODULES_CREATED = 3;
+  // One or more Organizations were created.
   //
   // Occurs within the instance.
-  EVENT_TYPE_ORGANIZATION_CREATED = 4;
+  EVENT_TYPE_ORGANIZATIONS_CREATED = 4;
 }
 
 // The type of a WebhookScope.

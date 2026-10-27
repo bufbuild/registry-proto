@@ -47,12 +47,12 @@ message Event {
   oneof payload {
     // The payload for EVENT_TYPE_PING.
     PingPayload ping = 4;
-    // The payload for EVENT_TYPE_MODULE_COMMIT_PUSHED.
-    ModuleCommitPushedPayload module_commit_pushed = 5;
-    // The payload for EVENT_TYPE_MODULE_CREATED.
-    ModuleCreatedPayload module_created = 6;
-    // The payload for EVENT_TYPE_ORGANIZATION_CREATED.
-    OrganizationCreatedPayload organization_created = 7;
+    // The payload for EVENT_TYPE_MODULE_COMMITS_PUSHED.
+    ModuleCommitsPushedPayload module_commits_pushed = 5;
+    // The payload for EVENT_TYPE_MODULES_CREATED.
+    ModulesCreatedPayload modules_created = 6;
+    // The payload for EVENT_TYPE_ORGANIZATIONS_CREATED.
+    OrganizationsCreatedPayload organizations_created = 7;
   }
 }
 
@@ -67,29 +67,38 @@ message PingPayload {
   ];
 }
 
-// The payload of an Event of type EVENT_TYPE_MODULE_COMMIT_PUSHED.
-message ModuleCommitPushedPayload {
-  // The Module that the Commit was pushed to.
-  buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
-  // The Commit that was pushed.
-  buf.registry.module.v1.Commit commit = 2 [(buf.validate.field).required = true];
-  // The labels that are associated with the Commit.
-  repeated string label_names = 3 [
-    (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.items = {
-      string: {max_len: 250}
-    }
-  ];
+// The payload of an Event of type EVENT_TYPE_MODULE_COMMITS_PUSHED.
+//
+// Contains only the Commits within the Webhook's scope.
+message ModuleCommitsPushedPayload {
+  // A Commit pushed to a Module.
+  message PushedCommit {
+    // The Module that the Commit was pushed to.
+    buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
+    // The Commit that was pushed.
+    buf.registry.module.v1.Commit commit = 2 [(buf.validate.field).required = true];
+    // The labels that are associated with the Commit.
+    repeated string label_names = 3 [
+      (buf.validate.field).repeated.min_items = 1,
+      (buf.validate.field).repeated.items = {
+        string: {max_len: 250}
+      }
+    ];
+  }
+  // The Commits that were pushed.
+  repeated PushedCommit pushed_commits = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-// The payload of an Event of type EVENT_TYPE_MODULE_CREATED.
-message ModuleCreatedPayload {
-  // The Module that was created.
-  buf.registry.module.v1.Module module = 1 [(buf.validate.field).required = true];
+// The payload of an Event of type EVENT_TYPE_MODULES_CREATED.
+//
+// Contains only the Modules within the Webhook's scope.
+message ModulesCreatedPayload {
+  // The Modules that were created.
+  repeated buf.registry.module.v1.Module modules = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-// The payload of an Event of type EVENT_TYPE_ORGANIZATION_CREATED.
-message OrganizationCreatedPayload {
-  // The Organization that was created.
-  buf.registry.owner.v1.Organization organization = 1 [(buf.validate.field).required = true];
+// The payload of an Event of type EVENT_TYPE_ORGANIZATIONS_CREATED.
+message OrganizationsCreatedPayload {
+  // The Organizations that were created.
+  repeated buf.registry.owner.v1.Organization organizations = 1 [(buf.validate.field).repeated.min_items = 1];
 }
