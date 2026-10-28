@@ -19,6 +19,7 @@ package buf.registry.owner.v1;
 import "buf/registry/owner/v1/organization.proto";
 import "buf/registry/owner/v1/user.proto";
 import "buf/registry/priv/extension/v1beta1/extension.proto";
+import "buf/registry/priv/validate/v1beta1/validate.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/owner/v1";
@@ -172,10 +173,11 @@ message CreateUsersRequest {
     // The configurable description of the User.
     string description = 3 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for a User.
+    //
+    // Must be an http or https URL.
     string url = 4 [
-      (buf.validate.field).string.uri = true,
-      (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+      (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.http_url) = true,
+      (buf.validate.field).string.max_len = 255
     ];
     // The verification status of the User.
     //
@@ -212,12 +214,11 @@ message UpdateUsersRequest {
     // The configurable description of the User.
     optional string description = 3 [(buf.validate.field).string.max_len = 350];
     // The configurable URL that represents the homepage for a User.
+    //
+    // Must be an http or https URL.
     optional string url = 4 [
       (buf.validate.field).string.max_len = 255,
-      (buf.validate.field).cel = {
-        id: "string.uri"
-        expression: "this == '' || this.isUri() ? '' : 'value must be a valid URI'"
-      }
+      (buf.validate.field).string.(buf.registry.priv.validate.v1beta1.http_url) = true
     ];
     // The verification status of the User.
     //
