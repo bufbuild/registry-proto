@@ -22,7 +22,11 @@ import "buf/registry/iam/v1/module_contributor.proto";
 import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/iam/v1/token.proto";
 import "buf/registry/iam/v1/trust_credential.proto";
+import "buf/registry/module/v1/file.proto";
+import "buf/registry/module/v1/label.proto";
 import "buf/registry/module/v1/module.proto";
+import "buf/registry/module/v1/resource.proto";
+import "buf/registry/owner/v1/owner.proto";
 import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/policy/v1/policy.proto";
 import "buf/registry/resource/v1/resource_type.proto";
@@ -106,7 +110,7 @@ message Resource {
 
 // EventType is the type of audited event.
 //
-// [#next-free-field: 103]
+// [#next-free-field: 105]
 enum EventType {
   EVENT_TYPE_UNSPECIFIED = 0;
   EVENT_TYPE_ORGANIZATION_CREATED = 1;
@@ -211,6 +215,8 @@ enum EventType {
   EVENT_TYPE_RESOURCES_READ = 100;
   EVENT_TYPE_MODULES_READ = 101;
   EVENT_TYPE_MODULES_LISTED = 102;
+  EVENT_TYPE_DOWNLOAD_READ = 103;
+  EVENT_TYPE_FILE_DESCRIPTOR_SET_READ = 104;
 }
 
 // EventMetadata provides additional details about the audited event.
@@ -225,7 +231,7 @@ message EventMetadata {
 // it happened, who did it, which resource was affected, and more contextual information on the
 // event.
 //
-// [#next-free-field: 106]
+// [#next-free-field: 108]
 message Event {
   // Unique id of the audited event.
   string id = 1 [(buf.validate.field).string.tuuid = true];
@@ -341,6 +347,8 @@ message Event {
     PayloadResourcesGet resources_get = 103;
     PayloadModulesGet modules_get = 104;
     PayloadModulesList modules_list = 105;
+    PayloadDownloadRead download_read = 106;
+    PayloadFileDescriptorSetRead file_descriptor_set_read = 107;
   }
 }
 
@@ -1270,20 +1278,97 @@ message PayloadUserInstanceRoleChanged {
 }
 
 // read-only events
-message PayloadRepositoryCommitGet {}
+message PayloadRepositoryCommitGet {
+  // resource_refs are the references to the commits requested.
+  repeated buf.registry.module.v1.ResourceRef resource_refs = 1;
+}
 
-message PayloadRepositoryCommitList {}
+message PayloadRepositoryCommitList {
+  // resource_ref is the reference to the module, label, or commit whose commits were listed.
+  buf.registry.module.v1.ResourceRef resource_ref = 1;
+  // id_query is the requested commit id filter. Optional.
+  string id_query = 2;
+}
 
-message PayloadLabelGet {}
+message PayloadLabelGet {
+  // label_refs are the references to the labels requested.
+  repeated buf.registry.module.v1.LabelRef label_refs = 1;
+}
 
-message PayloadLabelList {}
+message PayloadLabelList {
+  enum ArchiveFilter {
+    ARCHIVE_FILTER_UNSPECIFIED = 0;
+    ARCHIVE_FILTER_UNARCHIVED_ONLY = 1;
+    ARCHIVE_FILTER_ARCHIVED_ONLY = 2;
+    ARCHIVE_FILTER_ALL = 3;
+  }
+  // resource_ref is the reference to the module, label, or commit whose labels were listed.
+  buf.registry.module.v1.ResourceRef resource_ref = 1;
+  // commit_check_statuses is the requested commit check status filter. Optional.
+  repeated buf.registry.module.v1.CommitCheckStatus commit_check_statuses = 2;
+  // name_query is the requested label name filter. Optional.
+  string name_query = 3;
+  // archive_filter is the requested archive filter.
+  ArchiveFilter archive_filter = 4;
+}
 
-message PayloadLabelHistoryRead {}
+message PayloadLabelHistoryRead {
+  // label_ref is the reference to the label whose history was listed.
+  buf.registry.module.v1.LabelRef label_ref = 1;
+  // commit_check_statuses is the requested commit check status filter. Optional.
+  repeated buf.registry.module.v1.CommitCheckStatus commit_check_statuses = 2;
+  // start_commit_id is the requested commit id to start from. Optional.
+  string start_commit_id = 3;
+  // only_commits_with_changed_digests is whether only commits with changed digests were requested.
+  bool only_commits_with_changed_digests = 4;
+}
 
-message PayloadGraphGet {}
+message PayloadGraphGet {
+  // resource_refs are the references to the resources whose graph was requested.
+  repeated buf.registry.module.v1.ResourceRef resource_refs = 1;
+}
 
-message PayloadResourcesGet {}
+message PayloadResourcesGet {
+  // resource_refs are the references to the resources requested.
+  repeated buf.registry.module.v1.ResourceRef resource_refs = 1;
+}
 
-message PayloadModulesGet {}
+message PayloadModulesGet {
+  // module_refs are the references to the modules requested.
+  repeated buf.registry.module.v1.ModuleRef module_refs = 1;
+}
 
-message PayloadModulesList {}
+message PayloadModulesList {
+  // owner_refs are the references to the owners whose modules were listed. Empty means all owners.
+  repeated buf.registry.owner.v1.OwnerRef owner_refs = 1;
+}
+
+message PayloadDownloadRead {
+  message Value {
+    // resource_ref is the reference to the resource requested.
+    buf.registry.module.v1.ResourceRef resource_ref = 1;
+    // file_types are the requested file types. Optional.
+    repeated buf.registry.module.v1.FileType file_types = 2;
+    // paths are the requested paths. Optional.
+    repeated string paths = 3;
+    // paths_allow_not_exist is whether requested paths were allowed to not exist.
+    bool paths_allow_not_exist = 4;
+  }
+  // values are the requested downloads.
+  repeated Value values = 1;
+}
+
+message PayloadFileDescriptorSetRead {
+  // resource_ref is the reference to the resource requested.
+  buf.registry.module.v1.ResourceRef resource_ref = 1;
+  // exclude_imports is whether imports were excluded.
+  bool exclude_imports = 2;
+  // include_source_code_info is whether source code info was included.
+  bool include_source_code_info = 3;
+  // include_source_retention_options is whether source-retention options were included.
+  bool include_source_retention_options = 4;
+  // include_types are the requested fully-qualified type names to include. Optional.
+  repeated string include_types = 5;
+  // exclude_types are the requested fully-qualified type names to exclude. Optional.
+  repeated string exclude_types = 6;
+}
