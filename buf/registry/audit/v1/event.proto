@@ -106,7 +106,7 @@ message Resource {
 
 // EventType is the type of audited event.
 //
-// [#next-free-field: 94]
+// [#next-free-field: 103]
 enum EventType {
   EVENT_TYPE_UNSPECIFIED = 0;
   EVENT_TYPE_ORGANIZATION_CREATED = 1;
@@ -202,6 +202,15 @@ enum EventType {
   EVENT_TYPE_INSTANCE_IDP_GROUP_CREATED = 91;
   EVENT_TYPE_INSTANCE_IDP_GROUP_DELETED = 92;
   EVENT_TYPE_USER_INSTANCE_ROLE_CHANGED = 93;
+  EVENT_TYPE_REPOSITORY_COMMIT_READ = 94;
+  EVENT_TYPE_REPOSITORY_COMMITS_LISTED = 95;
+  EVENT_TYPE_LABEL_READ = 96;
+  EVENT_TYPE_LABELS_LISTED = 97;
+  EVENT_TYPE_LABEL_HISTORY_READ = 98;
+  EVENT_TYPE_GRAPH_READ = 99;
+  EVENT_TYPE_RESOURCES_READ = 100;
+  EVENT_TYPE_MODULES_READ = 101;
+  EVENT_TYPE_MODULES_LISTED = 102;
 }
 
 // EventMetadata provides additional details about the audited event.
@@ -216,7 +225,7 @@ message EventMetadata {
 // it happened, who did it, which resource was affected, and more contextual information on the
 // event.
 //
-// [#next-free-field: 97]
+// [#next-free-field: 106]
 message Event {
   // Unique id of the audited event.
   string id = 1 [(buf.validate.field).string.tuuid = true];
@@ -323,6 +332,15 @@ message Event {
     PayloadInstanceIdpGroupCreated instance_idp_group_created = 94;
     PayloadInstanceIdpGroupDeleted instance_idp_group_deleted = 95;
     PayloadUserInstanceRoleChanged user_instance_role_changed = 96;
+    PayloadRepositoryCommitGet repository_commit_get = 97;
+    PayloadRepositoryCommitList repository_commit_list = 98;
+    PayloadLabelGet label_get = 99;
+    PayloadLabelList label_list = 100;
+    PayloadLabelHistoryRead label_history_read = 101;
+    PayloadGraphGet graph_get = 102;
+    PayloadResourcesGet resources_get = 103;
+    PayloadModulesGet modules_get = 104;
+    PayloadModulesList modules_list = 105;
   }
 }
 
@@ -1250,3 +1268,22 @@ message PayloadUserInstanceRoleChanged {
   // new_role is the new role of the user.
   buf.registry.iam.v1.InstanceRole new_role = 2;
 }
+
+// read-only events
+message PayloadRepositoryCommitGet {}
+
+message PayloadRepositoryCommitList {}
+
+message PayloadLabelGet {}
+
+message PayloadLabelList {}
+
+message PayloadLabelHistoryRead {}
+
+message PayloadGraphGet {}
+
+message PayloadResourcesGet {}
+
+message PayloadModulesGet {}
+
+message PayloadModulesList {}
