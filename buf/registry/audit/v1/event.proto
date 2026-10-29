@@ -22,6 +22,7 @@ import "buf/registry/iam/v1/module_contributor.proto";
 import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/iam/v1/token.proto";
 import "buf/registry/iam/v1/trust_credential.proto";
+import "buf/registry/module/v1/commit.proto";
 import "buf/registry/module/v1/file.proto";
 import "buf/registry/module/v1/label.proto";
 import "buf/registry/module/v1/module.proto";
@@ -206,16 +207,16 @@ enum EventType {
   EVENT_TYPE_INSTANCE_IDP_GROUP_CREATED = 91;
   EVENT_TYPE_INSTANCE_IDP_GROUP_DELETED = 92;
   EVENT_TYPE_USER_INSTANCE_ROLE_CHANGED = 93;
-  EVENT_TYPE_REPOSITORY_COMMIT_READ = 94;
-  EVENT_TYPE_REPOSITORY_COMMITS_LISTED = 95;
-  EVENT_TYPE_LABEL_READ = 96;
-  EVENT_TYPE_LABELS_LISTED = 97;
-  EVENT_TYPE_LABEL_HISTORY_READ = 98;
-  EVENT_TYPE_GRAPH_READ = 99;
+  EVENT_TYPE_MODULE_COMMITS_READ = 94;
+  EVENT_TYPE_MODULE_COMMITS_LISTED = 95;
+  EVENT_TYPE_MODULE_LABELS_READ = 96;
+  EVENT_TYPE_MODULE_LABELS_LISTED = 97;
+  EVENT_TYPE_MODULE_LABEL_HISTORY_READ = 98;
+  EVENT_TYPE_MODULE_COMMITS_GRAPH_READ = 99;
   EVENT_TYPE_RESOURCES_READ = 100;
   EVENT_TYPE_MODULES_READ = 101;
   EVENT_TYPE_MODULES_LISTED = 102;
-  EVENT_TYPE_DOWNLOAD_READ = 103;
+  EVENT_TYPE_MODULE_COMMITS_DOWNLOADED = 103;
   EVENT_TYPE_FILE_DESCRIPTOR_SET_READ = 104;
 }
 
@@ -338,16 +339,16 @@ message Event {
     PayloadInstanceIdpGroupCreated instance_idp_group_created = 94;
     PayloadInstanceIdpGroupDeleted instance_idp_group_deleted = 95;
     PayloadUserInstanceRoleChanged user_instance_role_changed = 96;
-    PayloadRepositoryCommitGet repository_commit_get = 97;
-    PayloadRepositoryCommitList repository_commit_list = 98;
-    PayloadLabelGet label_get = 99;
-    PayloadLabelList label_list = 100;
-    PayloadLabelHistoryRead label_history_read = 101;
-    PayloadGraphGet graph_get = 102;
-    PayloadResourcesGet resources_get = 103;
-    PayloadModulesGet modules_get = 104;
-    PayloadModulesList modules_list = 105;
-    PayloadDownloadRead download_read = 106;
+    PayloadModuleCommitsRead module_commits_read = 97;
+    PayloadModuleCommitsListed module_commits_listed = 98;
+    PayloadModuleLabelsRead module_labels_read = 99;
+    PayloadModuleLabelsListed module_labels_listed = 100;
+    PayloadModuleLabelHistoryRead module_label_history_read = 101;
+    PayloadModuleCommitsGraphRead module_commits_graph_read = 102;
+    PayloadResourcesRead resources_read = 103;
+    PayloadModulesRead modules_read = 104;
+    PayloadModulesListed modules_listed = 105;
+    PayloadModuleCommitsDownloaded module_commits_downloaded = 106;
     PayloadFileDescriptorSetRead file_descriptor_set_read = 107;
   }
 }
@@ -1278,97 +1279,57 @@ message PayloadUserInstanceRoleChanged {
 }
 
 // read-only events
-message PayloadRepositoryCommitGet {
-  // resource_refs are the references to the commits requested.
-  repeated buf.registry.module.v1.ResourceRef resource_refs = 1;
+message PayloadModuleCommitsRead {
+  // commits are the commits requested.
+  repeated buf.registry.module.v1.Commit commits = 1;
 }
 
-message PayloadRepositoryCommitList {
-  // resource_ref is the reference to the module, label, or commit whose commits were listed.
-  buf.registry.module.v1.ResourceRef resource_ref = 1;
-  // id_query is the requested commit id filter. Optional.
-  string id_query = 2;
+message PayloadModuleCommitsListed {
+  // resource is the module, label, or commit whose commits were listed.
+  buf.registry.module.v1.Resource resource = 1;
 }
 
-message PayloadLabelGet {
-  // label_refs are the references to the labels requested.
-  repeated buf.registry.module.v1.LabelRef label_refs = 1;
+message PayloadModuleLabelsRead {
+  // labels are the labels requested.
+  repeated buf.registry.module.v1.Label labels = 1;
 }
 
-message PayloadLabelList {
-  enum ArchiveFilter {
-    ARCHIVE_FILTER_UNSPECIFIED = 0;
-    ARCHIVE_FILTER_UNARCHIVED_ONLY = 1;
-    ARCHIVE_FILTER_ARCHIVED_ONLY = 2;
-    ARCHIVE_FILTER_ALL = 3;
-  }
-  // resource_ref is the reference to the module, label, or commit whose labels were listed.
-  buf.registry.module.v1.ResourceRef resource_ref = 1;
-  // commit_check_statuses is the requested commit check status filter. Optional.
-  repeated buf.registry.module.v1.CommitCheckStatus commit_check_statuses = 2;
-  // name_query is the requested label name filter. Optional.
-  string name_query = 3;
-  // archive_filter is the requested archive filter.
-  ArchiveFilter archive_filter = 4;
+message PayloadModuleLabelsListed {
+  // resource is the module, label, or commit whose labels were listed.
+  buf.registry.module.v1.Resource resource = 1;
 }
 
-message PayloadLabelHistoryRead {
-  // label_ref is the reference to the label whose history was listed.
-  buf.registry.module.v1.LabelRef label_ref = 1;
-  // commit_check_statuses is the requested commit check status filter. Optional.
-  repeated buf.registry.module.v1.CommitCheckStatus commit_check_statuses = 2;
-  // start_commit_id is the requested commit id to start from. Optional.
-  string start_commit_id = 3;
-  // only_commits_with_changed_digests is whether only commits with changed digests were requested.
-  bool only_commits_with_changed_digests = 4;
+message PayloadModuleLabelHistoryRead {
+  // label is the label whose history was listed.
+  buf.registry.module.v1.Label label = 1;
 }
 
-message PayloadGraphGet {
-  // resource_refs are the references to the resources whose graph was requested.
-  repeated buf.registry.module.v1.ResourceRef resource_refs = 1;
+message PayloadModuleCommitsGraphRead {
+  // commits are the commits whose graph was requested.
+  repeated buf.registry.module.v1.Commit commits = 1;
 }
 
-message PayloadResourcesGet {
-  // resource_refs are the references to the resources requested.
-  repeated buf.registry.module.v1.ResourceRef resource_refs = 1;
+message PayloadResourcesRead {
+  // resources are the resources requested.
+  repeated buf.registry.module.v1.Resource resources = 1;
 }
 
-message PayloadModulesGet {
-  // module_refs are the references to the modules requested.
-  repeated buf.registry.module.v1.ModuleRef module_refs = 1;
+message PayloadModulesRead {
+  // modules are the modules requested.
+  repeated buf.registry.module.v1.Module modules = 1;
 }
 
-message PayloadModulesList {
-  // owner_refs are the references to the owners whose modules were listed. Empty means all owners.
-  repeated buf.registry.owner.v1.OwnerRef owner_refs = 1;
+message PayloadModulesListed {
+  // owners are the owners whose modules were listed. Empty means all owners.
+  repeated buf.registry.owner.v1.Owner owners = 1;
 }
 
-message PayloadDownloadRead {
-  message Value {
-    // resource_ref is the reference to the resource requested.
-    buf.registry.module.v1.ResourceRef resource_ref = 1;
-    // file_types are the requested file types. Optional.
-    repeated buf.registry.module.v1.FileType file_types = 2;
-    // paths are the requested paths. Optional.
-    repeated string paths = 3;
-    // paths_allow_not_exist is whether requested paths were allowed to not exist.
-    bool paths_allow_not_exist = 4;
-  }
-  // values are the requested downloads.
-  repeated Value values = 1;
+message PayloadModuleCommitsDownloaded {
+  // commits are the commits requested.
+  repeated buf.registry.module.v1.Commit commits = 1;
 }
 
 message PayloadFileDescriptorSetRead {
-  // resource_ref is the reference to the resource requested.
-  buf.registry.module.v1.ResourceRef resource_ref = 1;
-  // exclude_imports is whether imports were excluded.
-  bool exclude_imports = 2;
-  // include_source_code_info is whether source code info was included.
-  bool include_source_code_info = 3;
-  // include_source_retention_options is whether source-retention options were included.
-  bool include_source_retention_options = 4;
-  // include_types are the requested fully-qualified type names to include. Optional.
-  repeated string include_types = 5;
-  // exclude_types are the requested fully-qualified type names to exclude. Optional.
-  repeated string exclude_types = 6;
+  // commit is the commit requested.
+  buf.registry.module.v1.Commit commit = 1;
 }
