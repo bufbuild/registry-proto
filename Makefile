@@ -10,8 +10,8 @@ BIN := .tmp/bin
 export PATH := $(BIN):$(PATH)
 export GOBIN := $(abspath $(BIN))
 
-BUF_VERSION := v1.70.0
-COPYRIGHT_YEARS := 2023-2025
+BUF_VERSION := v1.75.0
+COPYRIGHT_YEARS := 2023-2026
 LICENSE_IGNORE := --ignore '\.yaml$$' --ignore '\.yml$$'
 
 .PHONY: help
