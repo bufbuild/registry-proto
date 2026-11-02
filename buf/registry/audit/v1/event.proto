@@ -22,12 +22,7 @@ import "buf/registry/iam/v1/module_contributor.proto";
 import "buf/registry/iam/v1/organization_membership.proto";
 import "buf/registry/iam/v1/token.proto";
 import "buf/registry/iam/v1/trust_credential.proto";
-import "buf/registry/module/v1/commit.proto";
-import "buf/registry/module/v1/file.proto";
-import "buf/registry/module/v1/label.proto";
 import "buf/registry/module/v1/module.proto";
-import "buf/registry/module/v1/resource.proto";
-import "buf/registry/owner/v1/owner.proto";
 import "buf/registry/plugin/v1/plugin.proto";
 import "buf/registry/policy/v1/policy.proto";
 import "buf/registry/resource/v1/resource_type.proto";
@@ -216,9 +211,9 @@ enum EventType {
   EVENT_TYPE_MODULE_COMMITS_LISTED = 98;
   EVENT_TYPE_MODULE_LABELS_READ = 99;
   EVENT_TYPE_MODULE_LABELS_LISTED = 100;
-  EVENT_TYPE_MODULE_LABEL_HISTORY_READ = 101;
+  EVENT_TYPE_MODULE_LABEL_HISTORY_LISTED = 101;
   EVENT_TYPE_MODULE_COMMITS_GRAPH_READ = 102;
-  EVENT_TYPE_RESOURCES_READ = 103;
+  EVENT_TYPE_MODULE_RESOURCES_READ = 103;
   EVENT_TYPE_MODULES_READ = 104;
   EVENT_TYPE_MODULES_LISTED = 105;
   EVENT_TYPE_MODULE_COMMITS_DOWNLOADED = 106;
@@ -351,9 +346,9 @@ message Event {
     PayloadModuleCommitsListed module_commits_listed = 101;
     PayloadModuleLabelsRead module_labels_read = 102;
     PayloadModuleLabelsListed module_labels_listed = 103;
-    PayloadModuleLabelHistoryRead module_label_history_read = 104;
+    PayloadModuleLabelHistoryListed module_label_history_listed = 104;
     PayloadModuleCommitsGraphRead module_commits_graph_read = 105;
-    PayloadResourcesRead resources_read = 106;
+    PayloadModuleResourcesRead module_resources_read = 106;
     PayloadModulesRead modules_read = 107;
     PayloadModulesListed modules_listed = 108;
     PayloadModuleCommitsDownloaded module_commits_downloaded = 109;
@@ -1286,62 +1281,6 @@ message PayloadUserInstanceRoleChanged {
   buf.registry.iam.v1.InstanceRole new_role = 2;
 }
 
-// read-only events
-message PayloadModuleCommitsRead {
-  // commits are the commits requested.
-  repeated buf.registry.module.v1.Commit commits = 1;
-}
-
-message PayloadModuleCommitsListed {
-  // resource is the module, label, or commit whose commits were listed.
-  buf.registry.module.v1.Resource resource = 1;
-}
-
-message PayloadModuleLabelsRead {
-  // labels are the labels requested.
-  repeated buf.registry.module.v1.Label labels = 1;
-}
-
-message PayloadModuleLabelsListed {
-  // resource is the module, label, or commit whose labels were listed.
-  buf.registry.module.v1.Resource resource = 1;
-}
-
-message PayloadModuleLabelHistoryRead {
-  // label is the label whose history was listed.
-  buf.registry.module.v1.Label label = 1;
-}
-
-message PayloadModuleCommitsGraphRead {
-  // commits are the commits whose graph was requested.
-  repeated buf.registry.module.v1.Commit commits = 1;
-}
-
-message PayloadResourcesRead {
-  // resources are the resources requested.
-  repeated buf.registry.module.v1.Resource resources = 1;
-}
-
-message PayloadModulesRead {
-  // modules are the modules requested.
-  repeated buf.registry.module.v1.Module modules = 1;
-}
-
-message PayloadModulesListed {
-  // owners are the owners whose modules were listed. Empty means all owners.
-  repeated buf.registry.owner.v1.Owner owners = 1;
-}
-
-message PayloadModuleCommitsDownloaded {
-  // commits are the commits requested.
-  repeated buf.registry.module.v1.Commit commits = 1;
-}
-
-message PayloadFileDescriptorSetRead {
-  // commit is the commit requested.
-  buf.registry.module.v1.Commit commit = 1;
-}
-
 message PayloadWebhookCreated {
   // scope is the scope the webhook is subscribed within.
   buf.registry.webhook.v1.WebhookScope scope = 1;
@@ -1382,4 +1321,59 @@ message PayloadWebhookDeleted {
   repeated buf.registry.webhook.v1.EventType event_types = 2;
   // url is the url that events were delivered to.
   string url = 3;
+}
+
+message PayloadModuleCommitsRead {
+  // commits are the commits read.
+  repeated Resource commits = 1;
+}
+
+message PayloadModuleCommitsListed {
+  // resource is the module, label, or commit whose commits were listed.
+  Resource resource = 1;
+}
+
+message PayloadModuleLabelsRead {
+  // labels are the labels read.
+  repeated Resource labels = 1;
+}
+
+message PayloadModuleLabelsListed {
+  // resource is the module, label, or commit whose labels were listed.
+  Resource resource = 1;
+}
+
+message PayloadModuleLabelHistoryListed {
+  // label is the label whose history was listed.
+  Resource label = 1;
+}
+
+message PayloadModuleCommitsGraphRead {
+  // commits are the commits whose graph was read.
+  repeated Resource commits = 1;
+}
+
+message PayloadModuleResourcesRead {
+  // resources are the modules, labels, or commits read.
+  repeated Resource resources = 1;
+}
+
+message PayloadModulesRead {
+  // modules are the modules read.
+  repeated Resource modules = 1;
+}
+
+message PayloadModulesListed {
+  // owners are the owners whose modules were listed. Empty means all owners.
+  repeated Resource owners = 1;
+}
+
+message PayloadModuleCommitsDownloaded {
+  // commits are the commits downloaded.
+  repeated Resource commits = 1;
+}
+
+message PayloadFileDescriptorSetRead {
+  // commit is the commit whose file descriptor set was read.
+  Resource commit = 1;
 }
