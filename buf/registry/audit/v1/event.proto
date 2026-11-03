@@ -108,7 +108,7 @@ message Resource {
 
 // EventType is the type of audited event.
 //
-// [#next-free-field: 97]
+// [#next-free-field: 108]
 enum EventType {
   EVENT_TYPE_UNSPECIFIED = 0;
   EVENT_TYPE_ORGANIZATION_CREATED = 1;
@@ -207,6 +207,17 @@ enum EventType {
   EVENT_TYPE_WEBHOOK_CREATED = 94;
   EVENT_TYPE_WEBHOOK_UPDATED = 95;
   EVENT_TYPE_WEBHOOK_DELETED = 96;
+  EVENT_TYPE_MODULE_COMMITS_READ = 97;
+  EVENT_TYPE_MODULE_COMMITS_LISTED = 98;
+  EVENT_TYPE_MODULE_LABELS_READ = 99;
+  EVENT_TYPE_MODULE_LABELS_LISTED = 100;
+  EVENT_TYPE_MODULE_LABEL_HISTORY_LISTED = 101;
+  EVENT_TYPE_MODULE_COMMITS_GRAPH_READ = 102;
+  EVENT_TYPE_MODULE_RESOURCES_READ = 103;
+  EVENT_TYPE_MODULES_READ = 104;
+  EVENT_TYPE_MODULES_LISTED = 105;
+  EVENT_TYPE_MODULE_COMMITS_DOWNLOADED = 106;
+  EVENT_TYPE_FILE_DESCRIPTOR_SET_READ = 107;
 }
 
 // EventMetadata provides additional details about the audited event.
@@ -221,7 +232,7 @@ message EventMetadata {
 // it happened, who did it, which resource was affected, and more contextual information on the
 // event.
 //
-// [#next-free-field: 100]
+// [#next-free-field: 111]
 message Event {
   // Unique id of the audited event.
   string id = 1 [(buf.validate.field).string.tuuid = true];
@@ -331,6 +342,17 @@ message Event {
     PayloadWebhookCreated webhook_created = 97;
     PayloadWebhookUpdated webhook_updated = 98;
     PayloadWebhookDeleted webhook_deleted = 99;
+    PayloadModuleCommitsRead module_commits_read = 100;
+    PayloadModuleCommitsListed module_commits_listed = 101;
+    PayloadModuleLabelsRead module_labels_read = 102;
+    PayloadModuleLabelsListed module_labels_listed = 103;
+    PayloadModuleLabelHistoryListed module_label_history_listed = 104;
+    PayloadModuleCommitsGraphRead module_commits_graph_read = 105;
+    PayloadModuleResourcesRead module_resources_read = 106;
+    PayloadModulesRead modules_read = 107;
+    PayloadModulesListed modules_listed = 108;
+    PayloadModuleCommitsDownloaded module_commits_downloaded = 109;
+    PayloadFileDescriptorSetRead file_descriptor_set_read = 110;
   }
 }
 
@@ -1299,4 +1321,59 @@ message PayloadWebhookDeleted {
   repeated buf.registry.webhook.v1.EventType event_types = 2;
   // url is the url that events were delivered to.
   string url = 3;
+}
+
+message PayloadModuleCommitsRead {
+  // commits are the commits read.
+  repeated Resource commits = 1;
+}
+
+message PayloadModuleCommitsListed {
+  // resource is the module, label, or commit whose commits were listed.
+  Resource resource = 1;
+}
+
+message PayloadModuleLabelsRead {
+  // labels are the labels read.
+  repeated Resource labels = 1;
+}
+
+message PayloadModuleLabelsListed {
+  // resource is the module, label, or commit whose labels were listed.
+  Resource resource = 1;
+}
+
+message PayloadModuleLabelHistoryListed {
+  // label is the label whose history was listed.
+  Resource label = 1;
+}
+
+message PayloadModuleCommitsGraphRead {
+  // commits are the commits whose graph was read.
+  repeated Resource commits = 1;
+}
+
+message PayloadModuleResourcesRead {
+  // resources are the modules, labels, or commits read.
+  repeated Resource resources = 1;
+}
+
+message PayloadModulesRead {
+  // modules are the modules read.
+  repeated Resource modules = 1;
+}
+
+message PayloadModulesListed {
+  // owners are the owners whose modules were listed. Empty means all owners.
+  repeated Resource owners = 1;
+}
+
+message PayloadModuleCommitsDownloaded {
+  // commits are the commits downloaded.
+  repeated Resource commits = 1;
+}
+
+message PayloadFileDescriptorSetRead {
+  // commit is the commit whose file descriptor set was read.
+  Resource commit = 1;
 }
