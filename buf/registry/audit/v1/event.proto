@@ -1331,6 +1331,8 @@ message PayloadModuleCommitsRead {
 message PayloadModuleCommitsListed {
   // resource is the module, label, or commit whose commits were listed.
   Resource resource = 1;
+  // commits are the commits listed.
+  repeated Resource commits = 2;
 }
 
 message PayloadModuleLabelsRead {
@@ -1341,6 +1343,8 @@ message PayloadModuleLabelsRead {
 message PayloadModuleLabelsListed {
   // resource is the module, label, or commit whose labels were listed.
   Resource resource = 1;
+  // labels are the labels listed.
+  repeated Resource labels = 2;
 }
 
 message PayloadModuleLabelHistoryListed {
@@ -1366,6 +1370,8 @@ message PayloadModulesRead {
 message PayloadModulesListed {
   // owners are the owners whose modules were listed. Empty means all owners.
   repeated Resource owners = 1;
+  // modules are the modules listed.
+  repeated Resource modules = 2;
 }
 
 message PayloadModuleCommitsDownloaded {
