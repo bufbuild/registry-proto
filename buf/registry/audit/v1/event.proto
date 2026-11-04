@@ -1350,6 +1350,8 @@ message PayloadModuleLabelsListed {
 message PayloadModuleLabelHistoryListed {
   // label is the label whose history was listed.
   Resource label = 1;
+  // commits are the commits listed.
+  repeated Resource commits = 2;
 }
 
 message PayloadModuleCommitsGraphRead {
