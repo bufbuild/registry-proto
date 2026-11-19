@@ -1,0 +1,98 @@
+// Copyright 2023-2026 Buf Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package buf.registry.webhook.v1;
+
+import "buf/registry/webhook/v1/webhook.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/webhook/v1";
+
+// The delivery of an Event to a Webhook.
+message EventDelivery {
+  option (buf.validate.message).cel = {
+    id: "event_delivery.failed_has_reason"
+    message: "last_failure_reason is required when state is STATE_FAILED"
+    // STATE_FAILED is 3.
+    expression: "this.state != 3 || this.last_failure_reason != 0"
+  };
+
+  // The state of an EventDelivery.
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    // The Event has not been acknowledged yet and will be sent again.
+    STATE_PENDING = 1;
+    // The receiver acknowledged the Event.
+    STATE_SUCCEEDED = 2;
+    // Every attempt failed. The Event will not be sent again unless redelivered.
+    STATE_FAILED = 3;
+  }
+  // The reason an attempt failed.
+  enum FailureReason {
+    FAILURE_REASON_UNSPECIFIED = 0;
+    // The receiver responded with an HTTP status other than 200.
+    FAILURE_REASON_HTTP_ERROR = 1;
+    // The receiver responded with HTTP status 200 but an invalid body.
+    FAILURE_REASON_INVALID_ACKNOWLEDGEMENT = 2;
+    // The receiver did not respond within 10 seconds.
+    FAILURE_REASON_TIMEOUT = 3;
+    // The receiver could not be reached.
+    FAILURE_REASON_CONNECTION_ERROR = 4;
+    // The BSR could not send the Event.
+    FAILURE_REASON_INTERNAL_ERROR = 5;
+  }
+  // The id of the Event sent to the receiver.
+  string event_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The id of the Webhook the Event is sent to.
+  string webhook_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.tuuid = true
+  ];
+  // The type of the Event.
+  EventType event_type = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The time the Event occurred.
+  google.protobuf.Timestamp event_time = 4 [(buf.validate.field).required = true];
+  // The state of the delivery.
+  State state = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  // The number of times the Event has been sent.
+  uint32 attempt_count = 6;
+  // The time of the last attempt.
+  //
+  // Unset if there have been no attempts.
+  google.protobuf.Timestamp last_attempt_time = 7;
+  // The HTTP status of the receiver's response to the last attempt.
+  //
+  // Unset if the receiver did not respond.
+  optional uint32 last_http_status_code = 8 [
+    (buf.validate.field).uint32.gte = 100,
+    (buf.validate.field).uint32.lte = 599
+  ];
+  // The reason the last attempt failed.
+  //
+  // Set if state is STATE_FAILED.
+  FailureReason last_failure_reason = 9 [(buf.validate.field).enum.defined_only = true];
+}
