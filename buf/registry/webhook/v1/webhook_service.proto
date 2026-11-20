@@ -71,8 +71,8 @@ service WebhookService {
   }
   // Send an EVENT_TYPE_PING Event to an existing or draft Webhook.
   //
-  // Delivery failures are reported in the response, not as errors. The receiver's
-  // response body is never returned.
+  // If the ping fails, the failure is reported in the response, not as an error. The
+  // receiver's response body is never returned.
   //
   // Requires bsr.webhook.create for both draft and existing Webhooks, since a ping sends
   // a request to a caller-chosen url.
@@ -187,9 +187,9 @@ message CreateWebhooksRequest {
       },
       (buf.validate.field).string.max_len = 1024
     ];
-    // The secret used to sign deliveries.
+    // The secret used to sign the body of each request sent to the receiver.
     //
-    // If empty, deliveries are not signed.
+    // If empty, requests are not signed.
     bytes signing_secret = 5 [
       debug_redact = true,
       (buf.validate.field).bytes.min_len = 16,
@@ -246,7 +246,7 @@ message UpdateWebhooksRequest {
       (buf.validate.field).string.max_len = 100,
       (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]*[a-z0-9])?$"
     ];
-    // The secret used to sign deliveries.
+    // The secret used to sign the body of each request sent to the receiver.
     //
     // If not set, the secret is not updated. If empty, the secret is removed.
     optional bytes signing_secret = 5 [
@@ -346,10 +346,10 @@ message PingWebhookResponse {
   //
   // Zero if no response was received.
   uint32 http_status_code = 2;
-  // Why the delivery failed.
+  // Why the ping failed.
   //
   // Empty on success. Never contains the receiver's response.
   string error_message = 3;
-  // How long the delivery took.
+  // How long the ping took.
   google.protobuf.Duration duration = 4 [(buf.validate.field).required = true];
 }

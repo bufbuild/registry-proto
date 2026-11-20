@@ -28,20 +28,22 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // Webhook's url ends in "/buf.registry.webhook.v1.EventService/HandleEvent", it is
 // called as is. Otherwise that suffix is appended to the url.
 //
-// If the Webhook has a signing secret, each delivery has a Buf-Signature-256 header set
+// If the Webhook has a signing secret, each request has a Buf-Signature-256 header set
 // to "sha256=" followed by the lowercase hex HMAC-SHA256 of the request body. Receivers
 // should verify the signature against the raw body before decoding it. Receivers may
 // also reject requests whose send_time is older than a maximum age they choose. This
-// stops a captured delivery from being replayed, and limits how long a receiver needs to
+// stops a captured request from being replayed, and limits how long a receiver needs to
 // store Event ids for deduplication.
 //
-// Receivers that do not use Connect must respond to a successful delivery with status
+// Receivers that do not use Connect must acknowledge an Event by responding with status
 // 200, Content-Type: application/json, and the body "{}". Any other response is a
 // failure.
 //
-// Receivers must respond within 10 seconds, or the delivery is treated as failed. Failed
-// deliveries are retried for a limited time and then dropped. An Event may be delivered
-// more than once and out of order. Use the Event id to deduplicate.
+// Receivers must respond within 10 seconds, or the attempt is treated as failed. Failed
+// attempts are retried for a limited time. An Event may be delivered more than once and
+// out of order. Use the Event id to deduplicate.
+//
+// An Event can be sent again within the retention period.
 //
 // New fields are added to Event payloads over time. Receivers that decode the request
 // body themselves should be configured to discard unknown fields to stay forward
@@ -59,7 +61,7 @@ service EventService {
 message HandleEventRequest {
   // The Event being delivered.
   Event event = 1 [(buf.validate.field).required = true];
-  // The time this delivery was sent.
+  // The time this request was sent.
   //
   // Changes on each retry, unlike the Event's event_time.
   google.protobuf.Timestamp send_time = 2 [(buf.validate.field).required = true];
