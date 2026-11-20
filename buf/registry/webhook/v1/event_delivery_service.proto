@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.webhook.v1;
 
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/webhook/v1/event_delivery.proto";
 import "buf/registry/webhook/v1/webhook.proto";
 import "buf/validate/validate.proto";
@@ -26,9 +27,12 @@ service EventDeliveryService {
   // List EventDeliveries for a Webhook.
   rpc ListEventDeliveries(ListEventDeliveriesRequest) returns (ListEventDeliveriesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.get";
   }
   // Send Events in STATE_PENDING or STATE_FAILED again.
-  rpc RedeliverEventDeliveries(RedeliverEventDeliveriesRequest) returns (RedeliverEventDeliveriesResponse);
+  rpc RedeliverEventDeliveries(RedeliverEventDeliveriesRequest) returns (RedeliverEventDeliveriesResponse) {
+    option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.update";
+  }
 }
 
 message ListEventDeliveriesRequest {
