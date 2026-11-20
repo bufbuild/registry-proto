@@ -39,10 +39,10 @@ message ListEventDeliveriesRequest {
   // The list order.
   enum Order {
     ORDER_UNSPECIFIED = 0;
-    // Order by the time the delivery was created, newest to oldest.
-    ORDER_CREATE_TIME_DESC = 1;
-    // Order by the time the delivery was created, oldest to newest.
-    ORDER_CREATE_TIME_ASC = 2;
+    // Order by event_time newest to oldest.
+    ORDER_EVENT_TIME_DESC = 1;
+    // Order by event_time oldest to newest.
+    ORDER_EVENT_TIME_ASC = 2;
   }
   // The maximum number of items to return on a page.
   //
@@ -56,7 +56,7 @@ message ListEventDeliveriesRequest {
   WebhookRef webhook_ref = 3 [(buf.validate.field).required = true];
   // The order to return the EventDeliveries.
   //
-  // If not specified, defaults to ORDER_CREATE_TIME_DESC.
+  // If not specified, defaults to ORDER_EVENT_TIME_DESC.
   Order order = 4 [(buf.validate.field).enum.defined_only = true];
   // Only return EventDeliveries in these states.
   //
