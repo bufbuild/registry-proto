@@ -31,7 +31,7 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 message Event {
   // The id of the Event.
   //
-  // The same id is used for every delivery of the Event to the same Webhook.
+  // The same id is used for every attempt to send the Event to the same Webhook.
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.tuuid = true

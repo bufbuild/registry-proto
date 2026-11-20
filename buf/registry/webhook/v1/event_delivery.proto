@@ -23,6 +23,8 @@ import "google/protobuf/timestamp.proto";
 option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/registry/webhook/v1";
 
 // The delivery of an Event to a Webhook.
+//
+// Each Event has exactly one EventDelivery, with 0 or more delivery attempts.
 message EventDelivery {
   option (buf.validate.message).cel = {
     id: "event_delivery.failed_has_reason"
