@@ -43,6 +43,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // attempts are retried for a limited time. An Event may be delivered more than once and
 // out of order. Use the Event id to deduplicate.
 //
+// An Event can be sent again within the retention period.
+//
 // New fields are added to Event payloads over time. Receivers that decode the request
 // body themselves should be configured to discard unknown fields to stay forward
 // compatible. Connect handlers do this by default.

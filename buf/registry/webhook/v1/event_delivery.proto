@@ -25,6 +25,8 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 // The delivery of an Event to a Webhook.
 //
 // Each Event has exactly one EventDelivery, with 0 or more delivery attempts.
+//
+// EventDeliveries are deleted after the retention period configured for the BSR instance.
 message EventDelivery {
   option (buf.validate.message).cel = {
     id: "event_delivery.failed_has_reason"
