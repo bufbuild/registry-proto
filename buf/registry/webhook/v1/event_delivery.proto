@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package buf.registry.webhook.v1;
 
+import "buf/registry/priv/extension/v1beta1/extension.proto";
 import "buf/registry/webhook/v1/webhook.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
@@ -24,41 +25,19 @@ option go_package = "buf.build/gen/go/bufbuild/registry/protocolbuffers/go/buf/r
 
 // The delivery of an Event to a Webhook.
 //
-// Each Event has exactly one EventDelivery, with 0 or more delivery attempts.
+// Each Event, other than a ping, has exactly one EventDelivery, with 0 or more delivery
+// attempts.
 //
 // EventDeliveries are deleted after the retention period configured for the BSR instance.
 message EventDelivery {
+  option (buf.registry.priv.extension.v1beta1.message).response_only = true;
   option (buf.validate.message).cel = {
     id: "event_delivery.failed_has_reason"
-    message: "last_failure_reason is required when state is STATE_FAILED"
-    // STATE_FAILED is 3.
+    message: "last_failure_reason is required when state is EVENT_DELIVERY_STATE_FAILED"
+    // EVENT_DELIVERY_STATE_FAILED is 3.
     expression: "this.state != 3 || this.last_failure_reason != 0"
   };
 
-  // The state of an EventDelivery.
-  enum State {
-    STATE_UNSPECIFIED = 0;
-    // The Event has not been acknowledged yet and will be sent again.
-    STATE_PENDING = 1;
-    // The receiver acknowledged the Event.
-    STATE_SUCCEEDED = 2;
-    // Every attempt failed. The Event will not be sent again unless redelivered.
-    STATE_FAILED = 3;
-  }
-  // The reason an attempt failed.
-  enum FailureReason {
-    FAILURE_REASON_UNSPECIFIED = 0;
-    // The receiver responded with an HTTP status other than 200.
-    FAILURE_REASON_HTTP_ERROR = 1;
-    // The receiver responded with HTTP status 200 but an invalid body.
-    FAILURE_REASON_INVALID_ACKNOWLEDGEMENT = 2;
-    // The receiver did not respond within 10 seconds.
-    FAILURE_REASON_TIMEOUT = 3;
-    // The receiver could not be reached.
-    FAILURE_REASON_CONNECTION_ERROR = 4;
-    // The BSR could not send the Event.
-    FAILURE_REASON_INTERNAL_ERROR = 5;
-  }
   // The id of the Event sent to the receiver.
   string event_id = 1 [
     (buf.validate.field).required = true,
@@ -72,12 +51,13 @@ message EventDelivery {
   // The type of the Event.
   EventType event_type = 3 [
     (buf.validate.field).required = true,
-    (buf.validate.field).enum.not_in = 0
+    (buf.validate.field).enum.not_in = 0,
+    (buf.validate.field).enum.not_in = 1
   ];
   // The time the Event occurred.
   google.protobuf.Timestamp event_time = 4 [(buf.validate.field).required = true];
   // The state of the delivery.
-  State state = 5 [
+  EventDeliveryState state = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).enum.not_in = 0
@@ -97,6 +77,32 @@ message EventDelivery {
   ];
   // The reason the last attempt failed.
   //
-  // Set if state is STATE_FAILED.
-  FailureReason last_failure_reason = 9 [(buf.validate.field).enum.defined_only = true];
+  // Unset if there have been no attempts or the last attempt succeeded.
+  EventDeliveryFailureReason last_failure_reason = 9 [(buf.validate.field).enum.defined_only = true];
+}
+
+// The state of an EventDelivery.
+enum EventDeliveryState {
+  EVENT_DELIVERY_STATE_UNSPECIFIED = 0;
+  // The Event has not been acknowledged yet and will be resent (or sent for the first time).
+  EVENT_DELIVERY_STATE_PENDING = 1;
+  // The receiver acknowledged the Event.
+  EVENT_DELIVERY_STATE_SUCCEEDED = 2;
+  // Every attempt failed. The Event will not be sent again unless redelivered.
+  EVENT_DELIVERY_STATE_FAILED = 3;
+}
+
+// The reason an attempt to send an Event failed.
+enum EventDeliveryFailureReason {
+  EVENT_DELIVERY_FAILURE_REASON_UNSPECIFIED = 0;
+  // The receiver responded with an HTTP status other than 200.
+  EVENT_DELIVERY_FAILURE_REASON_HTTP_ERROR = 1;
+  // The receiver responded with HTTP status 200 but an invalid Content-Type or body.
+  EVENT_DELIVERY_FAILURE_REASON_INVALID_ACKNOWLEDGEMENT = 2;
+  // The receiver did not respond in time.
+  EVENT_DELIVERY_FAILURE_REASON_TIMEOUT = 3;
+  // The receiver could not be reached.
+  EVENT_DELIVERY_FAILURE_REASON_CONNECTION_ERROR = 4;
+  // The BSR could not send the Event.
+  EVENT_DELIVERY_FAILURE_REASON_INTERNAL_ERROR = 5;
 }

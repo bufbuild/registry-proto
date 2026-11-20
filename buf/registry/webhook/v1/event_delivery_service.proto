@@ -29,8 +29,10 @@ service EventDeliveryService {
     option idempotency_level = NO_SIDE_EFFECTS;
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.get";
   }
-  // Send Events in STATE_PENDING or STATE_FAILED again.
-  rpc RedeliverEventDeliveries(RedeliverEventDeliveriesRequest) returns (RedeliverEventDeliveriesResponse) {
+  // Send Events in EVENT_DELIVERY_STATE_PENDING or EVENT_DELIVERY_STATE_FAILED again.
+  //
+  // A failed send is reflected in EventDelivery in the response, not as a connect error.
+  rpc RedeliverEvents(RedeliverEventsRequest) returns (RedeliverEventsResponse) {
     option (buf.registry.priv.extension.v1beta1.method).required_permission = "bsr.webhook.update";
   }
 }
@@ -61,7 +63,7 @@ message ListEventDeliveriesRequest {
   // Only return EventDeliveries in these states.
   //
   // If empty, EventDeliveries are not filtered by state.
-  repeated EventDelivery.State states = 5 [
+  repeated EventDeliveryState has_states = 5 [
     (buf.validate.field).repeated.unique = true,
     (buf.validate.field).repeated.items.enum.defined_only = true,
     (buf.validate.field).repeated.items.enum.not_in = 0
@@ -76,16 +78,16 @@ message ListEventDeliveriesResponse {
   repeated EventDelivery event_deliveries = 2;
 }
 
-message RedeliverEventDeliveriesRequest {
+message RedeliverEventsRequest {
   // The ids of the Events to send again.
   repeated string event_ids = 1 [
     (buf.validate.field).repeated.min_items = 1,
-    (buf.validate.field).repeated.max_items = 250,
+    (buf.validate.field).repeated.max_items = 10,
     (buf.validate.field).repeated.unique = true,
     (buf.validate.field).repeated.items.string.tuuid = true
   ];
 }
-message RedeliverEventDeliveriesResponse {
-  // The redelivered EventDeliveries in the same order as requested.
+message RedeliverEventsResponse {
+  // The EventDeliveries of the redelivered Events, in the same order as requested.
   repeated EventDelivery event_deliveries = 1 [(buf.validate.field).repeated.min_items = 1];
 }
